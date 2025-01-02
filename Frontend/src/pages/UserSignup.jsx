@@ -120,4 +120,4 @@ const UserSignup = () => {
   )
 }
 
-export default UserSignup
+export default UserSignup;
