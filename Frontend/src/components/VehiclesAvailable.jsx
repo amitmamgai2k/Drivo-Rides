@@ -3,7 +3,7 @@ import car from '../assets/car.png';
 import bike from '../assets/bike.png';
 import auto from '../assets/auto.png';
 import 'remixicon/fonts/remixicon.css'
-function VehiclesAvailable() {
+function VehiclesAvailable(props) {
     const vehiclesData = [
 
       { type: 'UberGo', price: '₹100', seats: 4, image: car, time:'2 mins away',para:'Affordable car rides for everyday use'},
@@ -12,10 +12,10 @@ function VehiclesAvailable() {
 
 ]
 return (
-    <div className=" flex flex-col  gap-4 p-4 w-full">
+    <div className="  flex flex-col  gap-4 p-4 w-full">
         <h1 className='font-bold text-2xl'>Choose a Vehicle</h1>
         {vehiclesData.map((vehicle, index) => (
-            <div key={index} className="flex border-2  active:border-black flex-row shadow-md rounded-lg overflow-hidden w-full">
+            <div onClick={() => {props.setConfirmRidePanel(true)}}  key={index} className="flex border-2  active:border-black flex-row shadow-md rounded-lg overflow-hidden w-full">
                 <img src={vehicle.image} alt={vehicle.type} className="vehicle-image w-30 h-20 bg-transparent object-cover" />
 
                 <div className=" flex flex-col justify-end pl-2 pb-2 ">
