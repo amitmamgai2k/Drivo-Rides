@@ -88,7 +88,7 @@ const RidePop = (props) => {
           onClick={()=>props.setConfirmRidePopupPanel(true)}
           className="w-full bg-black text-white py-4 rounded-lg font-semibold hover:bg-blue-400 transition-colors duration-200 cursor-pointer"
         >
-          Confirm Ride
+          Accept Ride
         </button>
       </div>
       <div className="mt-6">

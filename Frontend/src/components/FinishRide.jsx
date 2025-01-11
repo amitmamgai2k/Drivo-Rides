@@ -2,9 +2,7 @@ import React, { useState } from 'react';
 import { MapPin, ArrowLeft, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
-const ConfirmRidePopUp = (props) => {
-  const [otp, setOtp] = useState(['', '', '', '']);
-  const [error, setError] = useState('');
+const FinishRide = (props) => {
 
   const vehiclesData = [
     {
@@ -19,27 +17,7 @@ const ConfirmRidePopUp = (props) => {
 
   const vehicle = vehiclesData.length > 0 ? vehiclesData[0] : null;
 
-  const handleOtpChange = (index, value) => {
-    if (value.length <= 1 && /^\d*$/.test(value)) {
-      const newOtp = [...otp];
-      newOtp[index] = value;
-      setOtp(newOtp);
-      setError('');
 
-      // Auto-focus next input
-      if (value && index < 3) {
-        const nextInput = document.getElementById(`otp-${index + 1}`);
-        if (nextInput) nextInput.focus();
-      }
-    }
-  };
-
-  const handleKeyDown = (index, e) => {
-    if (e.key === 'Backspace' && !otp[index] && index > 0) {
-      const prevInput = document.getElementById(`otp-${index - 1}`);
-      if (prevInput) prevInput.focus();
-    }
-  };
 
   if (!vehicle) {
     return (
@@ -50,11 +28,11 @@ const ConfirmRidePopUp = (props) => {
   }
 
   return (
-    <div className="flex flex-col w-full px-6 pt-4">
+    <div className="flex flex-col w-full px-6 pt-4 mt-2">
       {/* Back Button */}
       <div className="mb-4">
         <button
-          onClick={() => props.setConfirmRidePopupPanel(false)}
+          onClick={() => props.setfinishRidePanel(false)}
           className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-6 h-6" />
@@ -106,26 +84,7 @@ const ConfirmRidePopUp = (props) => {
           </div>
         </div>
 
-        {/* OTP Input Section */}
-        <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Enter OTP</h3>
-          <div className="flex justify-center space-x-4">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                id={`otp-${index}`}
-                type="text"
-                value={digit}
-                onChange={(e) => handleOtpChange(index, e.target.value)}
-                onKeyDown={(e) => handleKeyDown(index, e)}
-                className="w-12 h-12 text-center text-xl border-2 border-gray-300 rounded-lg focus:border-black focus:outline-none"
-                maxLength={1}
-              />
-            ))}
-          </div>
-          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
-        </div>
-      </div>
+
 
       {/* Action Buttons */}
       <div className="mt-6 mb-3">
@@ -135,13 +94,14 @@ const ConfirmRidePopUp = (props) => {
           }}
           className="w-full flex items-center justify-center bg-black text-white py-4 rounded-lg font-semibold hover:bg-blue-400 transition-colors duration-200 cursor-pointer"
         >
-          Confirm
+          Finish Ride
         </Link>
+        <p className='text-center font- base text-sm text-gray-400 mt-2'>Click on Finish Ride button to finish the ride</p>
       </div>
-
+</div>
 
     </div>
   );
 };
 
-export default ConfirmRidePopUp;
+export default FinishRide;
