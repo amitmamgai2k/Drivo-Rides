@@ -4,6 +4,7 @@ import CaptainDetails from "../components/CaptainDetails";
 import RidePop from "../components/RidePop";
 import gsap from "gsap";
 import ConfirmRidePopUp from "../components/ConfirmRidePopUp";
+import MapBackGround from "../components/MapBackGround";
 
 const CaptainHome = () => {
   const [ridePopupPanel, setRidePopupPanel] = useState(true);
@@ -66,13 +67,7 @@ const CaptainHome = () => {
       </Link>
 
       {/* Map Section */}
-      <div className="h-3/5">
-        <img
-          src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
-          alt="Map background"
-          className="w-full h-full object-cover"
-        />
-      </div>
+      <MapBackGround/>
 
       {/* Captain Details */}
       <div className="h-2/5 p-4">

@@ -3,12 +3,13 @@ import { ChevronDown, Circle, MapPin } from 'lucide-react';
 import LocationSearchPanel from '../components/LocationSearchPanel';
 import { useRef } from 'react';
 import gsap from "gsap";
-
+import axios from 'axios';
 
 import VehiclesAvailable from '../components/VehiclesAvailable';
 import ConfirmedVehicle from '../components/ConfirmedVehicle';
 import LookingForDriver from '../components/LookingForDriver';
 import WaitForDriver from '../components/WaitForDriver';
+import MapBackGround from '../components/MapBackGround';
 
 const Home = () => {
   const [pickup, setPickup] = useState('');
@@ -18,11 +19,44 @@ const Home = () => {
   const[confirmRidePanel,setConfirmRidePanel] = useState(false);
  const [vehicleFound,setVehicleFound] = useState(false);
  const [waitingForDriver, setwaitingForDriver] = useState(false);
+ const [ pickupSuggestions, setPickupSuggestions ] = useState([])
+ const [ destinationSuggestions, setDestinationSuggestions ] = useState([])
+ const [ activeField, setActiveField ] = useState(null)
   const vehiclePanelRef = useRef(null);
   const confirmRidePanelRef = useRef(null);
   const vehiceleFoundRef = useRef(null);
   const waitingForDriverRef = useRef(null);
 
+  const handlePickupChange = async (e) => {
+    setPickup(e.target.value);
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
+        params: { address: e.target.value },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+          'Content-Type': 'application/json',
+        },
+      });
+      setPickupSuggestions(response.data.data || []); // Extract the 'data' array
+    } catch (error) {
+      console.error("Error fetching pickup suggestions:", error);
+    }
+  };
+
+  const handleDropChange = async (e) => {
+    setDrop(e.target.value);
+    try {
+      const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
+        params: { address: e.target.value },
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      setDestinationSuggestions(response.data.data || []); // Extract the 'data' array
+    } catch (error) {
+      console.error("Error fetching destination suggestions:", error);
+    }
+  };
   const handleFormSubmit = (e) => {
     e.preventDefault();
     console.log('Pickup:', pickup, 'Drop:', drop);
@@ -84,18 +118,8 @@ const Home = () => {
         <h1 className="text-4xl font-bold text-black">UBER</h1>
       </div>
 
-      {/* Map Background */}
-      <div onClick={() => setVehiclePanel(false)}
-        className={`h-full w-full transition-opacity duration-300 ${
-          panelOpen ? 'opacity-0' : 'opacity-100'
-        }`}
-      >
-        <img
-          src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
-          alt="Map background"
-          className="w-full h-full object-cover"
-        />
-      </div>
+      <MapBackGround panelOpen={panelOpen} setVehiclePanel={setVehiclePanel} />
+
 
       {/* Ride finder panel */}
       <div
@@ -135,28 +159,45 @@ const Home = () => {
             <div className="space-y-2">
               <input
                 value={pickup}
-                onChange={(e) => setPickup(e.target.value)}
-                onClick={() => setPanelOpen(true)}
+                onChange={handlePickupChange}
+                onClick={() => {setPanelOpen(true)
+                              setActiveField('pickup')
+                }}
                 className="w-full bg-gray-100 px-12 py-3 rounded-lg text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
                 placeholder="Enter pickup location"
               />
               <input
                 value={drop}
-                onChange={(e) => setDrop(e.target.value)}
-                onClick={() => setPanelOpen(true)}
+                onChange={handleDropChange}
+                onClick={() => {setPanelOpen(true)
+                              setActiveField('destination')
+                }}
                 className="w-full bg-gray-100 px-12 py-3 rounded-lg text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
                 placeholder="Enter destination"
               />
             </div>
           </form>
+          <button
+
+                        className='bg-black text-white px-4 py-2 rounded-lg mt-3 w-full'>
+                        Find Trip
+                    </button>
         </div>
 
         {/* Expandable panel content */}
         <div className={`${panelOpen ? 'block' : 'hidden'} p-5`}>
 
-         <LocationSearchPanel setPanelOpen={setPanelOpen}   setVehiclePanel={setVehiclePanel} />
+        <LocationSearchPanel
+  suggestions={activeField === 'pickup' ? pickupSuggestions : destinationSuggestions}
+  setPickup={setPickup}
+  setDrop={setDrop}
+  setPanelOpen={setPanelOpen}
+  setVehiclePanel={setVehiclePanel}
+  activeField={activeField}
+/>
+
 
         </div>
       </div>

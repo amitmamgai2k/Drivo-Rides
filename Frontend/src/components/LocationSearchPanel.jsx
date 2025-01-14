@@ -1,38 +1,35 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
-
-function LocationSearchPanel(props) {
-  const locations = [
-    { name: 'Downtown', description: 'City Center, Main Street' },
-    { name: 'Airport', description: 'International Terminal' },
-    { name: 'Shopping Mall', description: 'Central Mall, East Wing' },
-    { name: 'Central Park', description: 'Large park in the city center' },
-    { name: 'Museum of Art', description: 'Modern art collections' },
-    { name: 'Beachside', description: 'Coastal area, great for swimming' },
-    { name: 'Train Station', description: 'Main transit hub in the city' },
-  ];
+const LocationSearchPanel = ({ suggestions = [], setPickup, setDrop, activeField, setPanelOpen, setVehiclePanel }) => {
+  const handleSuggestionClick = (suggestion) => {
+    if (activeField === 'pickup') {
+      setPickup(suggestion); // Set the selected suggestion as pickup
+    } else if (activeField === 'destination') {
+      setDrop(suggestion); // Set the selected suggestion as drop
+    }
+    setPanelOpen(false);
+    setVehiclePanel(true);
+  };
 
   return (
-    <div className="p-5 bg-white rounded-lg shadow-md">
-      <h5 className="text-lg font-semibold mb-4">Popular Locations</h5>
-      <ul className="space-y-3 ">
-        {locations.map((location, index) => (
-          <li onClick={() =>{
-            props.setVehiclePanel(true)
-            props.setPanelOpen(false)}}
+    <div className="p-4">
+      <h3 className="text-lg font-semibold mb-4">Suggested Locations</h3>
+      <div className="space-y-3">
+        {suggestions.map((suggestion, index) => (
+          <div
             key={index}
-            className="p-3  border-2 active:border-black bg-gray-50 rounded-lg hover:bg-gray-100 cursor-pointer transition-colors flex items-start gap-3"
+            onClick={() => handleSuggestionClick(suggestion)}
+            className="flex items-center gap-3 p-3 hover:bg-gray-100 rounded-lg cursor-pointer transition-colors"
           >
-            <MapPin className="w-5 h-5 text-gray-500 mt-0.5 flex-shrink-0" />
-            <div >
-              <div className="font-medium">{location.name}</div>
-              <div className="text-sm text-gray-500">{location.description}</div>
+            <MapPin className="h-5 w-5 text-gray-500" />
+            <div>
+              <p className="font-medium">{suggestion}</p>
             </div>
-          </li>
+          </div>
         ))}
-      </ul>
+      </div>
     </div>
   );
-}
+};
 
 export default LocationSearchPanel;

@@ -74,17 +74,11 @@ module.exports.getSuggestions = async (req, res) => {
         const address = req.query.address; // Address passed as query parameter
         const suggestions = await mapsService.getSuggestions(address);
         res.status(200).json({
-            success: true,
-            message: "Suggestions fetched successfully",
+
             data: suggestions,
         });
     } catch (error) {
         console.error("Error fetching suggestions:", error.message);
         res.status(500).json({ error: "Unable to fetch suggestions" });
     }
-    res.status(200).json({
-            success: true,
-            message: "Suggestions fetched successfully",
-            data: suggestions,
-        })
-}
+};

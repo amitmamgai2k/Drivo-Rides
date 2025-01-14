@@ -1,51 +1,74 @@
-const rideModel = require("../models/ride.model");
-const mapService = require("../services/maps.service");
+const rideModel = require('../models/ride.model');
+const mapService = require('./maps.service');
 const crypto = require('crypto');
 
-async function getFare(origin,destination){
-    if(!origin||!destination){
-        throw new Error('Missing required fields');
+class RideService {
+    constructor() {
+        this.baseFare = {
+            auto: 30,
+            car: 50,
+            motorcycle: 20
+        };
+        this.farePerKm = {
+            auto: 10,
+            car: 15,
+            motorcycle: 8
+        };
     }
-    const distanceTime = await mapService.getDistanceTime(origin,destination);
 
-    const baseFare = {
-        auto:30,
-        car:50,
-        motorcycle:20
-    } // base fare in currency units
-    const farePerKm = {
-        auto: 10,
-        car: 15,
-        motorcycle: 8
-    };
+    async getFare(origin, destination) {
+        if (!origin || !destination) {
+            throw new Error('Missing required fields for fare calculation');
+        }
 
-    const fare = {
-        auto: baseFare.auto + (farePerKm.auto * distanceTime.distance),
-        car: baseFare.car + (farePerKm.car * distanceTime.distance),
-        motorcycle: baseFare.motorcycle + (farePerKm.motorcycle * distanceTime.distance)
-    };
+        const distanceTime = await mapService.getDistanceTimeForRide(origin, destination);
 
-    return fare;
-}
-function getOtp(num){
-    const otp = crypto.randomInt(Math.pow(10, num - 1), Math.pow(10, num)).toString();
-    return otp;
-}
-module.exports.createRide = async (user,origin,destination,vehicleType)=> {
-    if(!user||!origin||!destination||!vehicleType){
-        throw new Error('Missing required fields');
+        const fare = {
+            auto: this.baseFare.auto + (this.farePerKm.auto * distanceTime.distance),
+            car: this.baseFare.car + (this.farePerKm.car * distanceTime.distance),
+            motorcycle: this.baseFare.motorcycle + (this.farePerKm.motorcycle * distanceTime.distance)
+        };
+
+        // Round fares to 2 decimal places
+        Object.keys(fare).forEach(key => {
+            fare[key] = Math.round(fare[key] * 100) / 100;
+        });
+
+        return {
+            fare,
+            distanceTime
+        };
     }
-    const fare = await getFare(origin,destination);
-    const ride = rideModel.create({
-        user:user._id,
-        origin, // Address passed as query parameter
-        destination, // Address passed as query parameter
-         fare   : fare[vehicleType],
-         otp:getOtp(4),
 
+    getOtp(digits = 4) {
+        return crypto.randomInt(Math.pow(10, digits - 1), Math.pow(10, digits)).toString();
     }
-    );
-    return ride;
 
+    async createRide(user, origin, destination, vehicleType) {
+        if (!user || !origin || !destination || !vehicleType) {
+            throw new Error('Missing required fields for ride creation');
+        }
 
+        if (!['auto', 'car', 'motorcycle'].includes(vehicleType)) {
+            throw new Error('Invalid vehicle type');
+        }
+
+        const { fare, distanceTime } = await this.getFare(origin, destination);
+
+        const ride = await rideModel.create({
+            user: user._id,
+            origin,
+            destination,
+            price: fare[vehicleType],
+            duration: distanceTime.duration,
+            distance: distanceTime.distance,
+            otp: this.getOtp(4),
+            status: 'pending'
+        });
+        console.log(ride);
+
+        return ride;
+    }
 }
+
+module.exports = new RideService();

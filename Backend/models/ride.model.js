@@ -9,19 +9,33 @@ const rideSchema = new mongoose.Schema({
     captain: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'captain',
-        required: true
+        default: null
     },
     origin: {
-        type: String,
-        required: true
+        type: [Number], // [longitude, latitude]
+        required: true,
+        validate: {
+            validator: function(v) {
+                return Array.isArray(v) && v.length === 2 &&
+                       v.every(coord => typeof coord === 'number');
+            },
+            message: props => `${props.value} is not a valid coordinate pair!`
+        }
     },
     destination: {
-        type: String,
-        required: true
+        type: [Number], // [longitude, latitude]
+        required: true,
+        validate: {
+            validator: function(v) {
+                return Array.isArray(v) && v.length === 2 &&
+                       v.every(coord => typeof coord === 'number');
+            },
+            message: props => `${props.value} is not a valid coordinate pair!`
+        }
     },
     status: {
         type: String,
-        enum: ['pending', 'accepted', 'onride','completed', 'cancelled'],
+        enum: ['pending', 'accepted', 'onride', 'completed', 'cancelled'],
         default: 'pending'
     },
     duration: {
@@ -38,22 +52,23 @@ const rideSchema = new mongoose.Schema({
     },
     paymentID: {
         type: String,
-        required: true
+        default: null
     },
     orderID: {
         type: String,
-        required: true
+        default: null
     },
     signature: {
         type: String,
-        required: true
+        default: null
     },
-    otp:{
+    otp: {
         type: String,
-        required: true ,
+        required: true,
         select: false
-
     }
+}, {
+    timestamps: true
 });
 
 module.exports = mongoose.model('ride', rideSchema);
