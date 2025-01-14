@@ -107,3 +107,47 @@ module.exports.getSuggestions = async (address) => {
         throw new Error('Unable to fetch address suggestions');
     }
 };
+module.exports.getDistanceTimeForRide = async (origin, destination) => {
+    if (!origin || !destination) {
+        throw new Error('Both origin and destination coordinates are required.');
+    }
+
+    const apiKey = process.env.MAPS_API;
+    const url = 'https://api.openrouteservice.org/v2/matrix/driving-car';
+
+    try {
+        // Format coordinates as [longitude, latitude]
+        const coordinates = [
+            origin,      // [longitude, latitude] of origin
+            destination  // [longitude, latitude] of destination
+        ];
+
+        const response = await axios.post(
+            url,
+            {
+                locations: coordinates,
+                metrics: ["distance", "duration"],
+                units: "km"
+            },
+            {
+                headers: {
+                    Authorization: apiKey,
+                    'Content-Type': 'application/json',
+                }
+            }
+        );
+
+        // Extract distance and duration from matrix response
+        // Matrix response format: [[0,d],[d,0]] where d is the value
+        const distance = response.data.distances[0][1]; // Distance in kilometers
+        const duration = response.data.durations[0][1]; // Duration in seconds
+
+        return {
+            distance,
+            duration: duration / 60 // Convert to minutes
+        };
+    } catch (error) {
+        console.error('Error details:', error.response?.data || error.message);
+        throw new Error('Unable to fetch distance and time.');
+    }
+};

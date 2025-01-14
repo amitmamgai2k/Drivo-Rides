@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const { body } = require('express-validator');
+const { body,query } = require('express-validator');
 const rideController = require('../controllers/ride.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 
@@ -29,6 +29,25 @@ router.post('/create',
             .withMessage('Invalid vehicle type. Must be auto, car, or motorcycle')
     ],
     rideController.createRide
+);
+
+router.get('/get-fare',
+    authMiddleware.authUser,
+    [
+        query('originLat')
+            .isFloat()
+            .withMessage('Origin latitude must be a valid number'),
+        query('originLng')
+            .isFloat()
+            .withMessage('Origin longitude must be a valid number'),
+        query('destinationLat')
+            .isFloat()
+            .withMessage('Destination latitude must be a valid number'),
+        query('destinationLng')
+            .isFloat()
+            .withMessage('Destination longitude must be a valid number'),
+    ],
+    rideController.getFare
 );
 
 module.exports = router;

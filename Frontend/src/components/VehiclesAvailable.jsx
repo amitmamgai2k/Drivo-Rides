@@ -1,42 +1,65 @@
-import React from 'react'
-import car from '../assets/car.png';
-import bike from '../assets/bike.png';
-import auto from '../assets/auto.png';
-import 'remixicon/fonts/remixicon.css'
-function VehiclesAvailable(props) {
+import React from 'react';
+import { User } from 'lucide-react'; // Importing the User icon from lucide-react
+
+const VehiclesAvailable = (props) => {
+    console.log('props.fare:', props.fare);
+
     const vehiclesData = [
+        {
+            type: 'UberGo',
+            seats: 4,
+            time: '2 mins away',
+            para: 'Affordable car rides for everyday use',
+            image: 'https://swyft.pl/wp-content/uploads/2023/05/how-many-people-can-a-uberx-take.jpg',
+            fareKey: 'car',
+        },
+        {
+            type: 'Moto',
+            seats: 1,
+            time: '3 mins away',
+            para: 'Affordable bike rides for everyday use',
+            image: 'https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_638,w_956/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png',
+            fareKey: 'motorcycle',
+        },
+        {
+            type: 'UberAuto',
+            seats: 3,
+            time: '5 mins away',
+            para: 'Affordable auto rides for everyday use',
+            image: 'https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_368,w_552/v1648431773/assets/1d/db8c56-0204-4ce4-81ce-56a11a07fe98/original/Uber_Auto_558x372_pixels_Desktop.png',
+            fareKey: 'auto',
+        },
+    ];
 
-      { type: 'UberGo', price: '₹100', seats: 4, image: car, time:'2 mins away',para:'Affordable car rides for everyday use'},
-      { type: 'Moto', price: '₹50', seats: 2, image: bike , time:'5 mins away',para:'Affordable bike rides for everyday use'},
-      { type: 'UberAuto ', price: '₹40', seats: 3, image: auto, time:'10 mins away',para:'Affordable auto  rides for everyday use'},
+    return (
+        <div className="flex flex-col gap-4 p-4 mb-10 w-full">
+            <h1 className="font-bold text-2xl">Choose a Vehicle</h1>
+            {vehiclesData.map((vehicle, index) => (
+                <div
+                    key={index}
+                    onClick={() => {
+                        props.setConfirmRidePanel(true);
 
-]
-return (
-    <div className="  flex flex-col  gap-4 p-4 w-full">
-        <h1 className='font-bold text-2xl'>Choose a Vehicle</h1>
-        {vehiclesData.map((vehicle, index) => (
-            <div onClick={() => {props.setConfirmRidePanel(true)}}  key={index} className="flex border-2  active:border-black flex-row shadow-md rounded-lg overflow-hidden w-full">
-                <img src={vehicle.image} alt={vehicle.type} className="vehicle-image w-30 h-20 bg-transparent object-cover" />
-
-                <div className=" flex flex-col justify-end pl-2 pb-2 ">
-                <div className='flex   flex-row w-[100%]  px-2 ' >
-                    <div className="flex flex-col gap-2">
-                    <div className='flex flex-row gap-2 '>
-                    <h3 className="text-xl font-semibold">{vehicle.type}</h3>
-                    <p className="text-gray-600 font-bold "><i class="ri-user-3-fill"></i> {vehicle.seats}</p></div>
-                    <p className=' text-base'>{vehicle.time}</p>
-                    <p className='text-sm text-gray-700'>{vehicle.para}</p>
-                    <p></p>
+                        props.vehicleType(vehicle.fareKey);
+                    }}
+                    className="flex border-2 active:border-black mb-2 rounded-xl w-full p-3 items-center justify-between shadow-md"
+                >
+                    <img src={vehicle.image} alt={vehicle.type} className="h-10 w-20 object-cover rounded-md" />
+                    <div className="ml-2 w-1/2">
+                        <h4 className="font-medium text-base">
+                            {vehicle.type} <span><User className="inline-block" size={16} /> {vehicle.seats}</span>
+                        </h4>
+                        <h5 className="font-medium text-sm">{vehicle.time}</h5>
+                        <p className="font-normal text-xs text-gray-600">{vehicle.para}</p>
                     </div>
-                    <div><p className="text-gray-600 text-xl font-semibold"> {vehicle.price}</p></div>
-                    </div>
-
-
+                    {/* Handle undefined fare by providing a fallback value */}
+                    <h2 className="font-medium text-base">
+                        ₹{props.fare?.[vehicle.fareKey] || 'N/A'}
+                    </h2>
                 </div>
-            </div>
-        ))}
-    </div>
-)
-}
+            ))}
+        </div>
+    );
+};
 
-export default VehiclesAvailable
+export default VehiclesAvailable;

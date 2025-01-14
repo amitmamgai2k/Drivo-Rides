@@ -7,8 +7,8 @@ const LocationSearchPanel = ({ suggestions = [], setPickup, setDrop, activeField
     } else if (activeField === 'destination') {
       setDrop(suggestion); // Set the selected suggestion as drop
     }
-    setPanelOpen(false);
-    setVehiclePanel(true);
+    // setPanelOpen(false);
+    // setVehiclePanel(true);
   };
 
   return (

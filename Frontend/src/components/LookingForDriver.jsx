@@ -1,6 +1,6 @@
 import React from 'react'
 import { MapPin, ArrowLeft } from 'lucide-react';
-function LookingForDriver({setConfirmRidePanel, setVehiclePanel, setVehicleFound}) {
+function LookingForDriver(props) {
     const vehiclesData = [
         {
           img: 'https://www.pngplay.com/wp-content/uploads/8/Uber-PNG-Photos.png',
@@ -16,9 +16,9 @@ function LookingForDriver({setConfirmRidePanel, setVehiclePanel, setVehicleFound
       const vehicle = vehiclesData[0];
 
       const onBackClick = () => {
-        setVehicleFound(false); // Close Looking for Driver panel
-        setConfirmRidePanel(false); // Optionally, close Confirm Ride panel
-        setVehiclePanel(false); // Optionally, close Vehicles Available panel
+        props.setVehicleFound(false); // Close Looking for Driver panel
+        props.setConfirmRidePanel(false); // Optionally, close Confirm Ride panel
+        props.setVehiclePanel(false); // Optionally, close Vehicles Available panel
       };
   return (
     <div className="flex flex-col w-full h-full bg-white rounded-t-xl p-4">
@@ -37,13 +37,13 @@ function LookingForDriver({setConfirmRidePanel, setVehiclePanel, setVehicleFound
       <h2 className="text-2xl font-semibold"> Looking For a Driver</h2>
 
       {/* Vehicle Image */}
-      <div className="w-full h-40 bg-gray-100 rounded-lg overflow-hidden">
-        <img
-          src={vehicle.img}
-          alt="Vehicle"
-          className="w-full h-full object-contain"
-        />
-      </div>
+      <div className="relative w-full h-40 bg-gray-100 rounded-lg overflow-hidden ">
+  <img
+    src={vehicle.img }
+    alt="Vehicle"
+    className="absolute w-full h-full object-contain animate-carMove"
+  />
+</div>
 
       {/* Location Details */}
       <div className="space-y-4">

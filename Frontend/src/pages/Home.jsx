@@ -22,6 +22,9 @@ const Home = () => {
  const [ pickupSuggestions, setPickupSuggestions ] = useState([])
  const [ destinationSuggestions, setDestinationSuggestions ] = useState([])
  const [ activeField, setActiveField ] = useState(null)
+ const [fare, setfare] = useState({})
+ const [ vehicleType, setVehicleType ] = useState(null)
+ const [ ride, setRide ] = useState(null)
   const vehiclePanelRef = useRef(null);
   const confirmRidePanelRef = useRef(null);
   const vehiceleFoundRef = useRef(null);
@@ -106,6 +109,74 @@ const Home = () => {
 
    },[waitingForDriver])
 
+   async function findTrip() {
+    setPanelOpen(false);
+
+    try {
+        // First, get coordinates for pickup address
+        const pickupGeocode = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
+            params: { address: pickup },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            }
+        });
+
+        // Then get coordinates for destination address
+        const dropGeocode = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
+            params: { address: drop },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            }
+        });
+        const pickupCoordinates = pickupGeocode.data; // Example: { latitude: ..., longitude: ... }
+        const dropCoordinates = dropGeocode.data;
+        console.log("Pickup coordinates:", pickupCoordinates);
+        console.log("Drop coordinates:", dropCoordinates);
+
+        // Now call get-fare with the coordinates
+        const fareResponse = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/get-fare`, {
+            params: {
+                originLat: pickupGeocode.data.latitude,
+                originLng: pickupGeocode.data.longitude,
+                destinationLat: dropGeocode.data.latitude,
+                destinationLng: dropGeocode.data.longitude
+
+            },
+            headers: {
+                Authorization: `Bearer ${localStorage.getItem('token')}`,
+            },
+        });
+
+        console.log("Fare Response:", fareResponse.data);
+        setfare(fareResponse.data);
+        // setPickup(pickupCoordinates);
+        // console.log("pickup",pickup)
+        // setDrop(dropCoordinates);
+        // console.log("drop",drop)
+        setVehiclePanel(true);
+    } catch (error) {
+        console.error("Error fetching fare:", error);
+    }
+}
+function createRide(vehicleType) {
+  try{
+  const response = axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
+    origin: [pickup.longitude, pickup.latitude],
+    destination: [drop.longitude, drop.latitude],
+    vehicleType
+  }, {
+    headers: {
+      Authorization: `Bearer ${localStorage.getItem('token')}`,
+    }
+
+  })
+  console.log("Create Ride Debugger",response.data);
+  }   catch (error) {
+    console.error("Error creating ride:", error.response?.data || error.message);
+  }
+}
+
+
 
   return (
     <div className="relative h-screen w-screen  bg-gray-100">
@@ -180,7 +251,7 @@ const Home = () => {
             </div>
           </form>
           <button
-
+           onClick={findTrip}
                         className='bg-black text-white px-4 py-2 rounded-lg mt-3 w-full'>
                         Find Trip
                     </button>
@@ -193,6 +264,7 @@ const Home = () => {
   suggestions={activeField === 'pickup' ? pickupSuggestions : destinationSuggestions}
   setPickup={setPickup}
   setDrop={setDrop}
+
   setPanelOpen={setPanelOpen}
   setVehiclePanel={setVehiclePanel}
   activeField={activeField}
@@ -202,7 +274,9 @@ const Home = () => {
         </div>
       </div>
      <div ref = {vehiclePanelRef}  className=' fixed w-full bottom-0 translate-y-full bg-white px-3 py-8  z-50'>
-      <VehiclesAvailable setVehiclePanel={setVehiclePanel} setConfirmRidePanel = {setConfirmRidePanel}  />
+
+
+      <VehiclesAvailable   vehicleType={setVehicleType } fare = {fare} setVehiclePanel={setVehiclePanel} setConfirmRidePanel = {setConfirmRidePanel}  />
 
      </div>
      <div
@@ -213,6 +287,11 @@ const Home = () => {
   style={{ zIndex: 60 }} // Add this line
 >
   <ConfirmedVehicle
+  createRide={createRide}
+  pickup={pickup}
+  drop={drop}
+  fare={fare}
+  vehicleType={vehicleType}
     setConfirmRidePanel={setConfirmRidePanel}
     setVehicleFound={setVehicleFound}
   />
@@ -223,6 +302,11 @@ const Home = () => {
   style={{ zIndex: 100 }}
 >
   <LookingForDriver
+   createRide={createRide}
+   pickup={pickup}
+   drop={drop}
+   fare={fare}
+   vehicleType={vehicleType}
     setConfirmRidePanel={setConfirmRidePanel}
     setVehiclePanel={setVehiclePanel}
     setVehicleFound={setVehicleFound}

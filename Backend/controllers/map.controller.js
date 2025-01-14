@@ -12,12 +12,12 @@ module.exports.getAddressCoordinates = async (req, res) => {
 
     try {
         const address = req.query.address; // Address passed as a query parameter
-        const coordinates = await mapsService. getAddressCoordinates(address); // Fetch eLoc using the updated service function
+        const {latitude, longitude} = await mapsService. getAddressCoordinates(address); // Fetch eLoc using the updated service function
 
         res.status(200).json({
-            success: true,
-            message: "Coordinates fetched successfully",
-            data: { coordinates }, // Return eLoc in the response
+
+         latitude,
+         longitude
         });
     } catch (error) {
         console.error("Error fetching eLoc:", error.message);
