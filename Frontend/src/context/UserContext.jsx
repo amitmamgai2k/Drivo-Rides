@@ -8,7 +8,7 @@ function UserContext({ children }) {
     fullName: {
       firstName: '',
       lastName: '',
-    },
+    }
   });
 
   return (

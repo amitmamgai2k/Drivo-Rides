@@ -1,17 +1,31 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect,useContext } from "react";
 import { Link } from "react-router-dom";
 import CaptainDetails from "../components/CaptainDetails";
 import RidePop from "../components/RidePop";
 import gsap from "gsap";
 import ConfirmRidePopUp from "../components/ConfirmRidePopUp";
 import MapBackGround from "../components/MapBackGround";
-
+import { SocketContext } from '../context/SocketContext';
+import { CaptainDataContext } from "../context/CaptainContext";
 const CaptainHome = () => {
   const [ridePopupPanel, setRidePopupPanel] = useState(true);
   const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false);
 
   const ridePopupPanelRef = useRef(null);
   const confirmRidePopupPanelRef = useRef(null);
+  const{socket} = useContext(SocketContext);
+  const{captain} = useContext(CaptainDataContext);
+
+  useEffect(() => {
+      console.log("Full user object:", captain);
+      console.log(" user id:", captain.captain._id);
+      console.log("user name", captain.captain.fullname.firstname);
+
+      socket.emit("join", {
+          userId: captain?.captain?._id,  // Notice the double nesting
+          userType: "captain"
+      });
+  }, [captain]);
 
   // Animation for RidePop panel
   useEffect(() => {
@@ -65,29 +79,13 @@ const CaptainHome = () => {
       >
         <i className="ri-logout-box-r-line"></i>
       </Link>
-
+    <div className="h-3/5">
       {/* Map Section */}
-      <MapBackGround/>
-
+      <MapBackGround />
+</div>
       {/* Captain Details */}
-      <div className="h-2/5 p-4">
-        <div className="flex items-center justify-between gap-4 mb-10">
-          <div className="flex items-center gap-4">
-            <img
-              className="h-10 w-10 rounded-full object-cover"
-              src="https://rahahome.com/wp-content/uploads/2022/11/2-min-scaled.jpg"
-              alt="Captain"
-            />
-            <h4 className="text-lg font-medium">Amit Mamgai</h4>
-          </div>
-          <div className="text-center">
-            <h4 className="text-lg font-medium">₹200</h4>
-            <p className="text-sm text-gray-600">Earned</p>
-          </div>
-        </div>
 
         <CaptainDetails />
-      </div>
 
       {/* RidePop Panel */}
       <div

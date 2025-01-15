@@ -91,7 +91,7 @@ module.exports.getSuggestions = async (address) => {
         });
 
         // Log the response data for inspection
-        console.log("API Response Data:", response.data);
+
 
         // Check if there are any features in the response
        return response.data.features.map((feature) => feature.properties.name);

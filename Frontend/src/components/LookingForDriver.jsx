@@ -3,12 +3,15 @@ import { MapPin, ArrowLeft } from 'lucide-react';
 function LookingForDriver(props) {
     const vehiclesData = [
         {
-          img: 'https://www.pngplay.com/wp-content/uploads/8/Uber-PNG-Photos.png',
-          srcLocation: '562/11-A',
-          exactLocation: 'Kaikondrahalii, Bengaluru, Karnataka',
-          destLocation: 'Third Wave Coffee',
-          exactDestLocation: 'Plot no 417 sector2 HSR Layout, Bengaluru, Karnataka',
-          price: '193.20',
+          img1: '../src/assets/car.png',
+      img2:'../src/assets/bike.png',
+      img3:'../src/assets/auto.png',
+      img4:'../src/assets/Road.png',
+          srcLocation: 'Pickup Location',
+
+          destLocation: 'Dropoff Location',
+
+
           payMethod: 'Cash',
         },
       ];
@@ -26,7 +29,7 @@ function LookingForDriver(props) {
     <div className="mb-4">
       <button
         onClick={onBackClick}
-        className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-full transition-colors"
+        className="flex items-center space-x-2 hover:bg-gray-100  rounded-full transition-colors"
       >
         <ArrowLeft className="w-6 h-6" />
       </button>
@@ -37,12 +40,18 @@ function LookingForDriver(props) {
       <h2 className="text-2xl font-semibold"> Looking For a Driver</h2>
 
       {/* Vehicle Image */}
-      <div className="relative w-full h-40 bg-gray-100 rounded-lg overflow-hidden ">
-  <img
-    src={vehicle.img }
-    alt="Vehicle"
-    className="absolute w-full h-full object-contain animate-carMove"
+      <div className="relative w-full h-40  rounded-lg overflow-hidden  flex bg-cover bg-center  bg-no-repeat  "
+       style={{
+        backgroundImage: `url(${vehicle.img4})`,
+
+
+      }}
+      >
+
+     <img src={props.vehicleType === 'car' ? `${vehicle.img1}` : props.vehicleType === 'motorcycle' ? `${vehicle.img2}`: `${vehicle.img3}`} alt="Vehicle"
+    className="absolute w-full h-[50%]  object-contain mt-10 animate-carMove "
   />
+
 </div>
 
       {/* Location Details */}
@@ -54,7 +63,7 @@ function LookingForDriver(props) {
           </div>
           <div>
             <h3 className="font-semibold text-lg">{vehicle.srcLocation}</h3>
-            <p className="text-gray-600 text-sm">{vehicle.exactLocation}</p>
+            <p className="text-gray-600 text-sm">{props.pickup}</p>
           </div>
         </div>
 
@@ -65,7 +74,7 @@ function LookingForDriver(props) {
           </div>
           <div>
             <h3 className="font-semibold text-lg">{vehicle.destLocation}</h3>
-            <p className="text-gray-600 text-sm">{vehicle.exactDestLocation}</p>
+            <p className="text-gray-600 text-sm">{props.drop}</p>
           </div>
         </div>
       </div>
@@ -78,7 +87,7 @@ function LookingForDriver(props) {
         </div>
         <div>
           <p className="text-gray-600">Total Fare</p>
-          <p className="font-semibold">₹{vehicle.price}</p>
+          <p className="font-semibold">₹{props.fare[props.vehicleType]}</p>
         </div>
       </div>
     </div>

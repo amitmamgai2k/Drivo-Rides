@@ -1,4 +1,4 @@
-import React, { useState ,useEffect} from 'react';
+import React, { useState ,useEffect,useContext} from 'react';
 import { ChevronDown, Circle, MapPin } from 'lucide-react';
 import LocationSearchPanel from '../components/LocationSearchPanel';
 import { useRef } from 'react';
@@ -10,6 +10,8 @@ import ConfirmedVehicle from '../components/ConfirmedVehicle';
 import LookingForDriver from '../components/LookingForDriver';
 import WaitForDriver from '../components/WaitForDriver';
 import MapBackGround from '../components/MapBackGround';
+import { SocketContext } from '../context/SocketContext';
+import {UserDataContext} from '../context/UserContext'
 
 const Home = () => {
   const [pickup, setPickup] = useState('');
@@ -29,7 +31,16 @@ const Home = () => {
   const confirmRidePanelRef = useRef(null);
   const vehiceleFoundRef = useRef(null);
   const waitingForDriverRef = useRef(null);
+  const {socket} = useContext(SocketContext)
+  const {user}   = useContext(UserDataContext)
 
+  useEffect(() => {
+
+      socket.emit("join", {
+          userId: user?.user?._id,  // Notice the double nesting
+          userType: "user"
+      });
+  }, [user]);
   const handlePickupChange = async (e) => {
     setPickup(e.target.value);
     try {
@@ -108,6 +119,8 @@ const Home = () => {
 
 
    },[waitingForDriver])
+
+
 
    async function findTrip() {
     setPanelOpen(false);

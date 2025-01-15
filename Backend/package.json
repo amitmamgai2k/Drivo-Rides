@@ -23,6 +23,7 @@
     "mongoose": "^8.9.2",
     "nodemon": "^3.1.9",
     "parser": "^0.1.4",
-    "request": "^2.88.2"
+    "request": "^2.88.2",
+    "socket.io": "^4.8.1"
   }
 }
