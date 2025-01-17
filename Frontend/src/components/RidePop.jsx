@@ -4,9 +4,9 @@ import { MapPin, ArrowLeft,CreditCard } from 'lucide-react';
 const RidePop = (props) => {
   const vehiclesData = [
     {
-      srcLocation: '562/11-A',
+      srcLocation: 'Pickup Location',
       exactLocation: 'Kaikondrahalii, Bengaluru, Karnataka',
-      destLocation: 'Third Wave Coffee',
+      destLocation: 'Dropoff Location',
       exactDestLocation: 'Plot no 417 sector2 HSR Layout, Bengaluru, Karnataka',
       price: '193.20',
       payMethod: 'Cash',
@@ -46,8 +46,9 @@ const RidePop = (props) => {
               alt="Rider"
             />
             <div className="flex justify-between w-full">
-              <h4 className="text-lg font-medium">Amit Mamgai</h4>
-              <h4 className="text-lg font-medium">10KM</h4>
+              <h4 className="text-lg font-medium"> {props.ride?.user?.fullname?.firstname || "Unknown"} {props.ride?.user?.fullname?.lastname || ""}</h4>
+
+              <h4 className="text-lg font-medium">{props.ride?.distance} Km</h4>
             </div>
           </div>
         </div>
@@ -58,14 +59,14 @@ const RidePop = (props) => {
             <MapPin className="w-5 h-5 text-gray-500" />
             <div>
               <h3 className="font-semibold text-lg">{vehicle.srcLocation}</h3>
-              <p className="text-gray-600 text-sm">{vehicle.exactLocation}</p>
+              <p className="text-gray-600 text-sm">{props.ride?.origin}</p>
             </div>
           </div>
           <div className="flex items-start space-x-3">
             <MapPin className="w-5 h-5 text-gray-500" />
             <div>
               <h3 className="font-semibold text-lg">{vehicle.destLocation}</h3>
-              <p className="text-gray-600 text-sm">{vehicle.exactDestLocation}</p>
+              <p className="text-gray-600 text-sm">{props.ride?.destination}</p>
             </div>
           </div>
         </div>
@@ -76,7 +77,7 @@ const RidePop = (props) => {
            <CreditCard className='w-6 h-6 text-gray-500'/>
             </div>
             <div className='flex flex-col'>
-            <p className="font-semibold text-lg">₹{vehicle.price}</p>
+            <p className="font-semibold text-lg">₹{props.ride?.price}</p>
             <p className="font-extralight text-small">{vehicle.payMethod}</p>
           </div>
         </div>
@@ -85,7 +86,9 @@ const RidePop = (props) => {
       {/* Action Buttons */}
       <div className="mt-6">
         <button
-          onClick={()=>props.setConfirmRidePopupPanel(true)}
+          onClick={()=>{props.setConfirmRidePopupPanel(true)
+           props.confirmRide()
+            }}
           className="w-full bg-black text-white py-4 rounded-lg font-semibold hover:bg-blue-400 transition-colors duration-200 cursor-pointer"
         >
           Accept Ride

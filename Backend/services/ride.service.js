@@ -51,7 +51,13 @@ const createRide = async (user, origin, destination, vehicleType) => {
     if (!user || !origin || !destination || !vehicleType) {
         throw new Error('Missing required fields for ride creation');
     }
+    // const originCoordinates = await mapService.getAddressCoordinates(origin);
+    //     // Then get coordinates for destination
+    //     const destinationCoordinates = await mapService.getAddressCoordinates(destination);
 
+    //     // Extract coordinates from responses
+    //     const originCoords = [originCoordinates.longitude, originCoordinates.latitude];
+    //     const destinationCoords = [destinationCoordinates.longitude, destinationCoordinates.latitude];
     if (!['auto', 'car', 'motorcycle'].includes(vehicleType)) {
         throw new Error('Invalid vehicle type');
     }
@@ -62,6 +68,8 @@ const createRide = async (user, origin, destination, vehicleType) => {
         user: user._id,
         origin,
         destination,
+        // originText: origin,
+        // destinationText: destination,
         price: fare[vehicleType],
         duration: distanceTime.duration,
         distance: distanceTime.distance,
@@ -72,9 +80,26 @@ const createRide = async (user, origin, destination, vehicleType) => {
     console.log(ride);
     return ride;
 };
+const confirmRide = async (rideId,captain) => {
+    if(!rideId){
+        throw new Error('Missing required fields for ride creation');
+    }
+    await rideModel.findOneAndUpdate({ _id: rideId }, { status: 'accepted',captain :captain._id });
+    const ride   = await rideModel.findOne({_id:ride}).populate('user');
+    if(!ride){
+        throw new Error('Ride not found');
+    }
+    ride.status = 'accepted';
+
+    return ride.save();
+}
+
+
+
 
 module.exports = {
     getFare,
     getOtp,
-    createRide
+    createRide,
+    confirmRide
 };

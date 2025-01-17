@@ -31,6 +31,7 @@ router.post('/create',
     rideController.createRide
 );
 
+
 router.get('/get-fare',
     authMiddleware.authUser,
     [
@@ -49,5 +50,9 @@ router.get('/get-fare',
     ],
     rideController.getFare
 );
+router.post('/confirm',authMiddleware.authCaptain,
+    body('rideId').isMongoId().withMessage('Invalid ride ID'),
+
+    rideController.confirmRide);
 
 module.exports = router;

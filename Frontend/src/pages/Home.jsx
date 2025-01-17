@@ -41,6 +41,18 @@ const Home = () => {
           userType: "user"
       });
   }, [user]);
+
+  socket.on('ride-confirmed', ride => {
+    console.log("Ride confirmed:", ride);
+    setwaitingForDriver(true);
+    setVehicleFound(false);
+    setRide(ride)
+  });
+//   socket.on('ride-started', ride => {
+//     console.log("ride")
+//     setWaitingForDriver(false)
+//     navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
+// })
   const handlePickupChange = async (e) => {
     setPickup(e.target.value);
     try {
@@ -171,11 +183,33 @@ const Home = () => {
         console.error("Error fetching fare:", error);
     }
 }
-function createRide(vehicleType) {
+ async function createRide() {
+
+
+
   try{
-  const response = axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
-    origin: [pickup.longitude, pickup.latitude],
-    destination: [drop.longitude, drop.latitude],
+    // First, get coordinates for pickup address
+    const pickupGeocode = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
+      params: { address: pickup },
+      headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      }
+  });
+
+  // Then get coordinates for destination address
+  const dropGeocode = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
+      params: { address: drop },
+      headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+      }
+  });
+
+  const origin = [pickupGeocode.data.longitude, pickupGeocode.data.latitude];
+  const destination = [dropGeocode.data.longitude, dropGeocode.data.latitude];
+
+  const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
+    origin,
+    destination,
     vehicleType
   }, {
     headers: {
@@ -184,13 +218,14 @@ function createRide(vehicleType) {
 
   })
   console.log("Create Ride Debugger",response.data);
+
+
+
+
   }   catch (error) {
     console.error("Error creating ride:", error.response?.data || error.message);
   }
 }
-
-
-
   return (
     <div className="relative h-screen w-screen  bg-gray-100">
       {/* UBER Text at top */}
@@ -289,7 +324,7 @@ function createRide(vehicleType) {
      <div ref = {vehiclePanelRef}  className=' fixed w-full bottom-0 translate-y-full bg-white px-3 py-8  z-50'>
 
 
-      <VehiclesAvailable   vehicleType={setVehicleType } fare = {fare} setVehiclePanel={setVehiclePanel} setConfirmRidePanel = {setConfirmRidePanel}  />
+      <VehiclesAvailable   vehicleType={vehicleType}   setVehicleType={setVehicleType } fare = {fare} setVehiclePanel={setVehiclePanel} setConfirmRidePanel = {setConfirmRidePanel}  />
 
      </div>
      <div
@@ -305,13 +340,14 @@ function createRide(vehicleType) {
   drop={drop}
   fare={fare}
   vehicleType={vehicleType}
+
     setConfirmRidePanel={setConfirmRidePanel}
     setVehicleFound={setVehicleFound}
   />
 </div>
 <div
   ref={vehiceleFoundRef}
-  className='fixed w-full bottom-0  h-screen bg-white px-3 py-3 '
+  className={`fixed w-full bottom-0  h-screen bg-white px-3 py-3 ${vehicleFound ? 'translate-y-0' : 'translate-y-full'}` }
   style={{ zIndex: 100 }}
 >
   <LookingForDriver
@@ -320,8 +356,7 @@ function createRide(vehicleType) {
    drop={drop}
    fare={fare}
    vehicleType={vehicleType}
-    setConfirmRidePanel={setConfirmRidePanel}
-    setVehiclePanel={setVehiclePanel}
+
     setVehicleFound={setVehicleFound}
   />
 </div>
@@ -330,7 +365,8 @@ function createRide(vehicleType) {
   className='fixed w-full bottom-0  h-screen bg-white px-3 py-3 '
 
 >
-  <WaitForDriver waitingForDriver={waitingForDriver} setwaitingForDriver={setwaitingForDriver}
+  <WaitForDriver waitingForDriver={waitingForDriver} setwaitingForDriver={setwaitingForDriver}   ride={ride}
+                    setVehicleFound={setVehicleFound}
 
   />
 </div>

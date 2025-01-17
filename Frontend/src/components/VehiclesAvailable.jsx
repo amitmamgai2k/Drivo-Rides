@@ -38,9 +38,12 @@ const VehiclesAvailable = (props) => {
                 <div
                     key={index}
                     onClick={() => {
+                        console.log("Vehicle type selected:", vehicle.fareKey);
                         props.setConfirmRidePanel(true);
 
-                        props.vehicleType(vehicle.fareKey);
+                        props.setVehicleType(vehicle.fareKey);
+
+
                     }}
                     className="flex border-2 active:border-black mb-2 rounded-xl w-full p-3 items-center justify-between shadow-md"
                 >

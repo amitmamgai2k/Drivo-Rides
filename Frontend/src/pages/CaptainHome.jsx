@@ -7,42 +7,93 @@ import ConfirmRidePopUp from "../components/ConfirmRidePopUp";
 import MapBackGround from "../components/MapBackGround";
 import { SocketContext } from '../context/SocketContext';
 import { CaptainDataContext } from "../context/CaptainContext";
+
 const CaptainHome = () => {
-  const [ridePopupPanel, setRidePopupPanel] = useState(true);
+  const [ridePopupPanel, setRidePopupPanel] = useState(false);
   const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false);
+  const[ride,setRide] = useState(null)
 
   const ridePopupPanelRef = useRef(null);
   const confirmRidePopupPanelRef = useRef(null);
   const{socket} = useContext(SocketContext);
   const{captain} = useContext(CaptainDataContext);
 
-  useEffect(() => {
-      console.log("Full user object:", captain);
-      console.log(" user id:", captain.captain._id);
-      console.log("user name", captain.captain.fullname.firstname);
 
+
+  // useEffect(() => {
+  //   socket.on("new-ride", (data) => {
+  //     console.log("Ride request received:", data);
+  //         setRide(data);
+  //         setRidePopupPanel(true);
+
+
+  //   })
+  // }, []);
+
+  useEffect(() => {
       socket.emit("join", {
           userId: captain?.captain?._id,  // Notice the double nesting
           userType: "captain"
       });
-  }, [captain]);
+      const updateLocation = () => {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition((position) => {
+
+
+        socket.emit("update-location-captain", {
+          userId: captain?.captain?._id,
+          location: {
+            latitude:position.coords.latitude,
+            longitude:position.coords.longitude
+          }
+
+        });
+          });
+        }
+      };
+
+       const locationInterval = setInterval(updateLocation, 10000);
+      updateLocation();
+
+     //return () => clearInterval(locationInterval);
+
+  }, []);
+  socket.on('new-ride', (data) => {
+    console.log("Ride request received:", data);
+        setRide(data);
+        setRidePopupPanel(true);
+
+
+  })
+
+ async function confirmRide() {
+const response  = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm`, {
+
+  rideId:ride._id,
+  captainId:captain.captain._id,
+
+
+},{headers: {
+  Authorization: `Bearer ${localStorage.getItem('token')}`,
+}})
+ setConfirmRidePopupPanel(true);
+ setRidePopupPanel(false);
+
+ }
 
   // Animation for RidePop panel
-  useEffect(() => {
+  useEffect(function () {
     if (ridePopupPanel) {
-      gsap.to(ridePopupPanelRef.current, {
-        y: 0,
-        duration: 0.5,
-        ease: "power3.out",
-      });
+        gsap.to(ridePopupPanelRef.current, {
+            transform: 'translateY(0)'
+        })
     } else {
-      gsap.to(ridePopupPanelRef.current, {
-        y: "100%",
-        duration: 0.5,
-        ease: "power3.in",
-      });
+        gsap.to(ridePopupPanelRef.current, {
+            transform: 'translateY(100%)'
+        })
     }
-  }, [ridePopupPanel]);
+}, [ ridePopupPanel ])
+
 
   // Animation for ConfirmRidePopUp panel
   useEffect(() => {
@@ -62,7 +113,7 @@ const CaptainHome = () => {
   }, [confirmRidePopupPanel]);
 
   return (
-    <div className="h-screen relative overflow-hidden">
+    <div className="h-screen ">
       {/* Header Section */}
       <div className="absolute top-5 left-5 z-10">
         <img
@@ -84,8 +135,8 @@ const CaptainHome = () => {
       <MapBackGround />
 </div>
       {/* Captain Details */}
+    <div className="h-2/5 p-6">   <CaptainDetails /></div>
 
-        <CaptainDetails />
 
       {/* RidePop Panel */}
       <div
@@ -93,8 +144,10 @@ const CaptainHome = () => {
         className="fixed w-full h-auto bottom-0 bg-white px-4 py-6 z-50 transform translate-y-full shadow-lg"
       >
         <RidePop
+        ride={ride}
           setRidePopupPanel={setRidePopupPanel}
           setConfirmRidePopupPanel={setConfirmRidePopupPanel}
+           confirmRide = {confirmRide}
         />
       </div>
 

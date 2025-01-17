@@ -5,7 +5,13 @@ import 'remixicon/fonts/remixicon.css';
 function CaptainDetails() {
     const { captain } = useContext(CaptainDataContext);
   // console.log('captaindata',captain.captain.fullname.firstname);
-
+  if (!captain || !captain.captain) {
+    return (
+        <div className="h-2/5 p-4">
+            <p>Loading Captain Details...</p>
+        </div>
+    );
+}
 
   return (
 
@@ -18,7 +24,7 @@ function CaptainDetails() {
             src="https://rahahome.com/wp-content/uploads/2022/11/2-min-scaled.jpg"
             alt="Captain"
           />
-          <h4 className="text-lg font-medium">{captain.captain.fullname.firstname} {captain.captain.fullname.lastname}</h4>
+          <h4 className="text-lg font-medium">{captain?.captain?.fullname?.firstname + " " + captain?.captain?.fullname?.lastname}</h4>
         </div>
         <div className="text-center">
           <h4 className="text-lg font-medium">₹200</h4>

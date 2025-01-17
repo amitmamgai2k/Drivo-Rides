@@ -33,6 +33,13 @@ const rideSchema = new mongoose.Schema({
             message: props => `${props.value} is not a valid coordinate pair!`
         }
     },
+    // originText:{
+    //       type: String,
+    // },
+    // destinationText: {
+    //     type: String,
+    // },
+
     status: {
         type: String,
         enum: ['pending', 'accepted', 'onride', 'completed', 'cancelled'],
@@ -44,7 +51,7 @@ const rideSchema = new mongoose.Schema({
     },
     distance: {
         type: Number,
-        required: true
+        required: true,
     },
     price: {
         type: Number,
@@ -71,4 +78,5 @@ const rideSchema = new mongoose.Schema({
     timestamps: true
 });
 
-module.exports = mongoose.model('ride', rideSchema);
+const rideModel = mongoose.model('ride', rideSchema);
+module.exports = rideModel

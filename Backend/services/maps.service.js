@@ -1,5 +1,5 @@
 const axios = require('axios');
-
+const CaptainModel = require('../models/captain.model');
 module.exports.getAddressCoordinates = async (address) => {
     try {
         const apiKey = process.env.MAPS_API; // Your API key stored in an environment variable
@@ -139,7 +139,7 @@ module.exports.getDistanceTimeForRide = async (origin, destination) => {
 
         // Extract distance and duration from matrix response
         // Matrix response format: [[0,d],[d,0]] where d is the value
-        const distance = response.data.distances[0][1]; // Distance in kilometers
+        const distance = parseFloat(response.data.distances[0][1]).toFixed(1);    // Distance in kilometers
         const duration = response.data.durations[0][1]; // Duration in seconds
 
         return {
@@ -151,3 +151,14 @@ module.exports.getDistanceTimeForRide = async (origin, destination) => {
         throw new Error('Unable to fetch distance and time.');
     }
 };
+module.exports.getCaptainInTheRadius = async (latitude, longitude, radius) => {
+    const captains = await CaptainModel.find({
+        location:{
+            $geoWithin: {
+                $centerSphere:[[longitude, latitude], radius/6371] // Radius in kilometers
+        }
+
+}
+    });
+    return captains;
+}
