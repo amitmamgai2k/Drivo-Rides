@@ -80,20 +80,25 @@ const createRide = async (user, origin, destination, vehicleType) => {
     console.log(ride);
     return ride;
 };
-const confirmRide = async (rideId,captain) => {
-    if(!rideId){
-        throw new Error('Missing required fields for ride creation');
+const confirmRide = async ({ rideId, captain }) => {
+    if (!rideId || !captain) {
+        throw new Error('Missing required fields for ride confirmation');
     }
-    await rideModel.findOneAndUpdate({ _id: rideId }, { status: 'accepted',captain :captain._id });
-    const ride   = await rideModel.findOne({_id:ride}).populate('user');
-    if(!ride){
+
+    // Update ride with captain and status
+    await rideModel.findOneAndUpdate(
+        { _id: rideId },
+        { status: 'accepted', captain: captain._id }
+    );
+
+    // Fetch the updated ride and populate user
+    const ride = await rideModel.findOne({ _id: rideId }).populate('user');
+    if (!ride) {
         throw new Error('Ride not found');
     }
-    ride.status = 'accepted';
 
-    return ride.save();
-}
-
+    return ride;
+};
 
 
 

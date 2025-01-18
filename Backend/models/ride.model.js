@@ -33,12 +33,7 @@ const rideSchema = new mongoose.Schema({
             message: props => `${props.value} is not a valid coordinate pair!`
         }
     },
-    // originText:{
-    //       type: String,
-    // },
-    // destinationText: {
-    //     type: String,
-    // },
+
 
     status: {
         type: String,

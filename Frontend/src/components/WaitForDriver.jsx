@@ -12,7 +12,7 @@ const WaitForDriver = (props) => {
           alt="Driver"
           className="w-24 h-24 rounded-full"
         />
-        <h2 className="text-2xl font-bold">SANTH</h2>
+        <h2 className="text-2xl font-bold">{props.ride?.captain?.fullname?.firstname ||'unknown'}</h2>
         <p className="text-gray-500">KA15AK00-0</p>
         <p className="text-gray-500">White Suzuki S-Presso LXI ★ 4.9</p>
         <p className="text-2xl font-bold">2 min</p>

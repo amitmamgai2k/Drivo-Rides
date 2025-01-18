@@ -91,7 +91,7 @@ const RidePop = (props) => {
             }}
           className="w-full bg-black text-white py-4 rounded-lg font-semibold hover:bg-blue-400 transition-colors duration-200 cursor-pointer"
         >
-          Accept Ride
+          Accept
         </button>
       </div>
       <div className="mt-6">
@@ -99,7 +99,7 @@ const RidePop = (props) => {
           onClick={() =>  props.setRidePopupPanel(false)}
           className="w-full bg-green-800 text-white py-4 rounded-lg font-semibold hover:bg-blue-800 transition-colors duration-200 cursor-pointer"
         >
-          Ignore
+          Reject
         </button>
       </div>
     </div>

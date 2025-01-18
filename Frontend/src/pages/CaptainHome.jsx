@@ -7,6 +7,7 @@ import ConfirmRidePopUp from "../components/ConfirmRidePopUp";
 import MapBackGround from "../components/MapBackGround";
 import { SocketContext } from '../context/SocketContext';
 import { CaptainDataContext } from "../context/CaptainContext";
+import axios from "axios";
 
 const CaptainHome = () => {
   const [ridePopupPanel, setRidePopupPanel] = useState(false);
@@ -31,33 +32,46 @@ const CaptainHome = () => {
   // }, []);
 
   useEffect(() => {
-      socket.emit("join", {
-          userId: captain?.captain?._id,  // Notice the double nesting
-          userType: "captain"
-      });
-      const updateLocation = () => {
+    // Check if captain data exists
+    if (!captain?.captain?._id) {
+        console.log("Waiting for captain data...");
+        return;
+    }
+
+    console.log("Captain data loaded:", captain?.captain?._id);
+
+    // Join socket room
+    socket.emit("join", {
+        userType: "captain",
+        userId: captain.captain._id,
+    });
+
+    // Location update function
+    const updateLocation = () => {
         if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition((position) => {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const locationData = {
+                    userId: captain.captain._id,
+                    location: {
+                        latitude: position.coords.latitude,
+                        longitude: position.coords.longitude
+                    }
+                };
 
 
-        socket.emit("update-location-captain", {
-          userId: captain?.captain?._id,
-          location: {
-            latitude:position.coords.latitude,
-            longitude:position.coords.longitude
-          }
-
-        });
-          });
+            });
         }
-      };
+    };
 
-       const locationInterval = setInterval(updateLocation, 10000);
-      updateLocation();
+    const locationInterval = setInterval(updateLocation, 10000);
+    updateLocation(); // Initial update
 
-     //return () => clearInterval(locationInterval);
+    // Cleanup
+    return () => clearInterval(locationInterval);
 
-  }, []);
+}, [captain, socket]); // Add captain to dependencies
+
+
   socket.on('new-ride', (data) => {
     console.log("Ride request received:", data);
         setRide(data);
@@ -66,20 +80,35 @@ const CaptainHome = () => {
 
   })
 
- async function confirmRide() {
-const response  = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm`, {
+  async function confirmRide() {
+    // Add the captain's ID before making the API request
+    console.log("Ride id :", ride._id);
+    console.log("Captain  id:", captain.captain._id);
+    const captainId = captain.captain._id;
 
-  rideId:ride._id,
-  captainId:captain.captain._id,
 
+    if (!captainId) {
+      console.error("Captain ID is missing.");
+      return;
+    }
 
-},{headers: {
-  Authorization: `Bearer ${localStorage.getItem('token')}`,
-}})
- setConfirmRidePopupPanel(true);
- setRidePopupPanel(false);
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confirm`, {
+        rideId: ride._id,
+        captainId: captainId, // Manually include captain's ID
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
 
- }
+      console.log("Ride confirmed:", response.data);
+      setConfirmRidePopupPanel(true);
+      setRidePopupPanel(false);
+    } catch (error) {
+      console.error("Error confirming ride:", error.response?.data || error.message);
+    }
+  }
 
   // Animation for RidePop panel
   useEffect(function () {
@@ -144,7 +173,7 @@ const response  = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confi
         className="fixed w-full h-auto bottom-0 bg-white px-4 py-6 z-50 transform translate-y-full shadow-lg"
       >
         <RidePop
-        ride={ride}
+           ride={ride}
           setRidePopupPanel={setRidePopupPanel}
           setConfirmRidePopupPanel={setConfirmRidePopupPanel}
            confirmRide = {confirmRide}
@@ -157,7 +186,7 @@ const response  = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/confi
         className="fixed w-full object-cover top-0 bg-white px-6   z-50 transform translate-y-full shadow-lg"
       >
         <ConfirmRidePopUp
-          setConfirmRidePopupPanel={setConfirmRidePopupPanel} setRidePopupPanel={setRidePopupPanel}
+             ride={ride} setConfirmRidePopupPanel={setConfirmRidePopupPanel} setRidePopupPanel={setRidePopupPanel}
         />
       </div>
     </div>

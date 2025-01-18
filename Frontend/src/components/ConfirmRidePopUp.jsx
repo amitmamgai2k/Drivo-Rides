@@ -8,9 +8,9 @@ const ConfirmRidePopUp = (props) => {
 
   const vehiclesData = [
     {
-      srcLocation: '562/11-A',
+      srcLocation: 'PickUp Location',
       exactLocation: 'Kaikondrahalii, Bengaluru, Karnataka',
-      destLocation: 'Third Wave Coffee',
+      destLocation: 'DropOff Location',
       exactDestLocation: 'Plot no 417 sector2 HSR Layout, Bengaluru, Karnataka',
       price: '193.20',
       payMethod: 'Cash',
@@ -73,8 +73,8 @@ const ConfirmRidePopUp = (props) => {
               alt="Rider"
             />
             <div className="flex justify-between w-full">
-              <h4 className="text-lg font-medium">Amit Mamgai</h4>
-              <h4 className="text-medium font-medium">10 KM</h4>
+              <h4 className="text-lg font-medium">{props.ride?.user?.fullname?.firstname || "Unknown"} {props.ride?.user?.fullname?.lastname || ""}</h4>
+              <h4 className="text-medium font-medium">{props.ride?.distance} Km</h4>
             </div>
           </div>
         </div>
@@ -85,14 +85,14 @@ const ConfirmRidePopUp = (props) => {
             <MapPin className="w-5 h-5 text-gray-500" />
             <div>
               <h3 className="font-semibold text-lg">{vehicle.srcLocation}</h3>
-              <p className="text-gray-600 text-sm">{vehicle.exactLocation}</p>
+              <p className="text-gray-600 text-sm">{props.ride?.origin}</p>
             </div>
           </div>
           <div className="flex items-start space-x-3">
             <MapPin className="w-5 h-5 text-gray-500" />
             <div>
               <h3 className="font-semibold text-lg">{vehicle.destLocation}</h3>
-              <p className="text-gray-600 text-sm">{vehicle.exactDestLocation}</p>
+              <p className="text-gray-600 text-sm">{props.ride?.destination}</p>
             </div>
           </div>
         </div>
@@ -101,7 +101,7 @@ const ConfirmRidePopUp = (props) => {
         <div className="flex space-x-2 items-center p-4 bg-gray-50 rounded-lg">
           <CreditCard className="w-6 h-6 text-gray-500" />
           <div className="flex flex-col">
-            <p className="font-semibold text-lg">₹{vehicle.price}</p>
+            <p className="font-semibold text-lg">₹{props.ride?.price}</p>
             <p className="font-extralight text-sm">{vehicle.payMethod}</p>
           </div>
         </div>

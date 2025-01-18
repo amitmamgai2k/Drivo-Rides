@@ -43,9 +43,10 @@ const Home = () => {
   }, [user]);
 
   socket.on('ride-confirmed', ride => {
-    console.log("Ride confirmed:", ride);
+    console.log("Ride confirmed at Home:", ride);
     setwaitingForDriver(true);
     setVehicleFound(false);
+    setVehiclePanel(false);
     setRide(ride)
   });
 //   socket.on('ride-started', ride => {
@@ -208,6 +209,7 @@ const Home = () => {
   const destination = [dropGeocode.data.longitude, dropGeocode.data.latitude];
 
   const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
+
     origin,
     destination,
     vehicleType

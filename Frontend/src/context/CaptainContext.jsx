@@ -32,7 +32,6 @@ function CaptainContext({ children }) {
         const response = await fetch(`${import.meta.env.VITE_BASE_URL}/captains/profile`, {
           method: 'GET',
           headers: {
-            'Content-Type': 'application/json',
             Authorization: `Bearer ${localStorage.getItem('token')}`,
           },
         });
@@ -44,10 +43,10 @@ function CaptainContext({ children }) {
 
         // Update the captain state with fetched data
         setCaptain(data);
+
+        setIsLoading(false);
       } catch (err) {
         setError(err.message);
-      } finally {
-        setIsLoading(false);
       }
     };
 
