@@ -1,10 +1,14 @@
 import React, { useState } from 'react';
 import { MapPin, ArrowLeft, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const ConfirmRidePopUp = (props) => {
   const [otp, setOtp] = useState(['', '', '', '']);
   const [error, setError] = useState('');
+
+  const navigate = useNavigate();
 
   const vehiclesData = [
     {
@@ -48,6 +52,23 @@ const ConfirmRidePopUp = (props) => {
       </div>
     );
   }
+const submitHandler = async() =>{
+
+  const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/start-ride`,{
+    rideId:props.ride._id,
+    otp:otp
+  },{
+    headers: {
+      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+    }
+  });
+  if(response.status===200){
+    props.setConfirmRidePopupPanel(false);
+    props.setRidePopupPanel(false);
+    navigate('/captain-riding');
+}
+
+}
 
   return (
     <div className="flex flex-col w-full px-6 pt-4">
@@ -118,6 +139,7 @@ const ConfirmRidePopUp = (props) => {
                 value={digit}
                 onChange={(e) => handleOtpChange(index, e.target.value)}
                 onKeyDown={(e) => handleKeyDown(index, e)}
+
                 className="w-12 h-12 text-center text-xl border-2 border-gray-300 rounded-lg focus:border-black focus:outline-none"
                 maxLength={1}
               />
@@ -129,14 +151,17 @@ const ConfirmRidePopUp = (props) => {
 
       {/* Action Buttons */}
       <div className="mt-6 mb-3">
-        <Link to="/captain-riding"
+        <button
           onClick={() => {
             props.setConfirmRidePopupPanel(false);
+            submitHandler()
+
           }}
+
           className="w-full flex items-center justify-center bg-black text-white py-4 rounded-lg font-semibold hover:bg-blue-400 transition-colors duration-200 cursor-pointer"
         >
           Confirm
-        </Link>
+        </button>
       </div>
 
 

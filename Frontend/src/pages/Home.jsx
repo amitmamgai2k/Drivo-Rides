@@ -4,6 +4,7 @@ import LocationSearchPanel from '../components/LocationSearchPanel';
 import { useRef } from 'react';
 import gsap from "gsap";
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 import VehiclesAvailable from '../components/VehiclesAvailable';
 import ConfirmedVehicle from '../components/ConfirmedVehicle';
@@ -33,6 +34,7 @@ const Home = () => {
   const waitingForDriverRef = useRef(null);
   const {socket} = useContext(SocketContext)
   const {user}   = useContext(UserDataContext)
+  const navigate = useNavigate();
 
   useEffect(() => {
 
@@ -49,11 +51,10 @@ const Home = () => {
     setVehiclePanel(false);
     setRide(ride)
   });
-//   socket.on('ride-started', ride => {
-//     console.log("ride")
-//     setWaitingForDriver(false)
-//     navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
-// })
+  socket.on('ride-started', ride => {
+    setwaitingForDriver(false)
+    navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
+})
   const handlePickupChange = async (e) => {
     setPickup(e.target.value);
     try {

@@ -2,6 +2,7 @@ const { get } = require('http');
 const rideModel = require('../models/ride.model');
 const mapService = require('./maps.service');
 const crypto = require('crypto');
+const { send } = require('process');
 
 // Constants for fare calculation
 const BASE_FARE = {
@@ -92,7 +93,8 @@ const confirmRide = async ({ rideId, captain }) => {
     );
 
     // Fetch the updated ride and populate user
-    const ride = await rideModel.findOne({ _id: rideId }).populate('user');
+    const ride = await rideModel.findOne({ _id: rideId }).populate('user').populate('captain').select('+otp');
+
     if (!ride) {
         throw new Error('Ride not found');
     }
@@ -101,7 +103,38 @@ const confirmRide = async ({ rideId, captain }) => {
 };
 
 
+ const startRide = async ({ rideId, otp ,captain}) => {
+    if (!rideId || !otp) {
+        throw new Error('Missing required fields for ride start');
+    }
 
+    // Update ride with captain and status
+    const ride =await rideModel.findOneAndDelete({
+        _id:rideId
+    }).populate('user').populate('captain').select('+otp');
+    if (!ride) {
+        throw new Error('Ride not found');
+    }
+    if(ride.otp !== otp){
+        throw new Error('Invalid OTP');
+    }
+    if(ride.status !== 'accepted'){
+        throw new Error('Ride is not accepted');
+    }
+    await rideModel.findOneAndUpdate(
+        { _id: rideId },
+        { status: 'ongoing' }
+
+    )
+    sendMessageToSocketId(ride.user.socketId, {
+        event: 'ride-started',
+        data: ride,
+    });
+
+    return ride;
+
+
+ }
 module.exports = {
     getFare,
     getOtp,
