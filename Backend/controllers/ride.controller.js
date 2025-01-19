@@ -15,6 +15,8 @@ const createRide = async (req, res) => {
         }
 
         const { origin, destination, vehicleType } = req.body;
+        console.log("Origin:", origin, "Destination:", destination, "Vehicle Type:", vehicleType);
+
 
         const ride = await rideService.createRide(
             req.user,
@@ -138,7 +140,7 @@ const startRide = async (req, res) => {
             errors: errors.array(),
         });
     }
-    const{rideId,otp} = req.body;
+    const{rideId,otp} = req.query;
 
     try {
         // Assuming `req.captain` contains the captain object
@@ -167,6 +169,43 @@ const startRide = async (req, res) => {
         });
     }
 }
+const endRide = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({
+            status: 'error',
+            errors: errors.array(),
+        });
+    }
+    const{rideId} = req.body;
 
 
-module.exports = {  createRide, getFare,confirmRide,startRide };
+    try {
+        // Assuming `req.captain` contains the captain object
+        const ride = await rideService.endRide({
+            rideId,
+            captain: req.captain,
+        });
+
+        // Notify the user via socket
+        sendMessageToSocketId(ride.user.socketId, {
+            event: 'ride-ended',
+            data: ride,
+        });
+
+        return res.status(200).json({
+            status: 'success',
+            message: 'Ride ended successfully',
+            data: ride,
+        });
+    } catch (error) {
+        console.error('Error ending ride:', error);
+        return res.status(error.status || 500).json({
+            status: 'error',
+            message: error.message || 'Internal server error',
+        });
+    }
+}
+
+
+module.exports = {  createRide, getFare,confirmRide,startRide,endRide };

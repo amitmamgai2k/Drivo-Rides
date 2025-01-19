@@ -52,23 +52,35 @@ const ConfirmRidePopUp = (props) => {
       </div>
     );
   }
-const submitHandler = async() =>{
+  const submitHandler = async () => {
+    try {
+      const otpString = otp.join(''); // Convert OTP array to a string
+     console.log("rideId", props.ride._id);
+      const response = await axios.get(
+        `${import.meta.env.VITE_BASE_URL}/rides/start-ride`,
+        {
+          params: {
+            rideId: props.ride._id,
+            otp: otpString, // Pass the OTP as a string
+          },
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}`,
+          },
+        }
+      );
 
-  const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/rides/start-ride`,{
-    rideId:props.ride._id,
-    otp:otp
-  },{
-    headers: {
-      'Authorization': `Bearer ${localStorage.getItem('token')}`,
+      if (response.status === 200) {
+        props.setConfirmRidePopupPanel(false);
+        props.setRidePopupPanel(false);
+       const   ride = props.ride;
+        // console.log("riding props data",props.ride);
+
+        navigate('/captain-riding', { state: { ride }   });
+      }
+    } catch (error) {
+      console.error('Error starting ride:', error);
     }
-  });
-  if(response.status===200){
-    props.setConfirmRidePopupPanel(false);
-    props.setRidePopupPanel(false);
-    navigate('/captain-riding');
-}
-
-}
+  };
 
   return (
     <div className="flex flex-col w-full px-6 pt-4">

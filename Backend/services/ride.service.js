@@ -2,7 +2,7 @@ const { get } = require('http');
 const rideModel = require('../models/ride.model');
 const mapService = require('./maps.service');
 const crypto = require('crypto');
-const { send } = require('process');
+const { sendMessageToSocketId } = require('../socket');
 
 // Constants for fare calculation
 const BASE_FARE = {
@@ -49,6 +49,8 @@ const getFare = async (origin, destination) => {
 
 // Function to create a ride
 const createRide = async (user, origin, destination, vehicleType) => {
+    console.log("Origin:", origin, "Destination:", destination, "Vehicle Type:", vehicleType, "User:", user);
+
     if (!user || !origin || !destination || !vehicleType) {
         throw new Error('Missing required fields for ride creation');
     }
@@ -65,21 +67,25 @@ const createRide = async (user, origin, destination, vehicleType) => {
 
     const { fare, distanceTime } = await getFare(origin, destination);
 
-    const ride = await rideModel.create({
-        user: user._id,
-        origin,
-        destination,
-        // originText: origin,
-        // destinationText: destination,
-        price: fare[vehicleType],
-        duration: distanceTime.duration,
-        distance: distanceTime.distance,
-        otp: getOtp(4),
-        status: 'pending'
-    });
+    try {
+            const ride = await rideModel.create({
+            user: user._id,
+            origin,
+            destination,
+            price: fare[vehicleType],
+            duration: distanceTime.duration,
+            distance: distanceTime.distance,
+            otp: getOtp(4),
+            status: 'pending'
+        });
 
-    console.log(ride);
-    return ride;
+        console.log('Ride created successfully:', ride);
+        return ride;
+    } catch (error) {
+        console.error('Error saving ride to database:', error);
+        throw new Error('Ride creation failed');
+    }
+
 };
 const confirmRide = async ({ rideId, captain }) => {
     if (!rideId || !captain) {
@@ -89,7 +95,9 @@ const confirmRide = async ({ rideId, captain }) => {
     // Update ride with captain and status
     await rideModel.findOneAndUpdate(
         { _id: rideId },
-        { status: 'accepted', captain: captain._id }
+        { status: 'accepted', captain: captain._id },
+        { new: true }
+
     );
 
     // Fetch the updated ride and populate user
@@ -104,12 +112,14 @@ const confirmRide = async ({ rideId, captain }) => {
 
 
  const startRide = async ({ rideId, otp ,captain}) => {
+    console.log("rideId",rideId,"otp",otp,"captain",captain);
+
     if (!rideId || !otp) {
         throw new Error('Missing required fields for ride start');
     }
 
     // Update ride with captain and status
-    const ride =await rideModel.findOneAndDelete({
+    const ride =await rideModel.findOne({
         _id:rideId
     }).populate('user').populate('captain').select('+otp');
     if (!ride) {
@@ -123,7 +133,8 @@ const confirmRide = async ({ rideId, captain }) => {
     }
     await rideModel.findOneAndUpdate(
         { _id: rideId },
-        { status: 'ongoing' }
+        { status: 'ongoing' },
+        { new: true }
 
     )
     sendMessageToSocketId(ride.user.socketId, {
@@ -135,9 +146,43 @@ const confirmRide = async ({ rideId, captain }) => {
 
 
  }
+ const endRide = async ({ rideId, captain }) => {
+    if (!rideId || !captain) {
+        throw new Error('Missing required fields for ride end');
+    }
+
+
+    // Update ride with captain and status
+    console.log(rideId,captain._id);
+
+
+    // Fetch the updated ride and populate user
+    const ride = await rideModel.findOne({ _id: rideId ,captain:captain._id}).populate('user').populate('captain');
+
+
+console.log("Ride found:", ride);
+if (ride && ride.captain._id.toString() !== captain._id.toString()) {
+    throw new Error('Captain mismatch for this ride');
+}
+
+
+    if (!ride) {
+        throw new Error('Ride not found');
+    }
+   if(ride.status !== 'ongoing'){
+    throw new Error('Ride is not ongoing');
+   }
+//    await rideModel.findOneAndUpdate(
+//     { _id: rideId },
+//     { status: 'completed' }
+// );
+    return ride;
+ }
 module.exports = {
     getFare,
     getOtp,
     createRide,
-    confirmRide
+    confirmRide,
+    startRide,
+    endRide
 };

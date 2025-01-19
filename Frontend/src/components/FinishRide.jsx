@@ -1,8 +1,12 @@
 import React, { useState } from 'react';
 import { MapPin, ArrowLeft, CreditCard } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 const FinishRide = (props) => {
+
+  const navigate = useNavigate();
 
   const vehiclesData = [
     {
@@ -26,6 +30,26 @@ const FinishRide = (props) => {
       </div>
     );
   }
+
+  const endRide = async () => {
+
+    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/end-ride`, {
+      rideId:props.ride._id ,
+    }, {
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`,
+      },
+    });
+
+    if (response.status === 200) {
+
+      navigate('/captain-home');
+
+    }
+    }
+
+
+
 
   return (
     <div className="flex flex-col w-full px-6 pt-4 mt-2">
@@ -51,8 +75,8 @@ const FinishRide = (props) => {
               alt="Rider"
             />
             <div className="flex justify-between w-full">
-              <h4 className="text-lg font-medium">Amit Mamgai</h4>
-              <h4 className="text-medium font-medium">10 KM</h4>
+              <h4 className="text-lg font-medium">{props.ride?.user?.fullname?.firstname} {props.ride?.user?.fullname?.lastname}</h4>
+              <h4 className="text-medium font-medium">{props.ride?.distance} Km</h4>
             </div>
           </div>
         </div>
@@ -63,14 +87,14 @@ const FinishRide = (props) => {
             <MapPin className="w-5 h-5 text-gray-500" />
             <div>
               <h3 className="font-semibold text-lg">{vehicle.srcLocation}</h3>
-              <p className="text-gray-600 text-sm">{vehicle.exactLocation}</p>
+              <p className="text-gray-600 text-sm">{props.ride?.origin}</p>
             </div>
           </div>
           <div className="flex items-start space-x-3">
             <MapPin className="w-5 h-5 text-gray-500" />
             <div>
               <h3 className="font-semibold text-lg">{vehicle.destLocation}</h3>
-              <p className="text-gray-600 text-sm">{vehicle.exactDestLocation}</p>
+              <p className="text-gray-600 text-sm">{props.ride?.destination}</p>
             </div>
           </div>
         </div>
@@ -79,7 +103,7 @@ const FinishRide = (props) => {
         <div className="flex space-x-2 items-center p-4 bg-gray-50 rounded-lg">
           <CreditCard className="w-6 h-6 text-gray-500" />
           <div className="flex flex-col">
-            <p className="font-semibold text-lg">₹{vehicle.price}</p>
+            <p className="font-semibold text-lg">₹{props.ride?.price}</p>
             <p className="font-extralight text-sm">{vehicle.payMethod}</p>
           </div>
         </div>
@@ -88,14 +112,13 @@ const FinishRide = (props) => {
 
       {/* Action Buttons */}
       <div className="mt-6 mb-3">
-        <Link to="/captain-riding"
-          onClick={() => {
-            props.setConfirmRidePopupPanel(false);
-          }}
+        <button
+          onClick={endRide}
+
           className="w-full flex items-center justify-center bg-black text-white py-4 rounded-lg font-semibold hover:bg-blue-400 transition-colors duration-200 cursor-pointer"
         >
           Finish Ride
-        </Link>
+        </button>
         <p className='text-center font- base text-sm text-gray-400 mt-2'>Click on Finish Ride button to finish the ride</p>
       </div>
 </div>

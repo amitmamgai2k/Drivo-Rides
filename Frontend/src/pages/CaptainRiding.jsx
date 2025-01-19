@@ -2,10 +2,16 @@ import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
 import FinishRide from '../components/FinishRide';
 import { gsap } from "gsap";
+import { Link,useLocation } from 'react-router-dom';
 
 function CaptainRiding(props) {
   const [finishRidePanel, setfinishRidePanel] = useState(false);
   const finishRidePanelRef = useRef(null);
+  const location = useLocation();
+  const rideData = location.state?.ride || {};
+  console.log("rideData",rideData);
+
+
 
   useEffect(() => {
     if (finishRidePanel) {
@@ -78,7 +84,7 @@ function CaptainRiding(props) {
         className="fixed w-full h-auto bottom-0 bg-white px-4 py-6 z-50
                  transform translate-y-full shadow-xl rounded-t-3xl"
       >
-        <FinishRide setfinishRidePanel={setfinishRidePanel} />
+        <FinishRide setfinishRidePanel={setfinishRidePanel}  ride={rideData}/>
       </div>
     </div>
   );

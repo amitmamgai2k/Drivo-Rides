@@ -1,16 +1,20 @@
-import React from "react";
+import React,{useContext} from "react";
 import { Link } from "react-router-dom";
+import { useLocation } from "react-router-dom";
+import { SocketContext } from "../context/SocketContext";
+import { useNavigate } from "react-router-dom";
+const Riding = (props) => {
+  const location = useLocation();
+  const {ride} = location.state || {};
+  const {socket} =useContext(SocketContext); // Access the socket from the Socket}
+  const navigate = useNavigate();
 
-const Riding = () => {
+  socket.on("ride-ended",()=>{
+    navigate("/home");
+  })
+
   // Static placeholders for the ride data
-  const ride = {
-    captain: {
-      fullname: { firstname: "John Doe" },
-      vehicle: { plate: "AB-1234" },
-    },
-    destination: "Downtown, City Center",
-    fare: 250,
-  };
+
 
   return (
     <div className="h-screen">
@@ -42,7 +46,7 @@ const Riding = () => {
           />
           <div className="text-right">
             <h2 className="text-lg font-medium capitalize">
-              {ride.captain.fullname.firstname}
+            {ride.captain.fullname.firstname} {ride.captain.fullname.lastname}
             </h2>
             <h4 className="text-xl font-semibold -mt-1 -mb-1">
               {ride.captain.vehicle.plate}
@@ -56,14 +60,14 @@ const Riding = () => {
           <div className="flex items-center gap-5 p-3 border-b-2">
             <i className="text-lg ri-map-pin-2-fill"></i>
             <div>
-              <h3 className="text-lg font-medium">562/11-A</h3>
+              <h3 className="text-lg font-medium">{ride.origin}</h3>
               <p className="text-sm -mt-1 text-gray-600">{ride.destination}</p>
             </div>
           </div>
           <div className="flex items-center gap-5 p-3">
             <i className="ri-currency-line"></i>
             <div>
-              <h3 className="text-lg font-medium">₹{ride.fare}</h3>
+              <h3 className="text-lg font-medium">₹{ride.price}</h3>
               <p className="text-sm -mt-1 text-gray-600">Cash</p>
             </div>
           </div>
