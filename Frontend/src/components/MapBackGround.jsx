@@ -1,6 +1,10 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 const MapBackground = ({ panelOpen, setVehiclePanel }) => {
+  const [map, setMap] = useState(null); // Store map instance
+  const [currentLocation, setCurrentLocation] = useState([28.6139, 77.209]); // Default to New Delhi
+  const [zoomLevel, setZoomLevel] = useState(6); // Default zoom level to show a large region
+
   useEffect(() => {
     const loadMapplsScript = () => {
       if (!document.getElementById("mappls-sdk")) {
@@ -25,19 +29,54 @@ const MapBackground = ({ panelOpen, setVehiclePanel }) => {
 
     const initializeMap = () => {
       if (window.mappls && document.getElementById("map-container")) {
-        new window.mappls.Map("map-container", {
-          center: [28.638698386592438, 77.27604556863412], // Example coordinates
-          zoom: 12, // Zoom level
-          zoomControl: false, // Disable zoom controls
-          scaleControl: false, // Disable scale control
-          location: false, // Disable current location marker
-          logo: false, // Remove Mappls logo
-          attributionControl: false, // Remove attribution
-          fullscreenControl: false, // Disable fullscreen control
+        const mapInstance = new window.mappls.Map("map-container", {
+          center: currentLocation, // Default center
+          zoom: zoomLevel, // Default zoom level
+          zoomControl: false,
+          scaleControl: false,
+          location: false,
+          logo: false,
+          attributionControl: false,
+          fullscreenControl: false,
         });
-        console.log("Map initialized with custom settings");
+
+        setMap(mapInstance); // Save map instance
+
+        // Fetch user's current location
+        fetchCurrentLocation(mapInstance);
       } else {
         console.error("Mappls SDK not loaded or map container missing");
+      }
+    };
+
+    const fetchCurrentLocation = (mapInstance) => {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            const { latitude, longitude } = position.coords;
+            const userLocation = [latitude, longitude];
+            setCurrentLocation(userLocation); // Update state
+            setZoomLevel(12); // Adjust zoom level for city view
+
+            // Update map's center and zoom
+            mapInstance.setView(userLocation, 12);
+
+            // Add a marker at the user's location
+            new window.mappls.Marker({
+              map: mapInstance,
+              position: userLocation,
+            }).addTo(mapInstance);
+
+            console.log("User's location set on the map:", userLocation);
+          },
+          (error) => {
+            console.error("Failed to fetch location:", error);
+            alert("Unable to access location. Please enable location services.");
+          }
+        );
+      } else {
+        console.error("Geolocation is not supported by this browser.");
+        alert("Geolocation is not supported by this browser.");
       }
     };
 

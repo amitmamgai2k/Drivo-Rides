@@ -5,6 +5,8 @@ import { useRef } from 'react';
 import gsap from "gsap";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import logo from '../assets/logo.png';
+import { Oval } from 'react-loader-spinner';
 
 import VehiclesAvailable from '../components/VehiclesAvailable';
 import ConfirmedVehicle from '../components/ConfirmedVehicle';
@@ -15,6 +17,7 @@ import { SocketContext } from '../context/SocketContext';
 import {UserDataContext} from '../context/UserContext'
 
 const Home = () => {
+  const[loading,setLoading] = useState(false)
   const [pickup, setPickup] = useState('');
   const [drop, setDrop] = useState('');
   const [panelOpen, setPanelOpen] = useState(false);
@@ -137,6 +140,7 @@ const Home = () => {
 
 
    async function findTrip() {
+    setLoading(true)
     setPanelOpen(false);
 
     try {
@@ -183,6 +187,8 @@ const Home = () => {
         setVehiclePanel(true);
     } catch (error) {
         console.error("Error fetching fare:", error);
+    }finally{
+      setLoading(false)
     }
 }
  async function createRide() {
@@ -237,7 +243,7 @@ const Home = () => {
           panelOpen ? 'opacity-0' : 'opacity-100'
         }`}
       >
-        <h1 className="text-4xl font-bold text-black">UBER</h1>
+    <img src={logo} alt="hello" height={80} width={150} className='bg-transparent' />
       </div>
 
       <MapBackGround panelOpen={panelOpen} setVehiclePanel={setVehiclePanel} />
@@ -255,7 +261,7 @@ const Home = () => {
             <h4 className="font-semibold text-2xl">Find a ride</h4>
             <button
               onClick={() => setPanelOpen(!panelOpen)}
-              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+              className="   rounded-full transition-colors"
             >
               <ChevronDown
                 className={`transform transition-transform duration-300 ${
@@ -287,7 +293,7 @@ const Home = () => {
                 }}
                 className="w-full bg-gray-100 px-12 py-3 rounded-lg text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
-                placeholder="Enter pickup location"
+                placeholder="Enter Pickup Location"
               />
               <input
                 value={drop}
@@ -297,16 +303,39 @@ const Home = () => {
                 }}
                 className="w-full bg-gray-100 px-12 py-3 rounded-lg text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500"
                 type="text"
-                placeholder="Enter destination"
+                placeholder="Enter Drop Location"
               />
             </div>
           </form>
           <button
-           onClick={findTrip}
-                        className='bg-black text-white px-4 py-2 rounded-lg mt-3 w-full'>
-                        Find Trip
-                    </button>
+  onClick={findTrip}
+  className="bg-blue-500 hover:bg-blue-600 focus:ring-blue-300
+  text-white px-4 py-2 rounded-lg mt-3 w-full
+    transition-colors duration-300 ease-in-out
+     hover:border-2 hover:border-white
+    focus:outline-none focus:ring-2 "
+>
+  Find Trip
+</button>
+
         </div>
+   {loading && (
+    <div className="flex justify-center items-center min-h-screen">
+
+      <Oval
+        height={40}
+        width={40}
+        color="#3498db"
+        wrapperStyle={{}}
+        wrapperClass=""
+        visible={true}
+        ariaLabel="oval-loading"
+        secondaryColor="#f3f3f3"
+        strokeWidth={2}
+        strokeWidthSecondary={2}
+      />
+    </div>
+  )}
 
         {/* Expandable panel content */}
         <div className={`${panelOpen ? 'block' : 'hidden'} p-5`}>
@@ -327,7 +356,7 @@ const Home = () => {
      <div ref = {vehiclePanelRef}  className=' fixed w-full bottom-0 translate-y-full bg-white px-3 py-8  z-50'>
 
 
-      <VehiclesAvailable   vehicleType={vehicleType}   setVehicleType={setVehicleType } fare = {fare} setVehiclePanel={setVehiclePanel} setConfirmRidePanel = {setConfirmRidePanel}  />
+    <VehiclesAvailable   vehicleType={vehicleType}   setVehicleType={setVehicleType } fare = {fare} setVehiclePanel={setVehiclePanel} setConfirmRidePanel = {setConfirmRidePanel}  />
 
      </div>
      <div
@@ -350,8 +379,8 @@ const Home = () => {
 </div>
 <div
   ref={vehiceleFoundRef}
-  className={`fixed w-full bottom-0  h-screen bg-white px-3 py-3 ${vehicleFound ? 'translate-y-0' : 'translate-y-full'}` }
-  style={{ zIndex: 100 }}
+  className="fixed w-full bottom-0  h-screen bg-white px-3 py-3  translate-y-full z-1000"
+
 >
   <LookingForDriver
    createRide={createRide}
@@ -365,7 +394,7 @@ const Home = () => {
 </div>
 <div
   ref = {waitingForDriverRef}
-  className='fixed w-full bottom-0  h-screen bg-white px-3 py-3 '
+  className='fixed w-full bottom-0  translate-y-full h-screen bg-white px-3 py-3 '
 
 >
   <WaitForDriver waitingForDriver={waitingForDriver} setwaitingForDriver={setwaitingForDriver}   ride={ride}

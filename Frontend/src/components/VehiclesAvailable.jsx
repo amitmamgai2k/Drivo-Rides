@@ -1,5 +1,8 @@
 import React from 'react';
 import { User } from 'lucide-react'; // Importing the User icon from lucide-react
+import car from '../assets/car.png';
+import bike from '../assets/bike.png';
+import auto from '../assets/auto.png';
 
 const VehiclesAvailable = (props) => {
     console.log('props.fare:', props.fare);
@@ -10,7 +13,7 @@ const VehiclesAvailable = (props) => {
             seats: 4,
             time: '2 mins away',
             para: 'Affordable car rides for everyday use',
-            image: 'https://swyft.pl/wp-content/uploads/2023/05/how-many-people-can-a-uberx-take.jpg',
+            image:car,
             fareKey: 'car',
         },
         {
@@ -18,7 +21,7 @@ const VehiclesAvailable = (props) => {
             seats: 1,
             time: '3 mins away',
             para: 'Affordable bike rides for everyday use',
-            image: 'https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_638,w_956/v1649231091/assets/2c/7fa194-c954-49b2-9c6d-a3b8601370f5/original/Uber_Moto_Orange_312x208_pixels_Mobile.png',
+            image: bike,
             fareKey: 'motorcycle',
         },
         {
@@ -26,7 +29,7 @@ const VehiclesAvailable = (props) => {
             seats: 3,
             time: '5 mins away',
             para: 'Affordable auto rides for everyday use',
-            image: 'https://www.uber-assets.com/image/upload/f_auto,q_auto:eco,c_fill,h_368,w_552/v1648431773/assets/1d/db8c56-0204-4ce4-81ce-56a11a07fe98/original/Uber_Auto_558x372_pixels_Desktop.png',
+            image: auto,
             fareKey: 'auto',
         },
     ];
@@ -47,7 +50,7 @@ const VehiclesAvailable = (props) => {
                     }}
                     className="flex border-2 active:border-black mb-2 rounded-xl w-full p-3 items-center justify-between shadow-md"
                 >
-                    <img src={vehicle.image} alt={vehicle.type} className="h-10 w-20 object-cover rounded-md" />
+                    <img src={vehicle.image} alt={vehicle.type} className="h-14 w-20 object-cover rounded-md" />
                     <div className="ml-2 w-1/2">
                         <h4 className="font-medium text-base">
                             {vehicle.type} <span><User className="inline-block" size={16} /> {vehicle.seats}</span>
