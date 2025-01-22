@@ -1,85 +1,166 @@
-import React,{useContext} from "react";
-import { Link } from "react-router-dom";
-import { useLocation } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { SocketContext } from "../context/SocketContext";
-import { useNavigate } from "react-router-dom";
+import { load } from "@cashfreepayments/cashfree-js";
+import axios from "axios";
+import MapBackground from "../components/MapBackGround";
+import { MapPin, Navigation, Home, CreditCard, Car } from 'lucide-react';
+import logo from '../assets/logo.png';
+
 const Riding = (props) => {
-  const location = useLocation();
-  const {ride} = location.state || {};
-  const {socket} =useContext(SocketContext); // Access the socket from the Socket}
-  const navigate = useNavigate();
+    const location = useLocation();
+    const { ride } = location.state || {};
+    const { socket } = useContext(SocketContext);
+    const navigate = useNavigate();
 
-  socket.on("ride-ended",()=>{
-    navigate("/home");
-  })
+    const [orderId, setOrderId] = useState("");
+    const [cashfree, setCashfree] = useState(null);
 
-  // Static placeholders for the ride data
+    // Initialize Cashfree SDK
+    const initializeSDK = async () => {
+        const cfInstance = await load({ mode: "sandbox" });
+        setCashfree(cfInstance);
+    };
 
+    useEffect(() => {
+        initializeSDK();
+    }, []);
 
-  return (
-    <div className="h-screen">
-      {/* Home Link */}
-      <Link
-        to="/home"
-        className="fixed right-2 top-2 h-10 w-10 bg-white flex items-center justify-center rounded-full"
-      >
-        <i className="text-lg font-medium ri-home-5-line"></i>
-      </Link>
+    const getSessionId = async () => {
+        try {
+            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/payment/payment`);
+            if (res.data && res.data.payment_session_id) {
+                setOrderId(res.data.order_id);
+                return res.data.payment_session_id;
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-      {/* Top Section */}
-       <div className="h-1/2">
-       <img
-          src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
-          alt="Map background"
-          className="w-full h-full object-cover"
-        />
-      </div>
+    const verifyPayment = async () => {
+        try {
+            const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/payment/verify`, {
+                orderId,
+            });
+            if (res.data) {
+                console.log("Payment verified successfully!");
+                navigate("/home");
+            }
+        } catch (error) {
+            console.error(error);
+        }
+    };
 
-      {/* Bottom Section */}
-      <div className="h-1/2 p-4">
-        {/* Ride Info */}
-        <div className="flex items-center justify-between">
-          <img
-            className="h-12"
-            src="https://swyft.pl/wp-content/uploads/2023/05/how-many-people-can-a-uberx-take.jpg"
-            alt="Vehicle"
-          />
-          <div className="text-right">
-            <h2 className="text-lg font-medium capitalize">
-            {ride.captain.fullname.firstname} {ride.captain.fullname.lastname}
-            </h2>
-            <h4 className="text-xl font-semibold -mt-1 -mb-1">
-              {ride.captain.vehicle.plate}
-            </h4>
-            <p className="text-sm text-gray-600">Maruti Suzuki Alto</p>
-          </div>
-        </div>
+    const handlePayment = async (e) => {
+        e.preventDefault();
+        try {
+            const sessionId = await getSessionId();
+            console.log("Session ID:", sessionId);
 
-        {/* Destination and Fare */}
-        <div className="flex flex-col gap-2 mt-5">
-          <div className="flex items-center gap-5 p-3 border-b-2">
-            <i className="text-lg ri-map-pin-2-fill"></i>
-            <div>
-              <h3 className="text-lg font-medium">{ride.origin}</h3>
-              <p className="text-sm -mt-1 text-gray-600">{ride.destination}</p>
+            const checkoutOptions = {
+                paymentSessionId: sessionId,
+                redirectTarget: "_modal",
+            };
+
+            cashfree.checkout(checkoutOptions).then(() => {
+                verifyPayment();
+            });
+            console.log("Payment started successfully!");
+
+        } catch (error) {
+            console.error(error);
+        }
+    };
+
+    socket.on("ride-ended", () => {
+        navigate("/home");
+    });
+
+    return (
+        <div className="h-screen bg-gray-50">
+            {/* Header */}
+            <div className="absolute top-0 left-0 right-0 p-4 z-20 flex justify-between items-center">
+                <img
+                    className="object-contain"
+                    src={logo}
+                    alt="Uber Logo"
+                    height={80}
+                    width={150}
+                />
+                <Link
+                    to="/home"
+                    className="h-10 w-10 bg-white shadow-md flex items-center justify-center rounded-full hover:bg-gray-50 transition-colors"
+                >
+                    <Home className="w-5 h-5" />
+                </Link>
             </div>
-          </div>
-          <div className="flex items-center gap-5 p-3">
-            <i className="ri-currency-line"></i>
-            <div>
-              <h3 className="text-lg font-medium">₹{ride.price}</h3>
-              <p className="text-sm -mt-1 text-gray-600">Cash</p>
-            </div>
-          </div>
-        </div>
 
-        {/* Payment Button */}
-        <button className="w-full mt-5 bg-green-600 text-white font-semibold p-2 rounded-lg">
-          Make a Payment
-        </button>
-      </div>
-    </div>
-  );
+            {/* Map Section */}
+            <div className="h-1/2 w-full relative shadow-lg">
+                <MapBackground />
+                <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg">
+                    <div className="flex items-center gap-2 text-sm text-gray-700">
+                        <Navigation className="w-4 h-4" />
+                        <span>On the way to destination</span>
+                    </div>
+                </div>
+            </div>
+
+            {/* Ride Details Section */}
+            <div className="h-1/2 bg-white rounded-t-3xl -mt-6 p-6 shadow-lg">
+                {/* Driver Info */}
+                <div className="flex items-center justify-between bg-gray-50 px-4  rounded-xl mb-6">
+                    <div className="flex items-center gap-4">
+                        <div className="h-14 w-14 rounded-full bg-gray-200 overflow-hidden">
+                            <img
+                                className="h-full w-full object-cover"
+                                src="https://indian-drivers.com/wp-content/uploads/2024/05/Rectangle-13.png"
+                                alt="Vehicle"
+                            />
+                        </div>
+                        <div>
+                            <h2 className="text-lg font-semibold capitalize">
+                                {ride.captain.fullname.firstname} {ride.captain.fullname.lastname}
+                            </h2>
+                            <div className="flex items-center gap-2">
+                                <Car className="w-4 h-4 text-gray-500" />
+                                <span className="text-gray-600">{ride.captain.vehicle.plate}</span>
+                            </div>
+                            <p className="text-sm text-gray-500">Maruti Suzuki Alto</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Ride Details */}
+                <div className="">
+                    <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
+                        <MapPin className="w-5 h-5 text-blue-500 flex-shrink-0 mt-1" />
+                        <div>
+                            <h3 className="font-medium text-gray-900">{ride.origin}</h3>
+                            <p className="text-sm text-gray-600">{ride.destination}</p>
+                        </div>
+                    </div>
+
+                    <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-lg">
+                        <CreditCard className="w-5 h-5 text-green-500" />
+                        <div>
+                            <h3 className="font-medium text-gray-900">₹{ride.price}</h3>
+                            <p className="text-sm text-gray-600">Cash Payment</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Payment Button */}
+                <button
+                    className="w-full mt-6 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 rounded-xl shadow-md transition-colors duration-200"
+                    onClick={handlePayment}
+                >
+                    Make Payment
+                </button>
+            </div>
+        </div>
+    );
 };
 
 export default Riding;

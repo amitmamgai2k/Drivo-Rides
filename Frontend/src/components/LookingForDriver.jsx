@@ -19,6 +19,8 @@ function LookingForDriver(props) {
       const vehicle = vehiclesData[0];
 
       const onBackClick = () => {
+        console.log("Back button clicked");
+
         props.setVehicleFound(false); // Close Looking for Driver panel
         props.setConfirmRidePanel(false); // Optionally, close Confirm Ride panel
         props.setVehiclePanel(false); // Optionally, close Vehicles Available panel

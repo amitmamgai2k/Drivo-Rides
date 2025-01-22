@@ -1,123 +1,253 @@
-import React, { useState} from 'react';
+import React, { useState, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import {UserDataContext} from '../context/UserContext';
-import { useContext } from 'react';
+import { UserDataContext } from '../context/UserContext';
+import logo from '../assets/logo.png';
+import { Mail, Lock, User, Phone, Upload, X } from 'lucide-react';
+
 const UserSignup = () => {
-  const [ email, setEmail ] = useState('')
-  const [ password, setPassword ] = useState('')
-  const [ firstName, setFirstName ] = useState('')
-  const [ lastName, setLastName ] = useState('')
-  const [ userData, setUserData ] = useState({})
+    const [email, setEmail] = useState('');
+    const [password, setPassword] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+    const [mobile, setMobile] = useState('');
+    const [profilePicture, setProfilePicture] = useState(null);
+    const [previewURL, setPreviewURL] = useState(null);
+    const [userData, setUserData] = useState({});
 
-  const navigate = useNavigate()
+    const navigate = useNavigate();
+    const { user, setUser } = useContext(UserDataContext);
 
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            if (file.size > 5 * 1024 * 1024) {
+                alert('File size should be less than 5MB');
+                return;
+            }
+            setProfilePicture(file);
+            setPreviewURL(URL.createObjectURL(file));
+        }
+    };
 
+    const removeImage = () => {
+        setProfilePicture(null);
+        setPreviewURL(null);
+    };
 
-  const { user, setUser } = useContext(UserDataContext)
+    const submitHandler = async (e) => {
+        e.preventDefault();
 
+        const formData = new FormData();
+        if (profilePicture) {
+            formData.append('profilePicture', profilePicture);
+        }
 
+        const userData = {
+            fullname: {
+                firstname: firstName,
+                lastname: lastName
+            },
+            email,
+            mobile,
+            password
+        };
 
+        formData.append('data', JSON.stringify(userData));
 
-  const submitHandler = async (e) => {
-    e.preventDefault()
-    const newUser = {
-      fullname: {
-        firstname: firstName,
-        lastname: lastName
-      },
-      email: email,
-      password: password
-    }
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}/users/register`,
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                }
+            );
 
-    const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/register`, newUser)
+            if (response.status === 201) {
+                const data = response.data;
+                setUser(data.user);
+                localStorage.setItem('token', data.token);
+                navigate('/home');
+            }
+        } catch (error) {
+            console.error('Registration error:', error);
+            alert(error.response?.data?.message || 'Registration failed');
+        }
 
-    if (response.status === 201) {
-      const data = response.data
-      setUser(data.user)
-      localStorage.setItem('token', data.token)
-      navigate('/home')
-    }
+        setEmail('');
+        setFirstName('');
+        setLastName('');
+        setPassword('');
+        setMobile('');
+        setProfilePicture(null);
+        setPreviewURL(null);
+    };
 
+    return (
+        <div className="min-h-screen bg-gray-50">
+            <div className='max-w-2xl mx-auto p-6'>
+                {/* Header Section */}
+                <div className=" mb-8">
+                    <img
+                        className=' mb-4 ml-[-10px] object-contain'
+                        src={logo}
+                        alt="Logo"
+                        height={80}
+                        width={150}
+                    />
+                    <h1 className='text-2xl font-bold text-gray-800'>Create Account</h1>
+                    <p className='text-gray-600 mt-2'>Begin your journey with us!</p>
+                </div>
 
-    setEmail('')
-    setFirstName('')
-    setLastName('')
-    setPassword('')
+                <form onSubmit={submitHandler} className="bg-white p-6 rounded-xl shadow-sm space-y-6">
+                    {/* Profile Picture Section */}
+                    <div className="flex flex-col items-center gap-4">
+                        <div className="relative w-32 h-32">
+                            <div className="w-full h-full rounded-full overflow-hidden border-4 border-gray-200 bg-gray-100">
+                                {previewURL ? (
+                                    <img
+                                        src={previewURL}
+                                        alt="Profile Preview"
+                                        className="w-full h-full object-cover"
+                                    />
+                                ) : (
+                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                        <User className="w-16 h-16" />
+                                    </div>
+                                )}
+                            </div>
+                            {previewURL && (
+                                <button
+                                    type="button"
+                                    onClick={removeImage}
+                                    className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+                                >
+                                    <X className="w-4 h-4" />
+                                </button>
+                            )}
+                        </div>
+                        <div>
+                            <label htmlFor="profile-picture" className="cursor-pointer flex items-center gap-2 text-blue-600 hover:text-blue-700">
+                                <Upload className="w-4 h-4" />
+                                <span>{previewURL ? 'Change Picture' : 'Upload Picture'}</span>
+                            </label>
+                            <input
+                                id="profile-picture"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageChange}
+                                className="hidden"
+                            />
+                            <p className="text-sm text-gray-500 text-center mt-1">
+                                Maximum size: 5MB
+                            </p>
+                        </div>
+                    </div>
 
-  };
-  return (
-    <div>
-      <div className='p-7 h-screen flex flex-col justify-between'>
-        <div>
-          <img className='w-16 mb-10' src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQYQy-OIkA6In0fTvVwZADPmFFibjmszu2A0g&s" alt="" />
+                    {/* Name Fields */}
+                    <div>
+                        <label className='text-gray-700 font-medium mb-2 block'>Full Name</label>
+                        <div className='flex gap-4'>
+                            <div className="relative flex-1">
+                                <User className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                                <input
+                                    required
+                                    className='w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none'
+                                    type="text"
+                                    placeholder='First name'
+                                    value={firstName}
+                                    onChange={(e) => setFirstName(e.target.value)}
+                                />
+                            </div>
+                            <div className="relative flex-1">
+                                <input
+                                    required
+                                    className='w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none'
+                                    type="text"
+                                    placeholder='Last name'
+                                    value={lastName}
+                                    onChange={(e) => setLastName(e.target.value)}
+                                />
+                            </div>
+                        </div>
+                    </div>
 
-          <form onSubmit={(e) => {
-            submitHandler(e)
-          }}>
+                    {/* Email Field */}
+                    <div>
+                        <label className='text-gray-700 font-medium mb-2 block'>Email Address</label>
+                        <div className="relative">
+                            <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                            <input
+                                required
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className='w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none'
+                                type="email"
+                                placeholder='email@example.com'
+                            />
+                        </div>
+                    </div>
 
-            <h3 className='text-lg w-1/2  font-medium mb-2'>What's your name</h3>
-            <div className='flex gap-4 mb-7'>
-              <input
-                required
-                className='bg-[#eeeeee] w-1/2 rounded-lg px-4 py-2 border  text-lg placeholder:text-base'
-                type="text"
-                placeholder='First name'
-                value={firstName}
-                onChange={(e) => {
-                  setFirstName(e.target.value)
-                }}
-              />
-              <input
-                required
-                className='bg-[#eeeeee] w-1/2  rounded-lg px-4 py-2 border  text-lg placeholder:text-base'
-                type="text"
-                placeholder='Last name'
-                value={lastName}
-                onChange={(e) => {
-                  setLastName(e.target.value)
-                }}
-              />
+                    {/* Mobile Field */}
+                    <div>
+                        <label className='text-gray-700 font-medium mb-2 block'>Mobile Number</label>
+                        <div className="relative">
+                            <Phone className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                            <input
+                                required
+                                value={mobile}
+                                onChange={(e) => setMobile(e.target.value)}
+                                className='w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none'
+                                type="tel"
+                                placeholder='+91 9876543210'
+                            />
+                        </div>
+                    </div>
+
+                    {/* Password Field */}
+                    <div>
+                        <label className='text-gray-700 font-medium mb-2 block'>Create Password</label>
+                        <div className="relative">
+                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
+                            <input
+                                className='w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none'
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                required
+                                type="password"
+                                placeholder='Enter secure password'
+                                minLength={6}
+                            />
+                        </div>
+                    </div>
+
+                    <button className='w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 rounded-xl transition-colors duration-200 shadow-lg'>
+                        Create Account
+                    </button>
+
+                    <p className='text-center text-gray-600'>
+                        Already have an account?{' '}
+                        <Link to='/user-login' className='text-blue-600 font-medium hover:text-blue-700'>
+                            Login here
+                        </Link>
+                    </p>
+                </form>
+
+                {/* Footer Text */}
+                <div className="mt-6">
+                    <p className='text-xs text-gray-500 text-center leading-relaxed'>
+                        By signing up, you agree to our{' '}
+                        <a href="#" className='text-blue-600 hover:underline'>Terms of Service</a>{' '}
+                        and{' '}
+                        <a href="#" className='text-blue-600 hover:underline'>Privacy Policy</a>
+                    </p>
+                </div>
             </div>
-
-            <h3 className='text-lg font-medium mb-2'>What's your email</h3>
-            <input
-              required
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value)
-              }}
-              className='bg-[#eeeeee] mb-7 rounded-lg px-4 py-2 border w-full text-lg placeholder:text-base'
-              type="email"
-              placeholder='email@example.com'
-            />
-
-            <h3 className='text-lg font-medium mb-2'>Enter Password</h3>
-
-            <input
-              className='bg-[#eeeeee] mb-7 rounded-lg px-4 py-2 border w-full text-lg placeholder:text-base'
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value)
-              }}
-              required type="password"
-              placeholder='password'
-            />
-
-            <button
-              className='bg-[#111] text-white font-semibold mb-3 rounded-lg px-4 py-2 w-full text-lg placeholder:text-base'
-            >Create account</button>
-
-          </form>
-          <p className='text-center'>Already have a account? <Link to='/user-login' className='text-blue-600'>Login here</Link></p>
         </div>
-        <div>
-          <p className='text-[10px] leading-tight'>This site is protected by reCAPTCHA and the <span className='underline'>Google Privacy
-            Policy</span> and <span className='underline'>Terms of Service apply</span>.</p>
-        </div>
-      </div>
-    </div >
-  )
-}
+    );
+};
 
 export default UserSignup;

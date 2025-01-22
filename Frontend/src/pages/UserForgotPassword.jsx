@@ -6,7 +6,7 @@ import axios from 'axios';
 import logo from '../assets/logo.png';
 import { Mail, Lock, Car } from 'lucide-react';
 
-const UserLogin = () => {
+const UserForgotPassword = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const { setUser } = useContext(UserDataContext);
@@ -40,8 +40,8 @@ const UserLogin = () => {
                         src={logo}  height={80} width={150}
                         alt="Logo"
                     />
-                    <h1 className="text-2xl font-bold mt-4">Welcome Back</h1>
-                    <p className="text-gray-600">Sign in to continue your journey</p>
+                    <h1 className="text-2xl font-bold mt-4">Forgot Your Password</h1>
+                    <p className="text-gray-600"></p>
                 </div>
 
                 {/* Login Form */}
@@ -62,7 +62,7 @@ const UserLogin = () => {
                     </div>
 
                     <div>
-                        <label className='text-gray-700 font-medium mb-2 block'>Password</label>
+                        <label className='text-gray-700 font-medium mb-2 block'> New Password</label>
                         <div className="relative">
                             <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
                             <input
@@ -76,36 +76,18 @@ const UserLogin = () => {
                         </div>
                     </div>
 
-                    <button className='w-full bg-black text-white font-semibold py-3 rounded-xl hover:bg-gray-800 transition-colors duration-200 shadow-lg'>
-                        Sign In
-                    </button>
+                    <Link to={'/captain-login'} className='w-full flex items-center justify-center bg-black text-white font-semibold py-3 rounded-xl hover:bg-gray-800 transition-colors duration-200 shadow-lg'>
+                         Confirm
+                    </Link>
+                    <p className='text-sm text-gray-500 '>After Confirm your password, you will be redirected to the login page </p>
 
-                    <p className='text-center text-gray-600'>
-                        New to Drivo? {' '}
-                        <Link to='/user-signup' className='text-blue-600 font-medium hover:text-blue-700'>
-                            Create an account
-                        </Link>
-                    </p>
-                    <p className='text-center text-gray-600'>
-                           Forgot Your Password? {' '}
-                        <Link to='/user-forgot-password' className='text-blue-600 font-medium hover:text-blue-700'>
-                           Forgot Password
-                        </Link>
-                    </p>
+
                 </form>
             </div>
 
-            {/* Captain Login Button */}
-            <Link
-                to='/captain-login'
-                className='flex items-center justify-center gap-2 bg-green-600 hover:bg-green-700 text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 shadow-lg mt-6'
-            >
-                <Car className="h-5 w-5" />
-                Sign in as Captain
-            </Link>
 
         </div>
     );
 };
 
-export default UserLogin;
+export default UserForgotPassword;

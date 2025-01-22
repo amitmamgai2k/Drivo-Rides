@@ -71,6 +71,7 @@ const ConfirmedVehicle = (props ) => {
         <button
 
           onClick={() => {props.setVehicleFound(true)
+
                   props.setConfirmRidePanel(false)
                   props.createRide()
           }}// Trigger action in parent

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import CaptainDetails from "../components/CaptainDetails";
 import RidePop from "../components/RidePop";
 import gsap from "gsap";
+import logo from "../assets/logo.png";
 import ConfirmRidePopUp from "../components/ConfirmRidePopUp";
 import MapBackGround from "../components/MapBackGround";
 import { SocketContext } from '../context/SocketContext';
@@ -21,15 +22,6 @@ const CaptainHome = () => {
 
 
 
-  // useEffect(() => {
-  //   socket.on("new-ride", (data) => {
-  //     console.log("Ride request received:", data);
-  //         setRide(data);
-  //         setRidePopupPanel(true);
-
-
-  //   })
-  // }, []);
 
   useEffect(() => {
     // Check if captain data exists
@@ -128,15 +120,11 @@ const CaptainHome = () => {
   useEffect(() => {
     if (confirmRidePopupPanel) {
       gsap.to(confirmRidePopupPanelRef.current, {
-        y: 0,
-        duration: 0.5,
-        ease: "power3.out",
+        transform: "translateY(0)",
       });
     } else {
       gsap.to(confirmRidePopupPanelRef.current, {
-        y: "100%",
-        duration: 0.5,
-        ease: "power3.in",
+        transform: "translateY(100%)",
       });
     }
   }, [confirmRidePopupPanel]);
@@ -144,10 +132,10 @@ const CaptainHome = () => {
   return (
     <div className="h-screen ">
       {/* Header Section */}
-      <div className="absolute top-5 left-5 z-10">
+      <div className="absolute top-4 left-4 z-10">
         <img
-          className="w-16 mb-10"
-          src="https://www.svgrepo.com/show/505031/uber-driver.svg"
+
+          src={logo} height={80} width={150}
           alt="Uber Logo"
         />
       </div>
@@ -159,31 +147,32 @@ const CaptainHome = () => {
       >
         <i className="ri-logout-box-r-line"></i>
       </Link>
-    <div className="h-3/5">
+    <div className="h-3/6">
       {/* Map Section */}
       <MapBackGround />
 </div>
       {/* Captain Details */}
-    <div className="h-2/5 p-6">   <CaptainDetails /></div>
+    <div className="h-3/6 p-6">   <CaptainDetails /></div>
 
 
       {/* RidePop Panel */}
-      <div
-        ref={ridePopupPanelRef}
-        className="fixed w-full h-auto bottom-0 bg-white px-4 py-6 z-50 transform translate-y-full shadow-lg"
-      >
-        <RidePop
-           ride={ride}
-          setRidePopupPanel={setRidePopupPanel}
-          setConfirmRidePopupPanel={setConfirmRidePopupPanel}
-           confirmRide = {confirmRide}
-        />
-      </div>
 
+{/* Ride Popup Panel */}
+<div
+    ref={ridePopupPanelRef}
+    className="fixed w-full max-h-[90vh] overflow-y-auto bottom-0 bg-white px-4 py-6 transform translate-y-full shadow-lg z-50"
+>
+    <RidePop
+        ride={ride}
+        setRidePopupPanel={setRidePopupPanel}
+        setConfirmRidePopupPanel={setConfirmRidePopupPanel}
+        confirmRide={confirmRide}
+    />
+</div>
       {/* ConfirmRidePopUp Panel */}
       <div
         ref={confirmRidePopupPanelRef}
-        className="fixed w-full object-cover top-0 bg-white px-6   z-50 transform translate-y-full shadow-lg"
+        className="fixed w-full object-cover bottom-0 bg-white px-6   z-50  translate-y-full shadow-lg"
       >
         <ConfirmRidePopUp
              ride={ride} setConfirmRidePopupPanel={setConfirmRidePopupPanel} setRidePopupPanel={setRidePopupPanel}

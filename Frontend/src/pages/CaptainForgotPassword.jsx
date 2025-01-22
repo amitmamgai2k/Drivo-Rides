@@ -6,7 +6,7 @@ import axios from 'axios';
 import logo from '../assets/logo.png';
 import { Mail, Lock, User } from 'lucide-react';
 
-const CaptainLogin = () => {
+const CaptainForgotPassword = () => {
    const [email, setEmail] = useState('');
    const [password, setPassword] = useState('');
    const [userData, setUserData] = useState({});
@@ -42,7 +42,7 @@ const CaptainLogin = () => {
                        width={150}
                        height={80}
                    />
-                   <h1 className="text-2xl font-bold">Welcome back, captain!</h1>
+                   <h1 className="text-2xl font-bold">Forgot Your Password</h1>
 
                </div>
 
@@ -67,7 +67,7 @@ const CaptainLogin = () => {
 
                    <div>
                        <label className='text-gray-700 font-medium mb-2 block'>
-                           Password
+                          New Password
                        </label>
                        <div className="relative">
                            <Lock className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-5 w-5" />
@@ -82,38 +82,17 @@ const CaptainLogin = () => {
                        </div>
                    </div>
 
-                   <button className='w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 rounded-xl transition-colors duration-200 shadow-lg'>
-                       Login as Captain
-                   </button>
+                   <Link to='/captain-login' className='w-full flex items-center justify-center bg-black hover:bg-gray-800 text-white font-semibold py-3 rounded-xl transition-colors duration-200 shadow-lg'>
+                     Confirm
+                   </Link>
+                   <p className='text-sm text-gray-500 '>After Confirm your password, you will be redirected to the login page </p>
 
-                   <div className="text-center text-gray-600 flex flex-col gap-6 ">
 
-                         <p className='text-center text-gray-600'>
-                         Want to join our fleet? {' '}
-                                               <Link to='/captain-signup' className='text-blue-600 font-medium hover:text-blue-700'>
-                                               Register as captain
-                                               </Link>
-                                           </p>
-                         <p className='text-center text-gray-600'>
-                                                  Forgot Your Password? {' '}
-                                               <Link to='/captain-forgot-password' className='text-blue-600 font-medium hover:text-blue-700'>
-                                                  Forgot Password
-                                               </Link>
-                                           </p>
-                   </div>
                </form>
            </div>
 
-           {/* User Login Link */}
-           <Link
-               to='/user-login'
-               className='flex items-center justify-center gap-2 bg-[#9ca265] hover:bg-[#8b916c] text-white font-semibold py-3 px-4 rounded-xl transition-colors duration-200 shadow-lg'
-           >
-               <User className="h-5 w-5" />
-               Sign in as User
-           </Link>
        </div>
    );
 };
 
-export default CaptainLogin;
+export default CaptainForgotPassword;

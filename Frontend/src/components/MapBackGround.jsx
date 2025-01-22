@@ -70,9 +70,12 @@ const MapBackground = ({ panelOpen, setVehiclePanel }) => {
             console.log("User's location set on the map:", userLocation);
           },
           (error) => {
-            console.error("Failed to fetch location:", error);
-            alert("Unable to access location. Please enable location services.");
-          }
+            console.error("Failed to fetch location:", error.message);
+            alert(
+              "Unable to access location. Please enable location services or try again."
+            );
+          },
+          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // High accuracy options
         );
       } else {
         console.error("Geolocation is not supported by this browser.");

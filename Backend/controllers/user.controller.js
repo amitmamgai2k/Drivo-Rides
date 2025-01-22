@@ -77,3 +77,18 @@ module.exports.logoutUser = async (req, res) => {
     await BlacklistToken.create({ token });
     res.status(200).json({ message: "Logout successful" });
 }
+module.exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        const token = await user.generatePasswordResetToken();
+        await user.save();
+        res.status(200).json({ message: "Password reset token sent to email" });
+    } catch (err) {
+        console.error("Error resetting password:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+};

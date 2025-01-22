@@ -22,6 +22,14 @@ const userSchema = new mongoose.Schema({
     unique: true,
     minlength: [3,'Email must be at least 5 characters long'],
     },
+    // mobileNumber:{
+    //     type: Number,
+    //     required: true
+    // },
+    // profileImage:{
+    //     type: String,
+    //     required: true
+    // },
     password:{
         type: String,
         required: true,

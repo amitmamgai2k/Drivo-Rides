@@ -208,4 +208,5 @@ const endRide = async (req, res) => {
 }
 
 
+
 module.exports = {  createRide, getFare,confirmRide,startRide,endRide };

@@ -43,6 +43,7 @@ const VehiclesAvailable = (props) => {
                     onClick={() => {
                         console.log("Vehicle type selected:", vehicle.fareKey);
                         props.setConfirmRidePanel(true);
+                        props.setVehiclePanel(false);
 
                         props.setVehicleType(vehicle.fareKey);
 

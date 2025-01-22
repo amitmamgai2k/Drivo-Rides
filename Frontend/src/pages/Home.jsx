@@ -103,6 +103,7 @@ const Home = () => {
 
 
   },[vehiclePanel])
+
   useEffect (function(){
     if(confirmRidePanel){
      gsap.to(confirmRidePanelRef.current,{
@@ -243,7 +244,7 @@ const Home = () => {
           panelOpen ? 'opacity-0' : 'opacity-100'
         }`}
       >
-    <img src={logo} alt="hello" height={80} width={150} className='bg-transparent' />
+    <img src={logo} alt="hello" height={80} width={150}  />
       </div>
 
       <MapBackGround panelOpen={panelOpen} setVehiclePanel={setVehiclePanel} />
@@ -379,7 +380,7 @@ const Home = () => {
 </div>
 <div
   ref={vehiceleFoundRef}
-  className="fixed w-full bottom-0  h-screen bg-white px-3 py-3  translate-y-full z-1000"
+  className="fixed w-full bottom-0  h-screen bg-white px-3 py-3  translate-y-full z-40"
 
 >
   <LookingForDriver
@@ -388,13 +389,15 @@ const Home = () => {
    drop={drop}
    fare={fare}
    vehicleType={vehicleType}
-
+   setwaitingForDriver={setwaitingForDriver}
     setVehicleFound={setVehicleFound}
+    setConfirmRidePanel={setConfirmRidePanel}
+   setVehiclePanel={setVehiclePanel}
   />
 </div>
 <div
   ref = {waitingForDriverRef}
-  className='fixed w-full bottom-0  translate-y-full h-screen bg-white px-3 py-3 '
+  className='fixed w-full bottom-0  translate-y-full h-screen bg-white px-3 py-3 z-1000 '
 
 >
   <WaitForDriver waitingForDriver={waitingForDriver} setwaitingForDriver={setwaitingForDriver}   ride={ride}

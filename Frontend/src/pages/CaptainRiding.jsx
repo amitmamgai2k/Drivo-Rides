@@ -1,8 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ChevronDown } from 'lucide-react';
+import logo from '../assets/logo.png';
 import FinishRide from '../components/FinishRide';
 import { gsap } from "gsap";
 import { Link,useLocation } from 'react-router-dom';
+import MapBackground from '../components/MapBackGround';
 
 function CaptainRiding(props) {
   const [finishRidePanel, setfinishRidePanel] = useState(false);
@@ -34,19 +36,16 @@ function CaptainRiding(props) {
       {/* Header with Logo */}
       <div className="absolute top-0 left-0 right-0 p-4 z-20">
         <img
-          className="w-16 h-16 object-contain"
-          src="https://www.svgrepo.com/show/505031/uber-driver.svg"
+          className=" object-contain"
+          src={logo}
           alt="Uber Logo"
+          height={80} width={150}
         />
       </div>
 
       {/* Map Section */}
-      <div className="h-[85vh] relative">
-        <img
-          src="https://miro.medium.com/v2/resize:fit:1400/0*gwMx05pqII5hbfmX.gif"
-          alt="Map background"
-          className="w-full h-full object-cover"
-        />
+      <div className="h-[85vh] relative w-full  object-cover">
+        <MapBackground />
       </div>
 
       {/* Bottom Panel */}
