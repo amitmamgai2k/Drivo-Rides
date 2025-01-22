@@ -34,6 +34,13 @@ const rideSchema = new mongoose.Schema({
         }
     },
 
+    originText:{
+        type: String,
+    },
+
+    destinationText:{
+        type: String,
+    },
 
     status: {
         type: String,

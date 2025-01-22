@@ -118,14 +118,14 @@ const ConfirmRidePopUp = (props) => {
             <MapPin className="w-5 h-5 text-gray-500" />
             <div>
               <h3 className="font-semibold text-lg">{vehicle.srcLocation}</h3>
-              <p className="text-gray-600 text-sm">{props.ride?.origin}</p>
+              <p className="text-gray-600 text-sm">{props.ride?.originText}</p>
             </div>
           </div>
           <div className="flex items-start space-x-3">
             <MapPin className="w-5 h-5 text-gray-500" />
             <div>
               <h3 className="font-semibold text-lg">{vehicle.destLocation}</h3>
-              <p className="text-gray-600 text-sm">{props.ride?.destination}</p>
+              <p className="text-gray-600 text-sm">{props.ride?.destinationText}</p>
             </div>
           </div>
         </div>

@@ -137,8 +137,8 @@ const Riding = (props) => {
                     <div className="flex items-start gap-4 p-4 bg-gray-50 rounded-lg">
                         <MapPin className="w-5 h-5 text-blue-500 flex-shrink-0 mt-1" />
                         <div>
-                            <h3 className="font-medium text-gray-900">{ride.origin}</h3>
-                            <p className="text-sm text-gray-600">{ride.destination}</p>
+                            <h3 className="font-medium text-gray-900">{ride.originText}</h3>
+                            <p className="text-sm text-gray-600">{ride.destinationText}</p>
                         </div>
                     </div>
 

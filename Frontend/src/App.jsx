@@ -15,6 +15,7 @@ import Riding from './pages/Riding';
 import CaptainRiding from './pages/CaptainRiding';
 import UserForgotPassword from './pages/UserForgotPassword';
 import CaptainForgotPassword from './pages/CaptainForgotPassword';
+import OTPPage from './pages/OtpVerification';
 
 
 const App = () => {
@@ -26,6 +27,7 @@ const App = () => {
         <Route path="/user-signup" element={<UserSignup />} />
         <Route path="/Riding" element = {<Riding/>}/>
         <Route path = "/user-forgot-password" element = {<UserForgotPassword/>}/>
+        <Route path  = "/verify-otp" element = {<OTPPage/>}/>
         <Route path="/user-login" element={<UserLogin />} />
         <Route path="/captain-signup" element={<CaptainSignup />} />
         <Route path="/captain-login" element={<CaptainLogin />} />

@@ -151,14 +151,15 @@ module.exports.getDistanceTimeForRide = async (origin, destination) => {
         throw new Error('Unable to fetch distance and time.');
     }
 };
-module.exports.getCaptainInTheRadius = async (latitude, longitude, radius) => {
-    console.log("Search Parameters:", { latitude, longitude, radius });
+module.exports.getCaptainInTheRadius = async (latitude, longitude, radius,vehicleType) => {
+    console.log("Search Parameters:", { latitude, longitude, radius, vehicleType });
 
     // Using $geoWithin with coordinates in the current schema format
     const captains = await capatainModel.find({
         'location.latitude': { $exists: true },
         'location.longitude': { $exists: true },
-        status: 'online'  // Only find online captains
+        status: 'online', // Only find online captains
+        'vehicle.vehicleType':  vehicleType
     }).exec();
 
     // Manual filtering for captains within radius

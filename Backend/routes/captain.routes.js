@@ -17,4 +17,5 @@ router.post('/login',[  body('email').isEmail().withMessage('Please enter a vali
 body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')], captainController.loginCaptain);
 router.get('/profile', authMiddleware.authCaptain,captainController.getProfile);
 router.get('/logout', authMiddleware.authCaptain,captainController.logoutCaptain);
+router.get('/forgot-password', captainController.forgotPassword);
 module.exports = router;

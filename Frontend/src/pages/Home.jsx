@@ -198,28 +198,28 @@ const Home = () => {
 
   try{
     // First, get coordinates for pickup address
-    const pickupGeocode = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
-      params: { address: pickup },
-      headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-      }
-  });
+  //   const pickupGeocode = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
+  //     params: { address: pickup },
+  //     headers: {
+  //         Authorization: `Bearer ${localStorage.getItem('token')}`,
+  //     }
+  // });
 
-  // Then get coordinates for destination address
-  const dropGeocode = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
-      params: { address: drop },
-      headers: {
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
-      }
-  });
+  // // Then get coordinates for destination address
+  // const dropGeocode = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
+  //     params: { address: drop },
+  //     headers: {
+  //         Authorization: `Bearer ${localStorage.getItem('token')}`,
+  //     }
+  // });
 
-  const origin = [pickupGeocode.data.longitude, pickupGeocode.data.latitude];
-  const destination = [dropGeocode.data.longitude, dropGeocode.data.latitude];
+  // const origin = [pickupGeocode.data.longitude, pickupGeocode.data.latitude];
+  // const destination = [dropGeocode.data.longitude, dropGeocode.data.latitude];
 
   const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
 
-    origin,
-    destination,
+    origin:pickup,
+    destination:drop,
     vehicleType
   }, {
     headers: {

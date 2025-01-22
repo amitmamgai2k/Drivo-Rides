@@ -12,5 +12,16 @@ router.post('/register', [
 router.post('/login',[body('email').isEmail().withMessage('Please enter a valid email'),body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')], userController.loginUser);
 router.get('/profile',authMiddleware.authUser, userController.getUserProfile);
 router.get('/logout',authMiddleware.authUser, userController.logoutUser);
+router.post('/forgot-password', [
+    body('email').isEmail().withMessage('Please enter a valid email'),
+], userController.forgotPassword);
+
+router.post('/verify-otp', [
+    body('email').isEmail().withMessage('Please enter a valid email'),
+    body('enteredOtp').isLength({ min: 4, max: 4 }).withMessage('Invalid OTP'),
+    body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
+
+], userController.verifyOtp);
+
 module.exports = router;
 

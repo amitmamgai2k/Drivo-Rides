@@ -143,7 +143,7 @@ const CaptainHome = () => {
       {/* Logout Button */}
       <Link
         to="/captain-login"
-        className="fixed right-2 top-5 h-10 w-10 bg-white flex items-center justify-center rounded-full shadow"
+        className="fixed right-0 mr-10 top-5 h-10 w-10 object-contain bg-white flex items-center justify-center rounded-full shadow z-30"
       >
         <i className="ri-logout-box-r-line"></i>
       </Link>

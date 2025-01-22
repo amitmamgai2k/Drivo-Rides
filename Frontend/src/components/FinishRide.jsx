@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { MapPin, ArrowLeft, CreditCard } from 'lucide-react';
+import { MapPin, ArrowLeft, CreditCard,MapPinHouse } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
@@ -11,11 +11,11 @@ const FinishRide = (props) => {
 
   const vehiclesData = [
     {
-      srcLocation: '562/11-A',
-      exactLocation: 'Kaikondrahalii, Bengaluru, Karnataka',
-      destLocation: 'Third Wave Coffee',
-      exactDestLocation: 'Plot no 417 sector2 HSR Layout, Bengaluru, Karnataka',
-      price: '193.20',
+      srcLocation: 'Pickup Location',
+
+      destLocation: 'Dropoff Location',
+
+
       payMethod: 'Cash',
     },
   ];
@@ -83,34 +83,45 @@ const FinishRide = (props) => {
         </div>
 
         {/* Location Info */}
-        <div className="space-y-4">
-          <div className="flex items-start space-x-3">
-            <MapPin className="w-5 h-5 text-gray-500" />
-            <div>
-              <h3 className="font-semibold text-lg">{vehicle.srcLocation}</h3>
-              <p className="text-gray-600 text-sm">{props.ride?.origin}</p>
-            </div>
-          </div>
-          <div className="flex items-start space-x-3">
-            <MapPin className="w-5 h-5 text-gray-500" />
-            <div>
-              <h3 className="font-semibold text-lg">{vehicle.destLocation}</h3>
-              <p className="text-gray-600 text-sm">{props.ride?.destination}</p>
-            </div>
-          </div>
-        </div>
+        <div className="space-y-6">
+  {/* Pickup Location */}
+  <div className="flex items-start">
+    <div className="w-8 flex-shrink-0 pt-0.5">
+      <MapPinHouse className="w-6 h-6 text-blue-600" />
+    </div>
+    <div className="flex-1">
 
-        {/* Fare and Payment Info */}
-        <div className="flex space-x-2 items-center p-4 bg-gray-50 rounded-lg">
-          <CreditCard className="w-6 h-6 text-gray-500" />
-          <div className="flex flex-col">
-            <p className="font-semibold text-lg">₹{props.ride?.price}</p>
-            <p className="font-extralight text-sm">{vehicle.payMethod}</p>
-          </div>
-        </div>
+      <h3 className="font-semibold text-gray-900">{vehicle.srcLocation}</h3>
+      <p className="text-sm text-gray-500 mt-1">{props.ride?.originText}</p>
+    </div>
+  </div>
 
+  {/* Destination */}
+  <div className="flex items-start">
+    <div className="w-8 flex-shrink-0 pt-0.5">
+      <MapPin className="w-6 h-6 text-red-600" />
+    </div>
+    <div className="flex-1">
 
+      <h3 className="font-semibold text-gray-900">{vehicle.destLocation}</h3>
+      <p className="text-sm text-gray-500 mt-1">{props.ride?.destinationText}</p>
+    </div>
+  </div>
 
+  {/* Payment */}
+  <div className="flex items-start">
+    <div className="w-8 flex-shrink-0 pt-0.5">
+      <CreditCard className="w-6 h-6 text-green-600" />
+    </div>
+    <div className="flex-1">
+      <p className="text-sm font-medium text-gray-500 mb-1">Payment</p>
+      <div className="flex items-baseline gap-2">
+        <p className="font-semibold text-gray-900 text-lg">₹{props.ride?.price}</p>
+        <span className="text-sm text-gray-500">• {vehicle.payMethod}</span>
+      </div>
+    </div>
+  </div>
+</div>
       {/* Action Buttons */}
       <div className="mt-6 mb-3">
         <button

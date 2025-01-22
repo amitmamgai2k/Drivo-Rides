@@ -74,3 +74,18 @@ module.exports.getProfile = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 };
+module.exports.forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        const captain = await captainModel.findOne({ email });
+        if (!captain) {
+            return res.status(404).json({ error: "Captain not found" });
+        }
+        const token = await captain.generatePasswordResetToken();
+        await captain.save();
+        res.status(200).json({ message: "Password reset token sent to email" });
+    } catch (err) {
+        console.error("Error resetting password:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+};
