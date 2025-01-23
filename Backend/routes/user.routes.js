@@ -3,8 +3,11 @@ const router = express.Router();
 const userController = require('../controllers/user.controller');
 const authMiddleware = require('../middlewares/auth.middleware');
 const { body } = require('express-validator');
+const upload  = require('../middlewares/multer.middleware');
 
-router.post('/register', [
+router.post('/register',
+    upload.single('ProfileImage'),
+    [
     body('email').isEmail().withMessage('Please enter a valid email'),
     body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be at least 3 characters long'),
     body('mobileNumber').isNumeric().isLength({ min: 10, max: 10 }).withMessage('Mobile number must be a numeric value'),

@@ -5,40 +5,61 @@ const { validationResult } = require('express-validator');
 const BlacklistToken = require('../models/blacklistToken.model');
 const sendMail = require('../utils/sendMail')
 const bcrypt = require("bcrypt"); // Use bcrypt for hashing passwords
+const uploadOnCloudinary = require('../utils/cloudinary');
 
 module.exports.registerUser = async (req, res) => {
-
-
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ errors: errors.array() });
     }
 
+    // Parse fullname from stringified JSON
+    const fullname = JSON.parse(req.body.fullname);
+    const { email, password, mobileNumber } = req.body;
 
-    const { fullname, email, password, mobileNumber } = req.body;
+    // Correct ProfileImage path (use req.file)
+    const ProfilePictureLocalPath = req.file?.path;
+    if (!ProfilePictureLocalPath) {
+      return res.status(400).json({ error: "Profile picture is required" });
+    }
+
+    // Fix required fields check (use || instead of ,)
+    if (!fullname || !email || !password || !mobileNumber) {
+      return res.status(400).json({ error: "Missing required fields" });
+    }
+
+    // Check if user exists
     const isUserAlreadyExists = await userModel.findOne({ email });
     if (isUserAlreadyExists) {
-        return res.status(400).json({ error: "User already exists" });
+      return res.status(400).json({ error: "User already exists" });
     }
+
+    // Upload to Cloudinary
+    const ProfilePicture = await uploadOnCloudinary(ProfilePictureLocalPath);
+    if (!ProfilePicture) {
+      return res.status(400).json({ error: "Error uploading profile picture" });
+    }
+
+    // Hash password
     const hashPassword = await userModel.hashPassword(password);
 
     try {
-        const user = await userService.createUser({
-            firstname: fullname.firstname,
-            lastname: fullname.lastname,
-            email,
-            password: hashPassword,
-            mobileNumber
-        });
+      const user = await userService.createUser({
+        firstname: fullname.firstname,
+        lastname: fullname.lastname,
+        email,
+        password: hashPassword,
+        mobileNumber,
+        ProfilePicture: ProfilePicture.url,
+      });
 
-        const token = await user.generateAuthToken();
-        res.status(201).json({ token, user });
-
+      const token = await user.generateAuthToken();
+      res.status(201).json({ token, user });
     } catch (err) {
-        console.error("Error registering user:", err);
-        res.status(500).json({ error: "Server error" });
+      console.error("Error registering user:", err);
+      res.status(500).json({ error: "Server error" });
     }
-};
+  };
 module.exports.loginUser = async (req, res) => {
 
     const errors = validationResult(req);

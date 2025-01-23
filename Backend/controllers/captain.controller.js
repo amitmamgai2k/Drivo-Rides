@@ -5,27 +5,46 @@ const BlacklistToken = require('../models/blacklistToken.model');
 const rideService = require('../services/ride.service');
 const bcrypt = require("bcrypt"); // Use bcrypt for hashing passwords
 const sendMail = require('../utils/sendMail');
+const uploadOnCloudinary = require('../utils/cloudinary');
 module.exports.registerCaptain = async (req, res) => {
     try {
         const errors = validationResult(req);
         if (!errors.isEmpty()) {
             return res.status(400).json({ errors: errors.array() });
         }
-        const {email,password,fullname,vehicle} = req.body;
+
+
+        const {email,password,mobileNumber,fullname,vehicle} = req.body;
         const isCaptainAlreadyExists = await captainModel.findOne({ email });
         if (isCaptainAlreadyExists) {
             return res.status(400).json({ error: "Captain already exists" });
         }
+        if(!fullname || !email || !password || !mobileNumber || !vehicle) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+        const ProfilePictureLocalPath = req.file?.path;
+       if (!ProfilePictureLocalPath) {
+      return res.status(400).json({ error: "Profile picture is required" });
+    }
+    const ProfilePicture = await uploadOnCloudinary(ProfilePictureLocalPath);
+    if (!ProfilePicture) {
+      return res.status(400).json({ error: "Error uploading profile picture" });
+    }
+
         const hashPassword = await captainModel.hashPassword(password);
         const captain = await captainService.createCaptain({
             email,
             password: hashPassword,
             firstname: fullname.firstname,
             lastname: fullname.lastname,
+            mobileNumber: mobileNumber,
             color: vehicle.color,
             plate: vehicle.plate,
             capacity: vehicle.capacity,
-            vehicleType: vehicle.vehicleType
+            model: vehicle.model,
+            vehicleType: vehicle.vehicleType,
+            ProfilePicture: ProfilePicture.url
+
             });
             const token = await captain.generateAuthToken();
         res.status(201).json({ captain, token });

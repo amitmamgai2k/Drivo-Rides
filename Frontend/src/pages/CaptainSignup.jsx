@@ -48,27 +48,31 @@ const CaptainSignup = () => {
 
         const formData = new FormData();
         if (profilePicture) {
-            formData.append('profilePicture', profilePicture);
+            formData.append('ProfileImage', profilePicture);
         }
 
-        const captainData = {
-            fullname: {
-                firstname: firstName,
-                lastname: lastName
-            },
-            email,
-            mobile,
-            password,
-            vehicle: {
-                color: colour,
-                plate,
-                model,
-                capacity: parseInt(capacity),
-                vehicleType
-            },
+        // Construct nested objects
+        const fullname = {
+            firstname: firstName,
+            lastname: lastName
         };
 
-        formData.append('data', JSON.stringify(captainData));
+        const vehicle = {
+            color: colour,
+            plate,
+            model,
+            capacity: parseInt(capacity),
+            vehicleType
+        };
+
+        // Append fields individually like userSignup
+        formData.append('email', email);
+        formData.append('mobileNumber', mobile);
+        formData.append('password', password);
+        formData.append('fullname', JSON.stringify(fullname));
+        formData.append('vehicle', JSON.stringify(vehicle));
+
+
 
         try {
             const response = await axios.post(
@@ -80,9 +84,9 @@ const CaptainSignup = () => {
                     },
                 }
             );
-
-            if (response.status === 201) {
-                setCaptain(response.data);
+           console.log('Captain Registered',response);
+            if (response.data && response.data.token) {
+                setCaptain(response.data.user);
                 localStorage.setItem('token', response.data.token);
                 navigate('/captain-home');
             }

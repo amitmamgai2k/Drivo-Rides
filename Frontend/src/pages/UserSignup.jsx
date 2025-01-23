@@ -35,25 +35,31 @@ const UserSignup = () => {
         setPreviewURL(null);
     };
 
-    const submitHandler = async (e) => {
-        e.preventDefault();
+   // In submitHandler function
+const submitHandler = async (e) => {
+    e.preventDefault();
+    const formData = new FormData();
 
-        const formData = new FormData();
-        if (profilePicture) {
-            formData.append('profilePicture', profilePicture);
-        }
+    // Append ProfileImage (if exists)
+    if (profilePicture) {
+      formData.append("ProfileImage", profilePicture);
+    }
 
-        const userData = {
-            fullname: {
-                firstname: firstName,
-                lastname: lastName
-            },
-            email,
-            mobile,
-            password
-        };
+    // Append other fields
+    formData.append("email", email);
+    formData.append("mobileNumber", mobile);
+    formData.append("password", password);
 
-        formData.append('data', JSON.stringify(userData));
+    // Create a fullname object and stringify it
+    const fullname = {
+      firstname: firstName,
+      lastname: lastName,
+    };
+
+
+    formData.append("fullname", JSON.stringify(fullname));
+
+
 
         try {
             const response = await axios.post(
@@ -62,30 +68,19 @@ const UserSignup = () => {
                 {
                     headers: {
                         'Content-Type': 'multipart/form-data',
-                    },
+                    }
                 }
             );
 
-            if (response.status === 201) {
-                const data = response.data;
-                setUser(data.user);
-                localStorage.setItem('token', data.token);
+            if (response.data && response.data.token) {
+                localStorage.setItem('token', response.data.token);
+                setUser(response.data.user);
                 navigate('/home');
             }
         } catch (error) {
-            console.error('Registration error:', error);
-            alert(error.response?.data?.message || 'Registration failed');
+            console.error('Registration error:', error.response?.data || error);
         }
-
-        setEmail('');
-        setFirstName('');
-        setLastName('');
-        setPassword('');
-        setMobile('');
-        setProfilePicture(null);
-        setPreviewURL(null);
     };
-
     return (
         <div className="min-h-screen bg-gray-50">
             <div className='max-w-2xl mx-auto p-6'>

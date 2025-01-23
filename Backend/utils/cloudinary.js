@@ -1,6 +1,6 @@
-import { v2 as cloudinary } from 'cloudinary';
-import fs from 'fs/promises';
-import path from 'path';
+const cloudinary = require('cloudinary').v2;
+const fs = require('fs').promises;
+
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -16,7 +16,7 @@ const uploadOnCloudinary = async (localFilePath) => {
     }
 
     // Upload the file to Cloudinary
-    const response = await cloudinary.uploader.upload(localFilePath, {
+      const response = await cloudinary.uploader.upload(localFilePath, {
       resource_type: 'auto',
       width: 250,
       height: 250,
@@ -49,4 +49,4 @@ const uploadOnCloudinary = async (localFilePath) => {
   }
 };
 
-export { uploadOnCloudinary };
+module.exports =  uploadOnCloudinary ;

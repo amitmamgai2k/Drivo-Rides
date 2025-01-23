@@ -53,6 +53,10 @@ const captainSchema = new mongoose.Schema({
         min: 1,
         max: 4
        },
+    model:{
+        type:String,
+        required:true
+    },
        vehicleType: {
         type: String,
         required: true,
@@ -69,12 +73,23 @@ const captainSchema = new mongoose.Schema({
             default:undefined
         }
     },
+    ProfilePicture:{
+        type: String,
+        required: true
+    },
+    mobileNumber:{
+        type: Number,
+        required: true,
+        unique: true
+    },
     otp:{
         type:Number
     },
 otpExpires:{
     type:Number
-}
+},
+
+
 
 });
 captainSchema.methods.generateAuthToken = async function(){
