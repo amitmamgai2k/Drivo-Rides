@@ -81,7 +81,7 @@ const UserForgotPassword = () => {
                     </button>
 
                     {isSuccess && (
-                        <p className="text-sm text-green-500 mt-2">
+                        <p className="text-sm text-center text-green-500 mt-2">
                             Redirecting to the OTP Verification Page...
                         </p>
                     )}

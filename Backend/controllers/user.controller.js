@@ -15,7 +15,7 @@ module.exports.registerUser = async (req, res) => {
     }
 
 
-    const { fullname, email, password } = req.body;
+    const { fullname, email, password, mobileNumber } = req.body;
     const isUserAlreadyExists = await userModel.findOne({ email });
     if (isUserAlreadyExists) {
         return res.status(400).json({ error: "User already exists" });
@@ -27,7 +27,8 @@ module.exports.registerUser = async (req, res) => {
             firstname: fullname.firstname,
             lastname: fullname.lastname,
             email,
-            password: hashPassword
+            password: hashPassword,
+            mobileNumber
         });
 
         const token = await user.generateAuthToken();
@@ -101,10 +102,52 @@ module.exports.forgotPassword = async (req, res) => {
         user.otp = otp; // Save OTP in the database (assuming `otp` is a field in the user schema)
         user.otpExpires = Date.now() + 10 * 60 * 1000; // OTP valid for 10 minutes
         await user.save();
-
+        const username = user.fullname.firstname + " " + user.fullname.lastname;
         // Send OTP via email
         const subject = "Reset Password";
-        const message = `Enter the OTP to reset your password: ${otp}`;
+        const message = `
+        <div style="max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">
+            <div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333333; line-height: 1.6;">
+                <p style="margin-bottom: 15px;">Dear ${username},</p>
+
+                <p style="margin-bottom: 15px;">You recently requested to reset your password. Please use the One-Time Password (OTP) below to proceed with resetting your password:</p>
+
+                <div style="text-align: center; margin: 25px 0;">
+                    <h3 style="color: #4CAF50; background-color: #e8f5e9;
+                              padding: 12px 24px; border-radius: 5px;
+                              display: inline-block; margin: 0;
+                              border: 2px dashed #81c784;">
+                        ${otp}
+                    </h3>
+                </div>
+
+                <div style="background-color: #fff3cd; padding: 15px; border-left: 4px solid #ffc107;
+                          margin: 20px 0; border-radius: 4px;">
+                    <p style="margin: 0; color: #856404;">
+                        ⚠️ This OTP is valid for the next <strong>10 minutes</strong>.
+                        Please do not share this code with anyone.
+                    </p>
+                </div>
+
+                <p style="margin-bottom: 15px; color: #6c757d;">
+                    If you did not request a password reset, please ignore this email or
+                    <a href="mailto:support@drivorides.com" style="color: #2196F3; text-decoration: none;">
+                        contact our support team
+                    </a> immediately.
+                </p>
+
+                <div style="border-top: 1px solid #e0e0e0; margin-top: 30px; padding-top: 20px;">
+                    <p style="margin: 5px 0; font-size: 0.9em; color: #757575;">
+                        Best regards,<br>
+                        <strong style="color: #2e7d32;">Drivo Rides Support Team</strong>
+                    </p>
+                    <p style="margin: 5px 0; font-size: 0.8em; color: #9e9e9e;">
+                        Need help? Reply to this email or call us at (555) 123-4567
+                    </p>
+                </div>
+            </div>
+        </div>
+    `;
         await sendMail(email, subject, message);
 
         // Inform user that OTP has been sent

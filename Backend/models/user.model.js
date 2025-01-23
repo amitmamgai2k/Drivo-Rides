@@ -23,10 +23,11 @@ const userSchema = new mongoose.Schema({
     unique: true,
     minlength: [3,'Email must be at least 5 characters long'],
     },
-    // mobileNumber:{
-    //     type: Number,
-    //     required: true
-    // },
+    mobileNumber:{
+        type: Number,
+        required: true,
+        unique: true
+    },
     // profileImage:{
     //     type: String,
     //     required: true
@@ -40,6 +41,10 @@ const userSchema = new mongoose.Schema({
     otp:{
       type: Number
     },
+    otpExpires:{
+        type:Number
+    },
+
     socketId:{
         type: String
     },

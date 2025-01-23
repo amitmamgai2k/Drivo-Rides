@@ -69,6 +69,12 @@ const captainSchema = new mongoose.Schema({
             default:undefined
         }
     },
+    otp:{
+        type:Number
+    },
+otpExpires:{
+    type:Number
+}
 
 });
 captainSchema.methods.generateAuthToken = async function(){

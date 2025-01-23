@@ -12,7 +12,7 @@ const sendMail = async function (email, subject, message) {
 //Setup email data
 
     let mailDetails = {
-        from: "amit.mamgai2002@gmail.com",
+        from: "Drivo Rides",
         to: email,
         subject: subject,
         html: message,
