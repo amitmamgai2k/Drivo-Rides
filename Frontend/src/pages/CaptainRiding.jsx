@@ -63,7 +63,7 @@ function CaptainRiding(props) {
         {/* Ride Info */}
         <div className="px-6 py-4 flex items-center justify-between">
           <div className="space-y-1">
-            <h4 className="text-2xl font-bold text-gray-800">4.2 Km</h4>
+            <h4 className="text-2xl font-bold text-gray-800">{rideData.distance} Km</h4>
             <p className="text-gray-500 text-sm">Distance to destination</p>
           </div>
           <button

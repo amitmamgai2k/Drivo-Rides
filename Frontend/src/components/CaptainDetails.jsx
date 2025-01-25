@@ -28,7 +28,7 @@ function CaptainDetails() {
                     <div className="relative">
                         <img
                             className="h-14 w-14 rounded-full object-cover border-2 border-blue-500"
-                            src="https://rahahome.com/wp-content/uploads/2022/11/2-min-scaled.jpg"
+                            src={captain?.captain?.ProfilePicture}
                             alt="Captain"
                         />
                         <span className="absolute bottom-0 right-0 h-3 w-3 rounded-full bg-green-500 border-2 border-white"></span>
@@ -43,7 +43,7 @@ function CaptainDetails() {
                     </div>
                 </div>
                 <div className="text-center bg-green-50 px-4 py-2 rounded-lg">
-                    <h4 className="text-lg font-bold text-green-700">₹2000</h4>
+                    <h4 className="text-lg font-bold text-green-700">₹ {captain?.captain?.TotalEarnings}</h4>
                     <p className="text-xs text-green-600">Today's Earning</p>
                 </div>
             </div>
@@ -54,21 +54,23 @@ function CaptainDetails() {
                     {/* Hours Online */}
                     <div className="flex-1 text-center bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                         <i className="text-2xl ri-time-line text-blue-600 mb-2"></i>
-                        <h4 className="text-lg font-bold">10.2</h4>
+                        <h4 className="text-lg font-bold">{captain?.captain?.hoursWorked
+}</h4>
                         <p className="text-sm text-gray-600">Hours Online</p>
                     </div>
 
                     {/* Distance Covered */}
                     <div className="flex-1 text-center bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                         <i className="text-2xl ri-speed-up-fill text-green-600 mb-2"></i>
-                        <h4 className="text-lg font-bold">300</h4>
+                        <h4 className="text-lg font-bold">{captain?.captain?.distanceTravelled}</h4>
+
                         <p className="text-sm text-gray-600">KM Covered</p>
                     </div>
 
                     {/* Rides Completed */}
                     <div className="flex-1 text-center bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                         <i className="text-2xl ri-route-line text-purple-600 mb-2"></i>
-                        <h4 className="text-lg font-bold">15</h4>
+                        <h4 className="text-lg font-bold">{captain?.captain?.RideDone}</h4>
                         <p className="text-sm text-gray-600">Rides Done</p>
                     </div>
                 </div>

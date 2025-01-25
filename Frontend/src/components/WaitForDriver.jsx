@@ -8,7 +8,7 @@ const WaitForDriver = (props) => {
     <div className="flex flex-col h-screen bg-white p-4">
       <div className="flex-1 flex flex-col justify-center items-center space-y-3">
         <img
-          src="https://www.rd.com/wp-content/uploads/2023/06/GettyImages-640566648.jpg?fit=700,700"
+          src={props.ride?.captain?.ProfilePicture}
           alt="Driver"
           className="w-24 h-24 rounded-full"
         />
@@ -54,7 +54,7 @@ const WaitForDriver = (props) => {
 
         <p className="text-center text-gray-500">
           Meet at the pickup point<br/>
-          {props.ride?.origin[0]},{props.ride?.origin[1]}
+          {props.ride?.originText}
         </p>
 
         <button

@@ -147,6 +147,8 @@ const startRide = async (req, res) => {
     const{rideId,otp} = req.query;
 
     try {
+        console.log("captain in confrim ride popup", req.captain);
+
         // Assuming `req.captain` contains the captain object
         const ride = await rideService.startRide({
             rideId,

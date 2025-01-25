@@ -102,7 +102,7 @@ const Riding = (props) => {
                 <div className="absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-lg shadow-lg">
                     <div className="flex items-center gap-2 text-sm text-gray-700">
                         <Navigation className="w-4 h-4" />
-                        <span>On the way to destination</span>
+                        <span>On the way to {ride.destinationText}</span>
                     </div>
                 </div>
             </div>
@@ -115,7 +115,7 @@ const Riding = (props) => {
                         <div className="h-14 w-14 rounded-full bg-gray-200 overflow-hidden">
                             <img
                                 className="h-full w-full object-cover"
-                                src="https://indian-drivers.com/wp-content/uploads/2024/05/Rectangle-13.png"
+                                src={ride.captain.ProfilePicture }
                                 alt="Vehicle"
                             />
                         </div>
@@ -127,7 +127,7 @@ const Riding = (props) => {
                                 <Car className="w-4 h-4 text-gray-500" />
                                 <span className="text-gray-600">{ride.captain.vehicle.plate}</span>
                             </div>
-                            <p className="text-sm text-gray-500">Maruti Suzuki Alto</p>
+                            <p className="text-sm text-gray-500">{ride.captain.vehicle.model || "Unknown Model"}</p>
                         </div>
                     </div>
                 </div>

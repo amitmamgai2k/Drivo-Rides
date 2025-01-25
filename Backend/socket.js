@@ -55,6 +55,25 @@ const initializeSocket = (server) => {
 
 
             })
+            socket.on('update-captain-details',async(data)=>{
+                const {userId,TodayEarnings,HoursWorked,DistanceTravelled,RideDone} = data;
+                if(!TodayEarnings || !HoursWorked || !DistanceTravelled || !RideDone){
+                    return socket.emit('error','Invalid details')
+                }
+                console.log(`User ${userId} updated details ${userId}`);
+
+                    await capatainModel.findByIdAndUpdate(userId,{
+                     $inc:{   TotalEarnings:TodayEarnings,
+                        hoursWorked:HoursWorked,
+                        distanceTravelled:DistanceTravelled,
+                        RideDone:RideDone
+                     }
+                    });
+                    console.log('Captain details updated successfully');
+                    socket.emit('update-success', 'Details updated');
+
+
+            })
 
 
         socket.on('disconnect', () => {

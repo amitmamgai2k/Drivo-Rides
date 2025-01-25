@@ -9,11 +9,15 @@ function CaptainContext({ children }) {
       firstName: '',
       lastName: '',
     },
+    mobileNumber: '',
+    ProfilePicture: '',
+
     vehicle: {
       color: '',
       plate: '',
       capacity: 0,
       vehicleType: '',
+      model: '',
     },
     status: 'offline',
   });

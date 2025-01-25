@@ -93,7 +93,7 @@ const confirmRide = async ({ rideId, captain }) => {
     if (!rideId || !captain) {
         throw new Error('Missing required fields for ride confirmation');
     }
-
+    console.log('Captain ID backend:', captain._id); // Log captain ID
     // Update ride with captain and status
     await rideModel.findOneAndUpdate(
         { _id: rideId },
@@ -104,6 +104,8 @@ const confirmRide = async ({ rideId, captain }) => {
 
     // Fetch the updated ride and populate user
     const ride = await rideModel.findOne({ _id: rideId }).populate('user').populate('captain').select('+otp');
+    console.log('Ride found:', ride);
+
 
     if (!ride) {
         throw new Error('Ride not found');

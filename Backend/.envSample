@@ -1,0 +1,31 @@
+# Server Configuration
+PORT=4000
+
+# Database Configuration
+MONGO_URI=mongodb://localhost:27017/myDummyDatabase
+
+# JWT Configuration
+JWT_SECRET=dummySecret123
+REFRESH_TOKEN_SECRET=dummyRefreshSecret456
+
+# Maps API Configuration
+MAPS_API_MAPINDIA=dummyMapsApiKey12345
+MAPS_CLIENT_ID=dummyClientId98765
+MAPS_CLIENT_SECRET=dummyClientSecret54321
+MAPS_API=dummyMapsApiKey09876
+
+# Payment Gateway Configuration
+PAYMENT_CLIENT_ID=dummyPaymentClientId001
+PAYMENT_CLIENT_SECRET=dummyPaymentClientSecret002
+
+# Cloudinary Configuration
+CLOUDINARY_CLOUD_NAME=dummyCloudName
+CLOUDINARY_API_KEY=dummyApiKey123456
+CLOUDINARY_API_SECRET=dummyApiSecret654321
+
+# Frontend Configuration
+FRONTEND_URL=http://localhost:5173/dummy-forgot-password
+
+# SMTP Configuration
+SMTP_MAIL=dummyemail@gmail.com
+SMTP_PASSWORD=dummySmtpPassword123

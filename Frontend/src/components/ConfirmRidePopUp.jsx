@@ -56,6 +56,8 @@ const ConfirmRidePopUp = (props) => {
     try {
       const otpString = otp.join(''); // Convert OTP array to a string
      console.log("rideId", props.ride._id);
+     console.log("captain Id in confrim ride popup", props.ride.captain._id);
+
       const response = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/rides/start-ride`,
         {
@@ -73,7 +75,7 @@ const ConfirmRidePopUp = (props) => {
         props.setConfirmRidePopupPanel(false);
         props.setRidePopupPanel(false);
        const   ride = props.ride;
-        // console.log("riding props data",props.ride);
+         console.log("riding confirm ridee popup props data",props.ride);
 
         navigate('/captain-riding', { state: { ride }   });
       }
@@ -102,7 +104,7 @@ const ConfirmRidePopUp = (props) => {
           <div className="flex items-center justify-between w-full gap-4">
             <img
               className="h-10 w-10 rounded-full object-cover"
-              src="https://rahahome.com/wp-content/uploads/2022/11/2-min-scaled.jpg"
+              src={props.ride?.user?.ProfilePicture}
               alt="Rider"
             />
             <div className="flex justify-between w-full">

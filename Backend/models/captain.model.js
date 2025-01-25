@@ -88,9 +88,36 @@ const captainSchema = new mongoose.Schema({
 otpExpires:{
     type:Number
 },
+hoursWorked: {
+    type:Number,
+    default:0,
+    set: (value) => {
+        // Round to two decimal places
+        return Math.round(value * 100) / 100;
+    },
+},
+distanceTravelled: {
+    type:Number,
+    default:0
+
+},
+RideDone:{
+    type:Number,
+    default:0
+},
+TotalEarnings:{
+    type:Number,
+    default:0
+}
 
 
 
+});
+captainSchema.pre('save', function (next) {
+    if (this.hoursWorked) {
+        this.hoursWorked = Math.round(this.hoursWorked * 100) / 100;
+    }
+    next();
 });
 captainSchema.methods.generateAuthToken = async function(){
     const token = jwt.sign({id: this._id},process.env.JWT_SECRET,{expiresIn: '24h'});

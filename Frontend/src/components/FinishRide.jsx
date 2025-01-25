@@ -1,13 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { MapPin, ArrowLeft, CreditCard,MapPinHouse } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import { SocketContext } from '../context/SocketContext';
 
 
 const FinishRide = (props) => {
 
   const navigate = useNavigate();
+  const{socket} = useContext(SocketContext);
 
   const vehiclesData = [
     {
@@ -43,11 +45,30 @@ const FinishRide = (props) => {
     });
 
     if (response.status === 200) {
+      console.log("Captain object: ", props.ride?.captain);
+
+
+      socket.emit("update-captain-details",{
+         userId:props.ride?.captain?._id,
+         TodayEarnings:props.ride.price,
+         HoursWorked:props.ride.duration,
+         DistanceTravelled:props.ride.distance,
+         RideDone : 1
+      })
+      console.log("Captain Data sent to socket");
+
 
       navigate('/captain-home');
 
     }
     }
+    socket.on('update-success', (message) => {
+      console.log(message); // Should log: 'Details updated'
+  });
+
+  socket.on('error', (message) => {
+      console.error(message);
+  });
 
 
 
@@ -72,7 +93,7 @@ const FinishRide = (props) => {
           <div className="flex items-center justify-between w-full gap-4">
             <img
               className="h-10 w-10 rounded-full object-cover"
-              src="https://rahahome.com/wp-content/uploads/2022/11/2-min-scaled.jpg"
+              src={props.ride?.user?.ProfilePicture}
               alt="Rider"
             />
             <div className="flex justify-between w-full">

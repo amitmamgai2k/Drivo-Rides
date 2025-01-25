@@ -144,7 +144,7 @@ module.exports.getDistanceTimeForRide = async (origin, destination) => {
 
         return {
             distance,
-            duration: duration / 60 // Convert to minutes
+            duration: duration / 3600 // Convert to Hours
         };
     } catch (error) {
         console.error('Error details:', error.response?.data || error.message);

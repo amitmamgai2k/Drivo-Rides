@@ -42,7 +42,7 @@ const RidePop = (props) => {
           <div className="flex items-center justify-between w-full gap-4">
             <img
               className="h-10 w-10 rounded-full object-cover"
-              src="https://rahahome.com/wp-content/uploads/2022/11/2-min-scaled.jpg"
+              src={props.ride?.user?.ProfilePicture}
               alt="Rider"
             />
             <div className="flex justify-between w-full">
