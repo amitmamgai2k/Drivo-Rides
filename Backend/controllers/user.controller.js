@@ -54,6 +54,16 @@ module.exports.registerUser = async (req, res) => {
         mobileNumber,
         ProfilePicture: ProfilePicture.url,
       });
+      const subject  = "Welcome to Drivo Rides";
+      const message = `<div style="max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">\n` +
+      `<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333333; line-height: 1.6;">\n` +
+      `<p style="margin-bottom: 15px;">Welcome to Drivo Rides, ${fullname.firstname} ${fullname.lastname}!</p>\n` +
+      `<p style="margin-bottom: 15px;">Thank you for registering with us. We're excited to have you on board.</p>\n` +
+      `<p style="margin-bottom: 15px;">If you have any questions or need assistance, please don't hesitate to reach out to our support team.</p>\n` +
+      `<p style="margin-bottom: 15px;">Best regards,<br>Drivo Rides Team</p>\n` +
+      `</div>\n` +
+      `</div>\n`;
+      await sendMail(email, subject, message);
 
       const token = await user.generateAuthToken();
       await sendRegistrationMessage(`91${mobileNumber}`, fullname.firstname, fullname.lastname);
@@ -81,6 +91,17 @@ module.exports.loginUser = async (req, res) => {
             return res.status(400).json({ error: "Invalid credentials" });
         }
         const token = await user.generateAuthToken();
+        const subject  = "Login Successful";
+        const message = `<div style="max-width: 600px; margin: 20px auto; padding: 20px; background-color: #f8f9fa; border-radius: 8px;">\n` +
+        `<div style="font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #333333; line-height: 1.6;">\n` +
+        `<p style="margin-bottom: 15px;">Hello ${user.fullname.firstname},</p>\n` +
+        `<p style="margin-bottom: 15px;">You have successfully logged in to your account.</p>\n` +
+        `<p style="margin-bottom: 15px;">If you have any questions or need assistance, please don't hesitate to reach out to our support team.</p>\n` +
+        `<p style="margin-bottom: 15px;">Best regards,<br>Drivo Rides Team</p>\n` +
+        `</div>\n` +
+        `</div>\n`;
+        await sendMail(email, subject, message);
+
         res.status(200).json({ token, user });
     } catch (err) {
         console.error("Error logging in user:", err);

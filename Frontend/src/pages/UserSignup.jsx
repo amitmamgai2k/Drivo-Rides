@@ -233,12 +233,12 @@ const submitHandler = async (e) => {
 
                 {/* Footer Text */}
                 <div className="mt-6">
-                    <p className='text-xs text-gray-500 text-center leading-relaxed'>
-                        By signing up, you agree to our{' '}
-                        <a href="#" className='text-blue-600 hover:underline'>Terms of Service</a>{' '}
-                        and{' '}
-                        <a href="#" className='text-blue-600 hover:underline'>Privacy Policy</a>
-                    </p>
+                   <p className="text-xs text-gray-500 text-center mt-6">
+                                       By signing up, you agree to our{' '}
+                                       <Link to='/Drivo-Rides-Terms-and-Conditions' className="text-blue-600 hover:underline">Terms of Service</Link>{' '}
+                                       and{' '}
+                                       <Link to ='/Drivo-Rides-privacy-policy' className="text-blue-600 hover:underline">Privacy Policy</Link>
+                                   </p>
                 </div>
             </div>
         </div>

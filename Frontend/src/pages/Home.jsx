@@ -1,5 +1,5 @@
 import React, { useState ,useEffect,useContext} from 'react';
-import { ChevronDown, Circle, MapPin } from 'lucide-react';
+import { ChevronDown, Circle, MapPin,Menu } from 'lucide-react';
 import LocationSearchPanel from '../components/LocationSearchPanel';
 import { useRef } from 'react';
 import gsap from "gsap";
@@ -15,10 +15,12 @@ import WaitForDriver from '../components/WaitForDriver';
 import MapBackGround from '../components/MapBackGround';
 import { SocketContext } from '../context/SocketContext';
 import {UserDataContext} from '../context/UserContext'
+import DropdownMenu from '../components/UserMenu/DropDownMenu';
 
 const Home = () => {
   const[loading,setLoading] = useState(false)
   const [pickup, setPickup] = useState('');
+  const[menuOpen,setMenuOpen] = useState(false)
   const [drop, setDrop] = useState('');
   const [panelOpen, setPanelOpen] = useState(false);
   const [vehiclePanel, setVehiclePanel] = useState(false);
@@ -236,17 +238,26 @@ const Home = () => {
     console.error("Error creating ride:", error.response?.data || error.message);
   }
 }
+const toggleMenu = (state) => {
+  setMenuOpen(state !== undefined ? state : !menuOpen); // Toggle menu state
+};
   return (
-    <div className="relative h-screen w-screen  bg-gray-100">
+    <div className="relative h-screen w-screen  bg-gray-100 mb-16">
       {/* UBER Text at top */}
       <div
-        className={`absolute top-5 left-5 z-10 transition-opacity duration-300 ${
-          panelOpen ? 'opacity-0' : 'opacity-100'
-        }`}
-      >
-    <img src={logo} alt="hello" height={80} width={150}  />
-      </div>
+  className={`absolute top-5 left-1 right-3 z-10 transition-opacity duration-300 flex flex-row justify-between items-center ${
+    panelOpen ? 'opacity-0' : 'opacity-100'
+  }`}
+>
+  {/* Logo on the left */}
+  <img src={logo} alt="hello" height={80} width={150} />
 
+  {/* Menu icon on the right */}
+  <button className="text-3xl font-semibold"  onClick={() => toggleMenu()}>
+    <Menu size={35} strokeWidth={2} />
+  </button>
+</div>
+<DropdownMenu isOpen={menuOpen} toggleMenu={toggleMenu} />
       <MapBackGround panelOpen={panelOpen} setVehiclePanel={setVehiclePanel} />
 
 
@@ -397,7 +408,7 @@ const Home = () => {
 </div>
 <div
   ref = {waitingForDriverRef}
-  className='fixed w-full bottom-0  translate-y-full h-screen bg-white px-3 py-3 z-1000 '
+  className='fixed w-full bottom-0  translate-y-full h-screen bg-white px-3 py-3 z-100 '
 
 >
   <WaitForDriver waitingForDriver={waitingForDriver} setwaitingForDriver={setwaitingForDriver}   ride={ride}

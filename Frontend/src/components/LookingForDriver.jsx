@@ -26,7 +26,7 @@ function LookingForDriver(props) {
         props.setVehiclePanel(false); // Optionally, close Vehicles Available panel
       };
   return (
-    <div className="flex flex-col w-full h-full bg-white rounded-t-xl p-4">
+    <div className="flex flex-col w-full h-full bg-white rounded-t-xl bottom-0 ">
     {/* Back Button */}
     <div className="mb-4">
       <button

@@ -17,6 +17,8 @@ import UserForgotPassword from './pages/UserForgotPassword';
 import CaptainForgotPassword from './pages/CaptainForgotPassword';
 import OTPPage from './pages/OtpVerification';
 import CaptainOtpVerification from './pages/CaptainOtpVerification';
+import PrivacyPolicy from './pages/CompanyPolicies/PrivacyPolicy';
+import TermsAndConditions from './pages/CompanyPolicies/TermsAndConditions';
 
 
 const App = () => {
@@ -44,6 +46,10 @@ const App = () => {
        <Route path = '/user-logout' element = {<UserProtectedWrapper><UserLogout/></UserProtectedWrapper>} />
        <Route path = '/captain-home' element = {<CaptainProtectedWrapper><CaptainHome/></CaptainProtectedWrapper>} />
        <Route path = '/captain-logout' element = {<CaptainProtectedWrapper><CaptainLogout/></CaptainProtectedWrapper>} />
+
+      <Route path = '/Drivo-Rides-privacy-policy' element = {<PrivacyPolicy/>} />
+      <Route path = '/Drivo-Rides-Terms-and-Conditions' element = {<TermsAndConditions/>} />
+
       </Routes>
 
     </div>
