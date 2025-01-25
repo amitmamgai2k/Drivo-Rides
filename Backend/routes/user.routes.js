@@ -5,8 +5,22 @@ const authMiddleware = require('../middlewares/auth.middleware');
 const { body } = require('express-validator');
 const upload  = require('../middlewares/multer.middleware');
 
+
 router.post('/register',
     upload.single('ProfileImage'),
+    (req, res, next) => {
+        try {
+            // Parse JSON fields if they exist
+            if (req.body.fullname && typeof req.body.fullname === 'string') {
+                req.body.fullname = JSON.parse(req.body.fullname);
+            }
+            next();
+        } catch (err) {
+            console.error('Error parsing JSON:', err.message);
+            return res.status(400).json({ message: 'Invalid JSON format for fullname' });
+        }
+    },
+
     [
     body('email').isEmail().withMessage('Please enter a valid email'),
     body('fullname.firstname').isLength({ min: 3 }).withMessage('First name must be at least 3 characters long'),

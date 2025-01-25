@@ -29,6 +29,7 @@
     "parser": "^0.1.4",
     "prettier": "^3.4.2",
     "request": "^2.88.2",
-    "socket.io": "^4.8.1"
+    "socket.io": "^4.8.1",
+    "twilio": "^5.4.2"
   }
 }

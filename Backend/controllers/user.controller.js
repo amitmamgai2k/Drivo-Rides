@@ -6,6 +6,7 @@ const BlacklistToken = require('../models/blacklistToken.model');
 const sendMail = require('../utils/sendMail')
 const bcrypt = require("bcrypt"); // Use bcrypt for hashing passwords
 const uploadOnCloudinary = require('../utils/cloudinary');
+const {sendRegistrationMessage} = require('../utils/sendSMS');
 
 module.exports.registerUser = async (req, res) => {
     const errors = validationResult(req);
@@ -14,8 +15,9 @@ module.exports.registerUser = async (req, res) => {
     }
 
     // Parse fullname from stringified JSON
-    const fullname = JSON.parse(req.body.fullname);
-    const { email, password, mobileNumber } = req.body;
+
+    const { fullname,email, password, mobileNumber } = req.body;
+
 
     // Correct ProfileImage path (use req.file)
     const ProfilePictureLocalPath = req.file?.path;
@@ -54,6 +56,7 @@ module.exports.registerUser = async (req, res) => {
       });
 
       const token = await user.generateAuthToken();
+      await sendRegistrationMessage(`91${mobileNumber}`, fullname.firstname, fullname.lastname);
       res.status(201).json({ token, user });
     } catch (err) {
       console.error("Error registering user:", err);
