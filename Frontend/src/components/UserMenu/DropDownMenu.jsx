@@ -1,4 +1,4 @@
-import React, { useState, useRef,useEffect } from 'react';
+import React, { useState, useRef,useEffect, useContext } from 'react';
 import {
   CircleUserRound,
   Contact,
@@ -16,15 +16,31 @@ import Support from './Support';
 import RideHistory from './RideHistory';
 import Feedback from './Feedback';
 import Refer from './ReferAndEarn';
+import { UserDataContext } from '../../context/UserContext';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+
 
 
 function DropdownMenu({ isOpen, toggleMenu }) {
+  const {user} =useContext(UserDataContext);
+  const navigate = useNavigate();
+  const [userData, setuser] = useState(null)
   const [showProfile, setShowProfile] = useState(false);
   const [about, setAbout] = useState(false);
   const[ContactUs,setContactUs]= useState(false);
-  const [rideHistory, setRideHistory] = useState(false)
-  const [feedback, setFeedback] = useState(false)
-  const [refer, setRefer] = useState(false)
+  const [rideHistory, setRideHistory] = useState(false);
+  const [feedback, setFeedback] = useState(false);
+  const [refer, setRefer] = useState(false);
+
+
+
+
+  useEffect(() => {
+    if (user) {
+      setuser(user);
+    }
+  }, [user]);
 
   if (!isOpen) return null;
 
@@ -36,12 +52,32 @@ function DropdownMenu({ isOpen, toggleMenu }) {
     { icon: MessagesSquare, label: 'Feedback', action: () => setFeedback(true) },
     { icon: Wallet, label: 'Refer And Earn', action: () => setRefer(true) },
   ];
+  console.log('User data:', userData);
 
 
-  const handleLogout = () => {
-    console.log('Logging out...');
-    toggleMenu(false);
-  };
+
+
+const handleLogout = async () => {
+    try {
+        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/logout`, {
+           headers:{Authorization: `Bearer ${localStorage.getItem('token')}`} // Send cookies with the request
+        });
+
+        if (response.status === 200) {
+            console.log(response.data.message); // "Logout successful"
+
+            // Clear local storage or user state if used
+            localStorage.removeItem('token');
+
+            // Redirect to login or home page
+            navigate('/user-login');
+        }
+    } catch (error) {
+        console.error('Error during logout:', error);
+        alert('Logout failed. Please try again.');
+    }
+};
+
   const toggleProfile = (state) => {
     setShowProfile(state !== undefined ? state : !showProfile); // Toggle menu state
   };
@@ -60,6 +96,8 @@ function DropdownMenu({ isOpen, toggleMenu }) {
   const toggleRefer = (state) => {
     setRefer(state !== undefined ? state : !refer); // Toggle menu state
   }
+
+
   return (
     <>
       {/* Overlay */}
@@ -81,12 +119,12 @@ function DropdownMenu({ isOpen, toggleMenu }) {
 
           <div className="flex items-center space-x-4">
             <img
-              src="http://res.cloudinary.com/ddjo2iypg/image/upload/v1737633957/ngsx07ii8wlz703xbfud.jpg"
+              src={user.user?.ProfilePicture}
               alt="Profile"
               className="w-12 h-12 rounded-full border-2 border-white"
             />
             <div>
-              <p className="font-semibold">Amit Mamgai</p>
+              <p className="font-semibold">{user.user?.fullname?.firstname} {user.user?.fullname?.lastname}</p>
               <p className="text-sm text-blue-100">View Profile</p>
             </div>
           </div>
@@ -127,11 +165,12 @@ function DropdownMenu({ isOpen, toggleMenu }) {
       {showProfile && (
         <div
         className="fixed inset-0 bg-black bg-opacity-50 z-30"
-        onClick={() => toggleProfile(false)}>
+       >
 
         <Profile
           toggleProfile={toggleProfile}
           showProfile={showProfile}
+          userData={userData}
         />
         </div>
 
@@ -139,7 +178,7 @@ function DropdownMenu({ isOpen, toggleMenu }) {
      {about && (
         <div
         className="fixed  bg-black bg-opacity-50 z-30"
-        onClick={() => toggleAbout(false)}>
+      >
 
         <About
           toggleAbout={toggleAbout}
@@ -168,6 +207,7 @@ function DropdownMenu({ isOpen, toggleMenu }) {
         <RideHistory
           toggleRideHistory={toggleRideHistory}
          History={rideHistory}
+          userData={userData}
         />
         </div>
 
@@ -184,7 +224,7 @@ function DropdownMenu({ isOpen, toggleMenu }) {
         </div>
 
       )}
-{refer && (
+        {refer && (
         <div
         className="fixed  bg-black bg-opacity-50 z-30"
       >

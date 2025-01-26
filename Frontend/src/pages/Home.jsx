@@ -242,7 +242,7 @@ const toggleMenu = (state) => {
   setMenuOpen(state !== undefined ? state : !menuOpen); // Toggle menu state
 };
   return (
-    <div className="relative h-screen w-screen  bg-gray-100 mb-16">
+    <div className="relative h-screen w-screen  bg-gray-100 mb-18">
       {/* UBER Text at top */}
       <div
   className={`absolute top-5 left-1 right-3 z-10 transition-opacity duration-300 flex flex-row justify-between items-center ${

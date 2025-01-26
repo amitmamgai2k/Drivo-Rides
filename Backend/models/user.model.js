@@ -48,10 +48,35 @@ const userSchema = new mongoose.Schema({
     socketId:{
         type: String
     },
+    hoursRide: {
+        type:Number,
+        default:0,
+    },
+    distanceTravelled: {
+        type:Number,
+        default:0
+
+    },
+    RideDone:{
+        type:Number,
+        default:0
+    },
+    TotalExepense:{
+        type:Number,
+        default:0
+    },
     forgotPasswordToken:String,
     forgotPasswordExpiry:Date
 
-})
+},{timestamps: true})
+
+userSchema.pre('save', function (next) {
+    if (this.hoursRide) {
+        this.hoursRide = Math.round(this.hoursRide * 100) / 100;
+    }
+    next();
+});
+
 userSchema.methods.generateAuthToken = async function(){
     const token = jwt.sign({id: this._id},process.env.JWT_SECRET,{expiresIn: '24h'});
     return token;

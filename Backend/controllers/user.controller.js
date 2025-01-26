@@ -246,3 +246,38 @@ module.exports.verifyOtp = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 };
+module.exports.deleteUser = async (req, res) => {
+    try {
+        const user = await userModel.findByIdAndDelete(req.user.id);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        res.status(200).json({ message: "User deleted successfully" });
+    } catch (err) {
+        console.error("Error deleting user:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+};
+module.exports.updateProfilePicture = async (req, res) => {
+    try {
+        const user = await userModel.findById(req.user.id);
+        if (!user) {
+            return res.status(404).json({ error: "User not found" });
+        }
+        const ProfilePictureLocalPath = req.file?.path;
+        if (!ProfilePictureLocalPath) {
+          return res.status(400).json({ error: "Profile picture is required" });
+        }
+        const ProfilePicture = await uploadOnCloudinary(ProfilePictureLocalPath);
+        if (!ProfilePicture) {
+          return res.status(400).json({ error: "Error uploading profile picture" });
+        }
+        user.ProfilePicture = ProfilePicture.url;
+
+        await user.save();
+        res.status(200).json({ message: "Profile picture updated successfully" });
+    } catch (err) {
+        console.error("Error updating profile picture:", err);
+        res.status(500).json({ error: "Server error" });
+    }
+}

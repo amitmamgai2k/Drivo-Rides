@@ -1,4 +1,4 @@
-import React from 'react';
+import React,{useState} from 'react';
 import {
   ArrowLeft,
   Clock,
@@ -11,13 +11,14 @@ import {
   Receipt,
   ChevronDown,
   ChevronUp,
-  CircleDollarSign
+  IndianRupee,
+  ArrowDownUp
 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 const RideHistory = (props) => {
-  const [expandedRide, setExpandedRide] = React.useState(null);
-  const [filter, setFilter] = React.useState('all');
+  const [expandedRide, setExpandedRide] = useState(null);
+  const [filter, setFilter] = useState('all');
 
   if (!props.History) return null;
 
@@ -59,10 +60,10 @@ const RideHistory = (props) => {
 
   // Stats cards data
   const stats = [
-    { icon: Car, value: rides.length, label: 'Total Rides', color: 'blue' },
-    { icon: CircleDollarSign, value: `$${rides.reduce((sum, ride) => sum + ride.fare, 0).toFixed(2)}`, label: 'Total Spent', color: 'green' },
-    { icon: Star, value: (rides.reduce((sum, ride) => sum + ride.rating, 0) / rides.length).toFixed(1), label: 'Avg Rating', color: 'yellow' },
-    { icon: Clock, value: `${rides.reduce((sum, ride) => sum + parseInt(ride.duration), 0)} mins`, label: 'Total Time', color: 'purple' },
+    { icon: Car, value: `${props?.userData?.user?.RideDone}`, label: 'Total Rides', color: 'blue' },
+    { icon: IndianRupee, value: `${props?.userData?.user?.TotalExepense}`, label: 'Total Spent', color: 'green' },
+    { icon:  ArrowDownUp, value: `${props?.userData?.user?.distanceTravelled} Km`, label: 'Total Distance', color: 'purple' },
+    { icon: Clock, value: `${props?.userData?.user?.hoursRide} Hours`, label: 'Total Time', color: 'orange' },
   ];
 
   return (
@@ -83,11 +84,11 @@ const RideHistory = (props) => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-2xl mx-auto px-6 py-8 space-y-12">
+      <div className="max-w-2xl mx-auto px-6 py-8 space-y-6">
         {/* Stats Overview */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {stats.map((stat, index) => (
-            <div key={index} className={`p-4 bg-${stat.color}-50 rounded-xl text-center`}>
+            <div key={index} className={`p-4 bg-${stat.color}-100 rounded-xl text-center`}>
               <stat.icon className={`w-8 h-8 text-${stat.color}-600 mx-auto mb-2`} />
               <div className={`text-2xl font-bold text-${stat.color}-600`}>{stat.value}</div>
               <div className="text-sm text-gray-600">{stat.label}</div>
@@ -96,24 +97,9 @@ const RideHistory = (props) => {
         </div>
 
         {/* Filters */}
-        <div className="flex gap-4 overflow-x-auto pb-2">
-          {['all', 'week', 'month', 'year', 'rated'].map((f) => (
-            <button
-              key={f}
-              onClick={() => setFilter(f)}
-              className={`px-4 py-2 rounded-full capitalize ${
-                filter === f
-                  ? 'bg-blue-600 text-white'
-                  : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-              }`}
-            >
-              {f === 'rated' ? '⭐ Rated' : f}
-            </button>
-          ))}
-        </div>
-
+        <h1 className='text-xl font-semibold ml-3'>Past Rides Details</h1>
         {/* Ride List */}
-        <div className="space-y-6">
+        <div className="space-y-2">
           {rides.map((ride) => (
             <div key={ride.id} className="border rounded-xl overflow-hidden">
               {/* Ride Summary */}
@@ -134,7 +120,7 @@ const RideHistory = (props) => {
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-lg">${ride.fare.toFixed(2)}</div>
+                    <div className="font-bold text-lg">₹{ride.fare.toFixed(2)}</div>
                     <div className="flex items-center gap-1 text-sm text-yellow-600">
                       <Star className="w-4 h-4 fill-yellow-400" />
                       {ride.rating}

@@ -50,10 +50,12 @@ const FinishRide = (props) => {
 
       socket.emit("update-captain-details",{
          userId:props.ride?.captain?._id,
+         clientId:props.ride?.user?._id,
          TodayEarnings:props.ride.price,
          HoursWorked:props.ride.duration,
          DistanceTravelled:props.ride.distance,
          RideDone : 1
+
       })
       console.log("Captain Data sent to socket");
 

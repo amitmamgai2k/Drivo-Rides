@@ -19,6 +19,7 @@ import OTPPage from './pages/OtpVerification';
 import CaptainOtpVerification from './pages/CaptainOtpVerification';
 import PrivacyPolicy from './pages/CompanyPolicies/PrivacyPolicy';
 import TermsAndConditions from './pages/CompanyPolicies/TermsAndConditions';
+import DeleteAccount from './components/UserMenu/DeleteAccount';
 
 
 const App = () => {
@@ -43,6 +44,7 @@ const App = () => {
           <Home/>
          </UserProtectedWrapper>
        } />
+       <Route path = '/delete-account' element = {<UserProtectedWrapper><DeleteAccount/></UserProtectedWrapper>} />
        <Route path = '/user-logout' element = {<UserProtectedWrapper><UserLogout/></UserProtectedWrapper>} />
        <Route path = '/captain-home' element = {<CaptainProtectedWrapper><CaptainHome/></CaptainProtectedWrapper>} />
        <Route path = '/captain-logout' element = {<CaptainProtectedWrapper><CaptainLogout/></CaptainProtectedWrapper>} />
