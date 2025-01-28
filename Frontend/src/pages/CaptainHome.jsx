@@ -41,6 +41,7 @@ const CaptainHome = () => {
     // Location update function
 
 
+
     const updateLocation = () => {
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition((position) => {
@@ -186,7 +187,7 @@ socket.on('new-ride', (data) => {
       {/* ConfirmRidePopUp Panel */}
       <div
         ref={confirmRidePopupPanelRef}
-        className="fixed w-full object-cover bottom-0 bg-white px-6   z-50  translate-y-full shadow-lg"
+        className="fixed w-full object-cover  bottom-0 bg-white px-6   z-50  translate-y-full shadow-lg"
       >
         <ConfirmRidePopUp
              ride={ride} setConfirmRidePopupPanel={setConfirmRidePopupPanel} setRidePopupPanel={setRidePopupPanel}

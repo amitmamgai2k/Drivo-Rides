@@ -54,6 +54,7 @@ const initializeSocket = (server) => {
 
 
 
+
             })
             socket.on('update-captain-details',async(data)=>{
                 const {userId,clientId,TodayEarnings,HoursWorked,DistanceTravelled,RideDone} = data;
@@ -82,7 +83,41 @@ const initializeSocket = (server) => {
                     socket.emit('update-success', 'Details updated');
 
 
-            })
+            });
+            socket.on('send_message', async (messageData) => {
+                try {
+                    const { rideId, recipientId, content } = messageData;
+                    
+                    // Save message to database
+                    const newMessage = await messageModel.create({
+                        rideId,
+                        senderId: userId,
+                        recipientId,
+                        content,
+                        timestamp: new Date()
+                    });
+
+                    // Find recipient's socket ID
+                    let recipientSocketId;
+                    const userRecipient = await userModel.findById(recipientId);
+                    const captainRecipient = await capatainModel.findById(recipientId);
+                    
+                    recipientSocketId = userRecipient?.socketId || captainRecipient?.socketId;
+
+                    if (recipientSocketId) {
+                        io.to(recipientSocketId).emit('receive_message', {
+                            ...messageData,
+                            senderId: userId,
+                            isSender: false
+                        });
+                    }
+
+                } catch (error) {
+                    console.error('Error handling message:', error);
+                    socket.emit('error', 'Failed to send message');
+                }
+            });
+        });
 
 
         socket.on('disconnect', () => {

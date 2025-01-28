@@ -1,12 +1,14 @@
 import React, { useState } from 'react';
-import { MapPin, ArrowLeft, CreditCard } from 'lucide-react';
+import { MapPinned ,MapPin, ArrowLeft, CreditCard ,MessageCircleMore} from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import ChatPanel from './ChatPanel';
 
 const ConfirmRidePopUp = (props) => {
   const [otp, setOtp] = useState(['', '', '', '']);
   const [error, setError] = useState('');
+ const [isChatOpen, setIsChatOpen] = useState(false);
 
   const navigate = useNavigate();
 
@@ -85,9 +87,10 @@ const ConfirmRidePopUp = (props) => {
   };
 
   return (
-    <div className="flex flex-col w-full px-6 pt-4">
+    <div>
+    <div className="flex flex-col w-full px-2 mt-10 ">
       {/* Back Button */}
-      <div className="mb-4">
+      <div className="">
         <button
           onClick={() => props.setConfirmRidePopupPanel(false)}
           className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
@@ -100,14 +103,14 @@ const ConfirmRidePopUp = (props) => {
       {/* Ride Info */}
       <div className="flex-1 space-y-6">
         <h2 className="text-2xl px-2 font-bold">Ride Details</h2>
-        <div className="flex items-center justify-between bg-yellow-400 gap-4 p-4 rounded-lg mb-10">
-          <div className="flex items-center justify-between w-full gap-4">
+        <div className="flex items-center justify-between bg-yellow-400 gap-8 p-4 rounded-lg mb-10">
+          <div className="flex items-center justify-between w-full gap-8">
             <img
-              className="h-10 w-10 rounded-full object-cover"
+              className="h-10 w-10 rounded-full object-cover border-2 border-black"
               src={props.ride?.user?.ProfilePicture}
               alt="Rider"
             />
-            <div className="flex justify-between w-full">
+            <div className="flex justify-between items-center w-full">
               <h4 className="text-lg font-medium">{props.ride?.user?.fullname?.firstname || "Unknown"} {props.ride?.user?.fullname?.lastname || ""}</h4>
               <h4 className="text-medium font-medium">{props.ride?.distance} Km</h4>
             </div>
@@ -117,14 +120,14 @@ const ConfirmRidePopUp = (props) => {
         {/* Location Info */}
         <div className="space-y-4">
           <div className="flex items-start space-x-3">
-            <MapPin className="w-5 h-5 text-gray-500" />
+          <div className='bg-green-200 p-3 rounded-lg'>  <MapPin className="w-5 h-5 text-green-800" /></div>
             <div>
               <h3 className="font-semibold text-lg">{vehicle.srcLocation}</h3>
               <p className="text-gray-600 text-sm">{props.ride?.originText}</p>
             </div>
           </div>
-          <div className="flex items-start space-x-3">
-            <MapPin className="w-5 h-5 text-gray-500" />
+          <div className="flex items-start space-x-3 bg-red ">
+          <div className='bg-blue-200 p-3 rounded-lg'> <MapPinned className="w-5 h-5 text-blue-800" /></div>
             <div>
               <h3 className="font-semibold text-lg">{vehicle.destLocation}</h3>
               <p className="text-gray-600 text-sm">{props.ride?.destinationText}</p>
@@ -133,13 +136,18 @@ const ConfirmRidePopUp = (props) => {
         </div>
 
         {/* Fare and Payment Info */}
-        <div className="flex space-x-2 items-center p-4 bg-gray-50 rounded-lg">
-          <CreditCard className="w-6 h-6 text-gray-500" />
-          <div className="flex flex-col">
+        <div className="flex items-start space-x-3   bg-gray-50 rounded-lg">
+        <div className='bg-orange-200 p-3 rounded-lg'>  <CreditCard className="w-6 h-6 text-orange-700" /></div>
+          <div className="flex flex-col ">
             <p className="font-semibold text-lg">₹{props.ride?.price}</p>
             <p className="font-extralight text-sm">{vehicle.payMethod}</p>
           </div>
+
         </div>
+        <div className='p-2 border-2 w-auto  text-bold rounded-lg flex flex-row items-center mx-auto justify-center mt-4'    onClick={() => setIsChatOpen(true)}>
+    <MessageCircleMore className="w-6 h-6 mr-2 text-blue-700" />
+    <p>Message To Rider</p>
+</div>
 
         {/* OTP Input Section */}
         <div className="space-y-4">
@@ -178,6 +186,19 @@ const ConfirmRidePopUp = (props) => {
         </button>
       </div>
 
+
+
+</div>
+<div className=''><ChatPanel
+      className = "h-screen fixed top-0 left-0 right-0 bottom-0 bg-gray-100  flex flex-col py-10 px-4"
+  isOpen={isChatOpen}
+  onClose={() => setIsChatOpen(false)}
+  Name={`${props.ride?.user?.fullname?.firstname || "Driver"} ${
+    props.ride?.user?.fullname?.lastname || ""
+  }`}
+  Image={props.ride?.user?.ProfilePicture || "default-profile.png"}
+/>
+</div>
 
     </div>
   );

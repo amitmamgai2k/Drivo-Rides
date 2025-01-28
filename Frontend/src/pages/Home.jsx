@@ -408,7 +408,7 @@ const toggleMenu = (state) => {
 </div>
 <div
   ref = {waitingForDriverRef}
-  className='fixed w-full bottom-0  translate-y-full h-screen bg-white px-3 py-3 z-100 '
+  className='fixed w-full bottom-0  translate-y-full h-screen bg-white px-3 py-3 z-10 '
 
 >
   <WaitForDriver waitingForDriver={waitingForDriver} setwaitingForDriver={setwaitingForDriver}   ride={ride}

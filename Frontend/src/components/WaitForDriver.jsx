@@ -1,7 +1,8 @@
-import React from 'react';
-import { Phone, Shield, Share } from 'lucide-react';
-
+import React,{ useState} from 'react';
+import { Phone, Shield, Share ,MessageCircleMore} from 'lucide-react';
+import ChatPanel from './ChatPanel';
 const WaitForDriver = (props) => {
+  const [isChatOpen, setIsChatOpen] = useState(false);
   console.log("WaitFor Driver",props.ride)
   const shareRideHandler = () => {
     if (navigator.share) {
@@ -22,7 +23,7 @@ const WaitForDriver = (props) => {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-white p-4">
+    <div className="flex flex-col h-screen z-30 bg-white p-4">
       <div className="flex-1 flex flex-col justify-center items-center space-y-3">
         <img
           src={props.ride?.captain?.ProfilePicture}
@@ -51,9 +52,14 @@ const WaitForDriver = (props) => {
         <p className="text-gray-900 font-bold">{props.ride?.captain?.vehicle?.model} {props.ride?.captain?.vehicle?.color} colour  {props.ride?.captain?.vehicle?.vehicleType}</p>
         <p className="text-2xl font-bold">{props.ride?.otp}</p>
         <p className='text-sm'>Share the Otp with the driver for ride confirmation</p>
-      </div>
 
-      <div className="space-y-4">
+      </div>
+   <div className='p-2 border-2 w-auto  text-bold rounded-lg flex flex-row items-center mx-auto justify-center mt-4'    onClick={() => setIsChatOpen(true)}>
+    <MessageCircleMore className="w-6 h-6 mr-2 text-blue-700" />
+    <p>Message To Driver</p>
+</div>
+
+      <div className="space-y-4 mt-6">
         <div className="flex justify-center space-x-8">
           <div>
             <Shield className="w-8 h-8 mx-auto mb-2 text-blue-500" />
@@ -83,7 +89,19 @@ const WaitForDriver = (props) => {
           Cancel Ride
         </button>
       </div>
-    </div>
+
+      <ChatPanel
+  isOpen={isChatOpen}
+  onClose={() => setIsChatOpen(false)}
+  Name={`${props.ride?.captain?.fullname?.firstname || "Driver"} ${
+    props.ride?.captain?.fullname?.lastname || ""
+  }`}
+  Image={props.ride?.captain?.ProfilePicture || "default-profile.png"}
+/>
+      </div>
+
+
+
   );
 };
 
