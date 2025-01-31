@@ -37,7 +37,7 @@ const createRide = async (req, res) => {
 
 
 
-                const captainsInRadius = await mapsService.getCaptainInTheRadius(originCoords.latitude, originCoords.longitude, 2, vehicleType);
+                const captainsInRadius = await mapsService.getCaptainInTheRadius(originCoords.latitude, originCoords.longitude, 200, vehicleType);
                 console.log("Found captains in radius:", captainsInRadius);
                  ride.otp = ""
 

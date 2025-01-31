@@ -57,6 +57,9 @@ const FinishRide = (props) => {
          RideDone : 1
 
       })
+      socket.emit("clear-chat-message",{
+         rideId:props.ride._id
+      })
       console.log("Captain Data sent to socket");
 
 

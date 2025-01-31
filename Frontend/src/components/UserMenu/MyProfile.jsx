@@ -251,7 +251,7 @@ const Profile = (props) => {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-500">Member Since</p>
-                  <p className="text-gray-900">{props.userData?.user?.createdAt.slice(0, 4)}</p>
+                  <p className="text-gray-900">  {props.userData?.user?.createdAt ? props.userData.user.createdAt.slice(0, 4) : '2024'}</p>
                 </div>
               </div>
             </div>

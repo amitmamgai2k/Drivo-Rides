@@ -97,6 +97,8 @@ const WaitForDriver = (props) => {
     props.ride?.captain?.fullname?.lastname || ""
   }`}
   Image={props.ride?.captain?.ProfilePicture || "default-profile.png"}
+  rideId={props.ride?._id}
+  recipientId={props.ride?.captain?._id}
 />
       </div>
 

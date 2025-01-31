@@ -88,15 +88,16 @@ const ConfirmRidePopUp = (props) => {
 
   return (
     <div>
-    <div className="flex flex-col w-full px-2 mt-10 ">
+    <div  className="" >
+    <div className="flex flex-col w-full px-2 mt-4">
       {/* Back Button */}
-      <div className="">
+      <div>
         <button
           onClick={() => props.setConfirmRidePopupPanel(false)}
           className="flex items-center space-x-2 hover:bg-gray-100 p-2 rounded-full transition-colors cursor-pointer"
         >
           <ArrowLeft className="w-6 h-6" />
-          <span>Back</span>
+
         </button>
       </div>
 
@@ -180,7 +181,7 @@ const ConfirmRidePopUp = (props) => {
 
           }}
 
-          className="w-full flex items-center justify-center bg-black text-white py-4 rounded-lg font-semibold hover:bg-blue-400 transition-colors duration-200 cursor-pointer"
+          className="w-full flex items-center justify-center bg-black text-white py-4 rounded-lg font-semibold hover:bg-blue-400 transition-colors duration-200 mb-4 cursor-pointer"
         >
           Confirm
         </button>
@@ -189,17 +190,19 @@ const ConfirmRidePopUp = (props) => {
 
 
 </div>
-<div className=''><ChatPanel
-      className = "h-screen fixed top-0 left-0 right-0 bottom-0 bg-gray-100  flex flex-col py-10 px-4"
-  isOpen={isChatOpen}
-  onClose={() => setIsChatOpen(false)}
-  Name={`${props.ride?.user?.fullname?.firstname || "Driver"} ${
-    props.ride?.user?.fullname?.lastname || ""
-  }`}
-  Image={props.ride?.user?.ProfilePicture || "default-profile.png"}
-/>
-</div>
 
+    </div>
+
+     <ChatPanel
+       isOpen={isChatOpen}
+       onClose={() => setIsChatOpen(false)}
+       Name={`${props.ride?.user?.fullname?.firstname || "Driver"} ${
+         props.ride?.user?.fullname?.lastname || ""
+       }`}
+       Image={props.ride?.user?.ProfilePicture || "default-profile.png"}
+       rideId={props.ride?._id}
+       recipientId={props.ride?.user?._id}
+     />
     </div>
   );
 };
