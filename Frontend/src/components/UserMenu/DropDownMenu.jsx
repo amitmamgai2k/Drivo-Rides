@@ -19,6 +19,7 @@ import Refer from './ReferAndEarn';
 import { UserDataContext } from '../../context/UserContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
+import toast from 'react-hot-toast';
 
 
 
@@ -32,6 +33,8 @@ function DropdownMenu({ isOpen, toggleMenu }) {
   const [rideHistory, setRideHistory] = useState(false);
   const [feedback, setFeedback] = useState(false);
   const [refer, setRefer] = useState(false);
+  const [rideHistoryData, setRideHistoryData] = useState([]);
+
 
 
 
@@ -43,12 +46,37 @@ function DropdownMenu({ isOpen, toggleMenu }) {
   }, [user]);
 
   if (!isOpen) return null;
+  const getRideHistory =async ()=>{
+    try {
+
+const userId = user.user?._id;
+
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/ride-history`, {userId} , {
+
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        },
+      });
+      if (response.status === 200) {
+        toast.success('Ride history fetched successfully');
+        setRideHistoryData([response.data]);
+        console.log('rideHistory',rideHistoryData);
+
+        console.log('rideHistory',response.data); // "Ride History"
+
+      }
+    } catch (error) {
+      toast.error('Failed to fetch ride history');
+      console.error('Error during fetching rides:', error);
+    }
+
+  }
 
   const menuItems = [
     { icon: CircleUserRound, label: 'My Profile', action: () => setShowProfile(true) },
     { icon: AppWindowMac, label: 'About', action: () => setAbout(true) },
     { icon: Contact, label: 'Contact', action: () => setContactUs(true) },
-    { icon: History, label: 'Past Rides', action: () => setRideHistory(true) },
+    { icon: History, label: 'Past Rides', action: () => {setRideHistory(true); getRideHistory()} ,},
     { icon: MessagesSquare, label: 'Feedback', action: () => setFeedback(true) },
     { icon: Wallet, label: 'Refer And Earn', action: () => setRefer(true) },
   ];
@@ -58,6 +86,7 @@ function DropdownMenu({ isOpen, toggleMenu }) {
 
 
 const handleLogout = async () => {
+
     try {
         const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/users/logout`, {
            headers:{Authorization: `Bearer ${localStorage.getItem('token')}`} // Send cookies with the request
@@ -68,13 +97,14 @@ const handleLogout = async () => {
 
             // Clear local storage or user state if used
             localStorage.removeItem('token');
+            toast.success('Logout successful');
 
             // Redirect to login or home page
             navigate('/user-login');
         }
     } catch (error) {
         console.error('Error during logout:', error);
-        alert('Logout failed. Please try again.');
+        toast.error('Logout failed');
     }
 };
 
@@ -123,7 +153,7 @@ const handleLogout = async () => {
               alt="Profile"
               className="w-12 h-12 rounded-full border-2 border-white"
             />
-            <div>
+            <div onClick={() => setShowProfile(true)}>
               <p className="font-semibold">{user.user?.fullname?.firstname} {user.user?.fullname?.lastname}</p>
               <p className="text-sm text-blue-100">View Profile</p>
             </div>
@@ -206,6 +236,7 @@ const handleLogout = async () => {
 
         <RideHistory
           toggleRideHistory={toggleRideHistory}
+          rideHistoryData = {rideHistoryData}
          History={rideHistory}
           userData={userData}
         />

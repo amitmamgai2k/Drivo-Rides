@@ -74,7 +74,11 @@ const submitHandler = async (e) => {
 
             if (response.data && response.data.token) {
                 localStorage.setItem('token', response.data.token);
+                console.log("d",user);
+
                 setUser(response.data.user);
+                console.log("v",user);
+
                 navigate('/home');
             }
         } catch (error) {

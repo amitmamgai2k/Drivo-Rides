@@ -7,6 +7,8 @@ const sendMail = require('../utils/sendMail')
 const bcrypt = require("bcrypt"); // Use bcrypt for hashing passwords
 const uploadOnCloudinary = require('../utils/cloudinary');
 const {sendRegistrationMessage} = require('../utils/sendSMS');
+const rideModel = require('../models/ride.model');
+const capatainModel = require('../models/captain.model');
 
 module.exports.registerUser = async (req, res) => {
     const errors = validationResult(req);
@@ -281,3 +283,64 @@ module.exports.updateProfilePicture = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 }
+module.exports.sendMessage = async(req,res)=>{
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    };
+    try {
+        const {name,email,message} = req.body;
+        if(!name || !email || !message){
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+        const messageData = await userService.createMessage({name,email,message});
+        res.status(200).json({ messageData });
+
+    } catch (error) {
+
+    }
+}
+
+
+module.exports.getRideHistory = async (req, res) => {
+    // Add a flag to prevent multiple responses
+    if (res.headersSent) return;
+
+    try {
+        const { userId } = req.body;
+        if (!userId) return res.status(400).json({ error: "UserId is required" });
+
+        const rides = await rideModel.find({ user: userId })
+            .populate("user")
+            .populate("captain")
+            .lean();
+
+        if (!rides?.length) return res.status(404).json({ message: "No rides found" });
+
+        const rideHistory = rides.map(ride => ({
+            rideID: ride._id,
+            captainFirstName: ride.captain?.fullname?.firstname,
+            captainLastName: ride.captain?.fullname?.lastname,
+            captainMobileNumber: ride.captain?.mobileNumber,
+            captainVehicleDetails: ride.captain?.vehicle,
+            captainProfilePicture: ride.captain?.ProfilePicture,
+            date: ride.createdAt,
+            origin: ride.originText,
+            destination: ride.destinationText,
+            duration: ride.duration,
+            distance: ride.distance,
+            price: ride.price,
+            orderId: ride.orderID,
+            paymentID: ride.paymentID
+        }));
+        console.log('rideHistory',rideHistory);
+
+
+        return res.status(200).json({ rideHistory });
+
+    } catch (error) {
+        if (!res.headersSent) {
+            return res.status(500).json({ error: "Server error" });
+        }
+    }
+};

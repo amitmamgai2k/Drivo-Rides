@@ -9,7 +9,7 @@ import { Mail, Lock, Car } from 'lucide-react';
 const UserLogin = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const { setUser } = useContext(UserDataContext);
+    const { user,setUser } = useContext(UserDataContext);
     const navigate = useNavigate();
 
     const submitHandler = async (e) => {
@@ -21,7 +21,12 @@ const UserLogin = () => {
         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData);
         if (response.status === 200) {
             const data = response.data;
+            console.log('user',user);
+
+
             setUser(data.user);
+            console.log('setUser',user);
+
             localStorage.setItem('token', data.token);
             navigate('/home');
         }

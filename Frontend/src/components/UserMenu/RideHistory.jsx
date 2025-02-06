@@ -1,69 +1,42 @@
-import React,{useState} from 'react';
-import {
-  ArrowLeft,
-  Clock,
-  MapPin,
-  Car,
-  Wallet,
-  Star,
-  Calendar,
-  Navigation,
-  Receipt,
-  ChevronDown,
-  ChevronUp,
-  IndianRupee,
-  ArrowDownUp
-} from 'lucide-react';
+import React, { useState } from 'react';
+import { ArrowLeft, Clock, MapPin, Car, Blend, Wallet, Star, Calendar, Navigation, Receipt, IndianRupee, ArrowDownUp,MapPinHouse,Phone, IdCard} from 'lucide-react';
 import { Link } from 'react-router-dom';
-
 const RideHistory = (props) => {
   const [expandedRide, setExpandedRide] = useState(null);
-  const [filter, setFilter] = useState('all');
 
-  if (!props.History) return null;
 
-  // Sample ride data
-  const rides = [
-    {
-      id: 1,
-      date: '2024-03-15',
-      time: '08:30 AM',
-      from: 'Central Business District',
-      to: 'Tech Park Campus',
-      driver: 'Michael Chen',
-      car: 'Toyota Camry (AB123CD)',
-      fare: 28.50,
-      duration: '25 mins',
-      distance: '12.4 km',
-      rating: 4.9,
-      payment: '•••• 1234',
-      routeImage: 'https://via.placeholder.com/400x150',
-      invoiceLink: '#'
-    },
-    {
-      id: 2,
-      date: '2024-03-14',
-      time: '06:45 PM',
-      from: 'Downtown Mall',
-      to: 'Green Valley Apartments',
-      driver: 'Sarah Johnson',
-      car: 'Honda Accord (XY456ZA)',
-      fare: 35.20,
-      duration: '38 mins',
-      distance: '18.7 km',
-      rating: 4.8,
-      payment: '•••• 5678',
-      routeImage: 'https://via.placeholder.com/400x150',
-      invoiceLink: '#'
-    }
-  ];
+  if (!props.rideHistoryData?.[0]?.rideHistory) return null;
+
+
+  const rides = props.rideHistoryData[0].rideHistory.map(ride => ({
+    id: ride.rideID,
+    fname: ride.captainFirstName,
+    lname: ride.captainLastName,
+    mobile: ride.captainMobileNumber,
+    vehicleType: ride.captainVehicleDetails.vehicleType,
+    vehiclePlate: ride.captainVehicleDetails.plate,
+    vehicleModel: ride.captainVehicleDetails.model,
+    vehicleColor: ride.captainVehicleDetails.color,
+    captainImage: ride.captainProfilePicture,
+    date: new Date(ride.date).toLocaleDateString(),
+    time: new Date(ride.date).toLocaleTimeString(),
+    from: ride.origin,
+    to: ride.destination,
+    fare: ride.price,
+    duration: ride.duration.toFixed(2)*60,
+    distance: ride.distance,
+    rating: ride.rating ?? "5",
+    payment: ride.paymentID ? `•••• ${ride.paymentID}` : "XXXX",
+    routeImage: 'https://blogadmin.uberinternal.com/wp-content/uploads/2022/08/image22.gif',
+    invoiceLink: '#'
+  }));
 
   // Stats cards data
   const stats = [
-    { icon: Car, value: `${props?.userData?.user?.RideDone}`, label: 'Total Rides', color: 'blue' },
-    { icon: IndianRupee, value: `${props?.userData?.user?.TotalExepense}`, label: 'Total Spent', color: 'green' },
-    { icon:  ArrowDownUp, value: `${props?.userData?.user?.distanceTravelled} Km`, label: 'Total Distance', color: 'purple' },
-    { icon: Clock, value: `${props?.userData?.user?.hoursRide} Hours`, label: 'Total Time', color: 'orange' },
+    { icon: Car, value: `${props?.userData?.user?.RideDone || 0}`, label: 'Total Rides', color: 'blue' },
+    { icon: IndianRupee, value: `${props?.userData?.user?.TotalExepense || 0}`, label: 'Total Spent', color: 'green' },
+    { icon: ArrowDownUp, value: `${props?.userData?.user?.distanceTravelled || 0} Km`, label: 'Total Distance', color: 'purple' },
+    { icon: Clock, value: `${props?.userData?.user?.hoursRide || 0} Hours`, label: 'Total Time', color: 'orange' },
   ];
 
   return (
@@ -96,42 +69,40 @@ const RideHistory = (props) => {
           ))}
         </div>
 
-        {/* Filters */}
         <h1 className='text-xl font-semibold ml-3'>Past Rides Details</h1>
+
         {/* Ride List */}
-        <div className="space-y-2">
+        <div className="space-y-2 ">
           {rides.map((ride) => (
-            <div key={ride.id} className="border rounded-xl overflow-hidden">
+            <div key={ride.id} className="border rounded-xl overflow-hidden ">
               {/* Ride Summary */}
               <div
-                className="p-4 hover:bg-gray-50 cursor-pointer"
+                className="p-4 bg-gray-200 cursor-pointer "
                 onClick={() => setExpandedRide(expandedRide === ride.id ? null : ride.id)}
               >
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between bg-gray-100 active:bg-gray-300  p-2 rounded-lg">
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <Calendar className="w-5 h-5 text-blue-600" />
+                      <Calendar className="w-5 h-5 text-green-600" />
                       <span className="font-medium">{ride.date}</span>
-                      <span className="text-gray-500">{ride.time}</span>
+                      <span className="text-gray-600">{ride.time}</span>
                     </div>
-                    <div className="flex items-center gap-2 text-gray-600">
-                      <Car className="w-5 h-5" />
-                      <span>{ride.car}</span>
+                    <div className="flex items-center gap-1 text-medium text-black font-sans">
+                      <Car className="w-5 h-5 text-blue-900 "  />
+                      <span>{ride.vehicleColor} Colour  {ride.vehicleModel} </span>
                     </div>
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-lg">₹{ride.fare.toFixed(2)}</div>
-                    <div className="flex items-center gap-1 text-sm text-yellow-600">
-                      <Star className="w-4 h-4 fill-yellow-400" />
-                      {ride.rating}
-                    </div>
+                    <div className="font-semibold text-lg">₹{ride.fare}</div>
                   </div>
                 </div>
               </div>
 
               {/* Expanded Details */}
               {expandedRide === ride.id && (
-                <div className="border-t p-4 space-y-6 bg-gray-50">
+
+                <div className="border-t p-4 space-y-6 bg-blue-50">
+                  <p className='font-semibold text-black'>RideID {ride.id}</p>
                   {/* Route Map */}
                   <div className="relative rounded-lg overflow-hidden">
                     <img
@@ -140,20 +111,26 @@ const RideHistory = (props) => {
                       className="w-full h-40 object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent" />
-                    <div className="absolute bottom-4 left-4 text-white">
+                    <div className="absolute bottom-4 left-4  w-[90%] text-white flex justify-between">
                       <div className="flex items-center gap-2">
-                        <Navigation className="w-5 h-5" />
-                        <span className="font-medium">{ride.distance}</span>
+                        <Navigation className="w-5 h-5 " />
+                        <span className="font-medium">{ride.distance} km</span>
                       </div>
-                      <div className="text-sm">{ride.duration} duration</div>
+                      <div className="flex items-center gap-2">
+                        <Clock className="w-5 h-5 " />
+                        <span className="font-medium">{ride.duration} mins</span>
+                      </div>
+
+
                     </div>
                   </div>
 
                   {/* Detailed Information */}
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        <MapPin className="w-5 h-5 text-green-600" />
+                  <div className=" gap-4">
+                    <div className="space-y-2 flex justify-between">
+
+                      <div className="flex items-center gap-2 ">
+                        <MapPinHouse  className="w-5 h-5 text-green-600" />
                         <div>
                           <div className="text-xs text-gray-500">From</div>
                           <div className="font-medium">{ride.from}</div>
@@ -168,7 +145,49 @@ const RideHistory = (props) => {
                       </div>
                     </div>
 
-                    <div className="space-y-2">
+
+                  </div>
+
+                  {/* Driver Details */}
+                  <div className="space-y-2 flex justify-between items-center ">
+                    <div className="flex items-center gap-2">
+                      <img
+                        src={ride.captainImage}
+                        alt="Driver"
+                        className="w-10 h-10 rounded-full border-2 border-solid border-gray-400"
+                      />
+                      <div>
+                        <div className="text-xs text-gray-500">DRIVER</div>
+                        <div className="font-medium">{ride.fname} {ride.lname}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Phone className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <div className="text-xs text-gray-500">CONTACT</div>
+                        <div className="font-medium">{ride.mobile}</div>
+                      </div>
+                    </div>
+                  </div>
+                  {/* Vehicle Detials */}
+
+                  <div className="space-y-2 flex justify-between items-center ">
+                    <div className="flex items-center gap-2">
+                    <IdCard className="w-5 h-5 text-orange-600" />
+                      <div>
+                        <div className="text-xs text-gray-500">{ride.vehicleType.toUpperCase()} PLATE NUMBER</div>
+                        <div className="font-medium">{ride.vehiclePlate}</div>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Blend  className="w-5 h-5 text-blue-600" />
+                      <div>
+                        <div className="text-xs text-gray-500">VEHICLE MODEL</div>
+                        <div className="font-medium">{ride.vehicleModel}</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="space-y-2 flex justify-between">
                       <div className="flex items-center gap-2">
                         <Wallet className="w-5 h-5 text-purple-600" />
                         <div>
@@ -177,7 +196,7 @@ const RideHistory = (props) => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Star className="w-5 h-5 text-yellow-600" />
+                        <Star className="w-5 h-5 text-orange-600" />
                         <div>
                           <div className="text-xs text-gray-500">Your Rating</div>
                           <div className="flex items-center gap-1">
@@ -191,17 +210,15 @@ const RideHistory = (props) => {
                         </div>
                       </div>
                     </div>
-                  </div>
+
 
                   {/* Actions */}
-                  <div className="flex gap-4">
-                    <button className="flex items-center gap-2 text-blue-600 hover:bg-blue-50 px-4 py-2 rounded-lg">
+                  <div className="flex justify-between ">
+                    <button className="flex items-center gap-2 text-blue-600 hover:bg-blue-50  py-2 rounded-lg">
                       <Receipt className="w-5 h-5" />
                       Download Receipt
                     </button>
-                    <button className="flex items-center gap-2 text-green-600 hover:bg-green-50 px-4 py-2 rounded-lg">
-                      Rate Again
-                    </button>
+
                   </div>
                 </div>
               )}
@@ -214,13 +231,13 @@ const RideHistory = (props) => {
           {rides.length} rides shown • Updated just now
         </div>
         <div className="mt-6">
-                   <p className="text-xs text-gray-500 text-center mt-6">
-                                       By signing up, you agree to our{' '}
-                                       <Link to='/Drivo-Rides-Terms-and-Conditions' className="text-blue-600 hover:underline">Terms of Service</Link>{' '}
-                                       and{' '}
-                                       <Link to ='/Drivo-Rides-privacy-policy' className="text-blue-600 hover:underline">Privacy Policy</Link>
-                                   </p>
-                </div>
+          <p className="text-xs text-gray-500 text-center mt-6">
+            By signing up, you agree to our{' '}
+            <Link to='/Drivo-Rides-Terms-and-Conditions' className="text-blue-600 hover:underline">Terms of Service</Link>
+            {' '}and{' '}
+            <Link to='/Drivo-Rides-privacy-policy' className="text-blue-600 hover:underline">Privacy Policy</Link>
+          </p>
+        </div>
       </div>
     </div>
   );

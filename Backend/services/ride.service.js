@@ -75,7 +75,7 @@ const createRide = async (user, origin, destination, vehicleType) => {
             originText: origin,
             destinationText: destination,
             price: fare[vehicleType],
-            duration: distanceTime.duration,
+            duration: distanceTime.duration.toFixed(2),
             distance: distanceTime.distance,
             otp: getOtp(4),
             status: 'pending'

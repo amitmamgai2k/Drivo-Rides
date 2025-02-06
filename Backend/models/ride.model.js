@@ -61,11 +61,11 @@ const rideSchema = new mongoose.Schema({
     },
     paymentID: {
         type: String,
-        default: null
+        default: 0
     },
     orderID: {
         type: String,
-        default: null
+        default: 0
     },
     signature: {
         type: String,

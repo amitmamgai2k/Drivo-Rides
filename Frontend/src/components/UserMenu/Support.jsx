@@ -1,19 +1,17 @@
-import React from 'react';
-import {
-  ArrowLeft,
-  Phone,
-  Mail,
-  MapPin,
-  Clock,
-  MessageSquare,
-  User,
-  LifeBuoy,
-  Smartphone,
-  ChevronRight
-} from 'lucide-react';
+import {useState} from 'react';
+import { ArrowLeft, Phone, Mail, MapPin, Clock,MessageSquare,User, LifeBuoy, Smartphone, ChevronRight} from 'lucide-react';
 import { Link } from 'react-router-dom';
+import {toast} from 'react-hot-toast';
+import axios from 'axios';
+
 
 const Support = (props) => {
+  const [name, setname] = useState("");
+  const [email, setemail] = useState("");
+  const [message, setmessage] = useState("");
+  const [mobileNumber, setmobileNumber] = useState("");
+
+
   if (!props.Contact) return null;
 
   const supportChannels = [
@@ -24,13 +22,7 @@ const Support = (props) => {
       action: "Visit Help Center",
       link: "#"
     },
-    {
-      icon: Smartphone,
-      title: "App Support",
-      description: "Get help with app-related issues",
-      action: "Open in App",
-      link: "#"
-    },
+
     {
       icon: MessageSquare,
       title: "Live Chat",
@@ -39,7 +31,36 @@ const Support = (props) => {
       link: "#"
     }
   ];
+ const handleSubmit = async (e)=>{
+  e.preventDefault();
+  const userData = {
+    name: name,
+    email: email,
+    message: message,
+    mobileNumber: mobileNumber
+};
+try{
+ const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/send-message`, userData);
+if (response.status === 200) {
+  toast.success('Message sent successfully');
 
+
+
+ }
+}
+catch(error){
+ console.error('Error sending message:', error);
+ toast.error('Failed to send message. Please try again.');
+}
+ setname('');
+ setemail('');
+ setmessage('');
+ setmobileNumber('');
+
+
+
+
+ }
   return (
     <div className="fixed inset-0 bg-white z-30 overflow-auto animate-in slide-in-from-right">
       {/* Header */}
@@ -106,13 +127,15 @@ const Support = (props) => {
             <h3 className="text-2xl font-semibold">Send a Message</h3>
           </div>
 
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="text"
+                  value={name}
+                  onChange={(e) => setname(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="John Doe"
                 />
@@ -125,8 +148,24 @@ const Support = (props) => {
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                 <input
                   type="email"
+                  value={email}
+                  onChange={(e) => setemail(e.target.value)}
                   className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                   placeholder="john@example.com"
+                />
+              </div>
+            </div>
+            {/* mobile Number */}
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-2">Mobile Number</label>
+              <div className="relative">
+                <Phone className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <input
+                  type="number"
+                  value={mobileNumber}
+                  onChange={(e) => setmobileNumber(e.target.value)}
+                  className="w-full pl-10 pr-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Enter your mobile Number"
                 />
               </div>
             </div>
@@ -135,6 +174,8 @@ const Support = (props) => {
               <label className="block text-sm font-medium text-gray-700 mb-2">Message</label>
               <textarea
                 rows="4"
+                value={message}
+                onChange={(e) => setmessage(e.target.value)}
                 className="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="How can we help you?"
               ></textarea>

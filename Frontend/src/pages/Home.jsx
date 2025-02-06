@@ -408,7 +408,11 @@ const toggleMenu = (state) => {
 </div>
 <div
   ref = {waitingForDriverRef}
-  className='fixed w-full bottom-0  translate-y-full h-screen bg-white px-3 py-3 z-10 '
+  className={`fixed w-full bottom-0 ${
+    waitingForDriver ? 'translate-y-0' : 'translate-y-full'
+  } bg-white px-3 py-3 z-50`}
+  style={{ zIndex: 60 }}
+  // className='fixed w-full bottom-0  translate-y-full h-screen bg-white px-3 py-3 z-10 '
 
 >
   <WaitForDriver waitingForDriver={waitingForDriver} setwaitingForDriver={setwaitingForDriver}   ride={ride}

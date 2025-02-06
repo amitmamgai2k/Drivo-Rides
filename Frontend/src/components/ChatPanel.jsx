@@ -1,46 +1,65 @@
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useState, useRef } from "react";
 import { SocketContext } from '../context/SocketContext';
 import { UserDataContext } from '../context/UserContext';
 import { ArrowLeft, SendHorizontal, Video, VideoIcon, X } from "lucide-react";
 
 const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
-  const [messages, setMessage] = useState([]);
+  const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const { socket } = useContext(SocketContext);
   const { user } = useContext(UserDataContext);
 
+  // Use ref to track if the listener is already set
+  const listenerSet = useRef(false);
+
   useEffect(() => {
-    if (socket && socket.connected) {
+    // Only set up the listener if it hasn't been set and socket exists
+    if (socket && socket.connected && !listenerSet.current) {
       const handleMessage = (message) => {
         console.log("Message received:", message);
-        setMessage((prev) => [...prev, message]);
+        setMessages(prev => [...prev, message]);
       };
 
       socket.on('receive_message', handleMessage);
-
+      listenerSet.current = true;
 
       return () => {
         socket.off('receive_message', handleMessage);
+        listenerSet.current = false;
       };
     }
-  }, [socket,setMessage]);
+  }, [socket]); // Remove setMessage from dependencies
 
   const sendMessage = () => {
     if (newMessage.trim() === '') return;
+
     const messageData = {
       rideId,
       recipientId,
-      content: newMessage,
+      content: newMessage.trim(),
+      timestamp: new Date().toISOString()
     };
 
-    socket.emit('send_message', messageData);
+    // Only emit if socket is connected
+    if (socket && socket.connected) {
+      socket.emit('send_message', messageData);
 
-    setMessage((prevMessage) => [
-      ...prevMessage,
-      { ...messageData, isSender: true },
-    ]);
-    setNewMessage('');
+      // Add message to local state
+      setMessages(prevMessages => [
+        ...prevMessages,
+        { ...messageData, isSender: true }
+      ]);
+      setNewMessage('');
+    } else {
+      console.error('Socket is not connected');
+    }
   };
+
+  // Auto-scroll to bottom when new messages arrive
+  const messagesEndRef = useRef(null);
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [messages]);
 
   if (!isOpen) return null;
 
@@ -50,12 +69,19 @@ const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
       <div className="bg-white shadow-lg">
         <div className="max-w-3xl mx-auto flex items-center justify-between p-4">
           <div className="flex items-center space-x-4">
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
               <ArrowLeft className="w-6 h-6 text-gray-600" />
             </button>
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <img src={Image} alt="Profile" className="w-12 h-12 rounded-full object-cover border-2 border-gray-200" />
+                <img
+                  src={Image}
+                  alt={Name}
+                  className="w-12 h-12 rounded-full object-cover border-2 border-gray-200"
+                />
                 <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
               </div>
               <div>
@@ -64,11 +90,14 @@ const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
               </div>
             </div>
           </div>
-          <div className="flex items-center space-x-2"> {/* Here i have to add video handelr */}
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" >
+          <div className="flex items-center space-x-2">
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
               <VideoIcon className="w-6 h-6 text-gray-600" />
             </button>
-            <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <button
+              onClick={onClose}
+              className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+            >
               <X className="w-6 h-6 text-gray-600" />
             </button>
           </div>
@@ -93,11 +122,15 @@ const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
               <p className={`text-xs mt-1 ${
                 message.isSender ? 'text-black' : 'text-gray-400'
               }`}>
-                {new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                {new Date(message.timestamp).toLocaleTimeString([], {
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
               </p>
             </div>
           </div>
         ))}
+        <div ref={messagesEndRef} />
       </div>
 
       {/* Input Area */}
@@ -113,7 +146,8 @@ const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
           />
           <button
             onClick={sendMessage}
-            className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full transition-colors flex items-center justify-center"
+            disabled={!newMessage.trim()}
+            className="bg-blue-500 hover:bg-blue-600 text-white p-3 rounded-full transition-colors flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <SendHorizontal className="w-5 h-5" />
           </button>

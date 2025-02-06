@@ -23,7 +23,7 @@ const CaptainSignup = () => {
     const [capacity, setVehicleCapacity] = useState('');
     const [vehicleType, setVehicleType] = useState('');
 
-    const { setCaptain } = useContext(CaptainDataContext);
+    const { captain,setCaptain } = useContext(CaptainDataContext);
     const navigate = useNavigate();
 
     const handleImageChange = (e) => {
@@ -86,7 +86,10 @@ const CaptainSignup = () => {
             );
            console.log('Captain Registered',response);
             if (response.data && response.data.token) {
+                console.log('c',captain);
+
                 setCaptain(response.data.user);
+                console.log('vc',captain);
                 localStorage.setItem('token', response.data.token);
                 navigate('/captain-home');
             }
