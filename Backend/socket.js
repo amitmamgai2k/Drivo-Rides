@@ -89,7 +89,7 @@ const initializeSocket = (server) => {
             socket.on('send_message', async (messageData) => {
                 console.log('Received message:', messageData);
                 try {
-                    const { rideId, recipientId, content } = messageData;
+                    const { rideId, recipientId, content,timestamp } = messageData;
 
                     // Save message to database
                     const newMessage = await messageModel.create({
@@ -97,7 +97,7 @@ const initializeSocket = (server) => {
                         senderId: userId,
                         recipientId,
                         content,
-                        timestamp: new Date()
+                        timestamp: timestamp
                     });
 
                     // Find recipient's socket ID

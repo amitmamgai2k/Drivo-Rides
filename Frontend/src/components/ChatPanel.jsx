@@ -1,59 +1,73 @@
-import React, { useContext, useEffect, useState, useRef } from "react";
+import React, { useContext, useEffect, useState, useRef, useCallback } from "react";
 import { SocketContext } from '../context/SocketContext';
 import { UserDataContext } from '../context/UserContext';
 import { ArrowLeft, SendHorizontal, Video, VideoIcon, X } from "lucide-react";
+import VideoPage from "./videoPanel";
 
 const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
+  const [videoCall, setVideoCall] = useState(false);
   const { socket } = useContext(SocketContext);
-  const { user } = useContext(UserDataContext);
 
-  // Use ref to track if the listener is already set
-  const listenerSet = useRef(false);
 
+  // Message handler with useCallback to prevent recreating on every render
+  const handleMessage = useCallback((message) => {
+    setMessages(prev => {
+      // Check if message already exists using timestamp and content
+      const messageExists = prev.some(
+        m => m.timestamp === message.timestamp && m.content === message.content
+      );
+
+      if (messageExists) {
+        return prev;
+      }
+
+      return [...prev, message];
+    });
+  }, []);
+
+  // Set up socket listener
   useEffect(() => {
-    // Only set up the listener if it hasn't been set and socket exists
-    if (socket && socket.connected && !listenerSet.current) {
-      const handleMessage = (message) => {
-        console.log("Message received:", message);
-        setMessages(prev => [...prev, message]);
-      };
+    if (!socket) return;
 
-      socket.on('receive_message', handleMessage);
-      listenerSet.current = true;
+    // Remove any existing listeners first
+    socket.off('receive_message');
 
-      return () => {
-        socket.off('receive_message', handleMessage);
-        listenerSet.current = false;
-      };
-    }
-  }, [socket]); // Remove setMessage from dependencies
+    // Add new listener
+    socket.on('receive_message', handleMessage);
+    console.log("Socket listener set up");
 
-  const sendMessage = () => {
-    if (newMessage.trim() === '') return;
+    // Cleanup on unmount or when dependencies change
+    return () => {
+      socket.off('receive_message', handleMessage);
+      console.log("Socket listener cleaned up");
+    };
+  }, [socket, handleMessage]);
 
+  const sendMessage = useCallback(() => {
+    if (!socket || !newMessage.trim() || !rideId || !recipientId) return;
+
+    const timestamp = new Date().toISOString();
     const messageData = {
       rideId,
       recipientId,
       content: newMessage.trim(),
-      timestamp: new Date().toISOString()
+      timestamp
     };
 
-    // Only emit if socket is connected
-    if (socket && socket.connected) {
-      socket.emit('send_message', messageData);
+    // Add message to local state first
+    const localMessage = {
+      ...messageData,
+      isSender: true
+    };
 
-      // Add message to local state
-      setMessages(prevMessages => [
-        ...prevMessages,
-        { ...messageData, isSender: true }
-      ]);
-      setNewMessage('');
-    } else {
-      console.error('Socket is not connected');
-    }
-  };
+    setMessages(prev => [...prev, localMessage]);
+    setNewMessage('');
+
+    // Then emit to socket
+    socket.emit('send_message', messageData);
+  }, [socket, newMessage, rideId, recipientId]);
 
   // Auto-scroll to bottom when new messages arrive
   const messagesEndRef = useRef(null);
@@ -62,7 +76,6 @@ const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
   }, [messages]);
 
   if (!isOpen) return null;
-
   return (
     <div className="fixed inset-0 bg-gray-100 z-50 flex flex-col">
       {/* Header */}
@@ -91,7 +104,7 @@ const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors">
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" onClick={() => setVideoCall(true)}>
               <VideoIcon className="w-6 h-6 text-gray-600" />
             </button>
             <button
@@ -153,6 +166,7 @@ const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
           </button>
         </div>
       </div>
+      {videoCall && <VideoPage isOpen={videoCall} setVideoCall={setVideoCall} />}
     </div>
   );
 };

@@ -88,7 +88,7 @@ const ConfirmRidePopUp = (props) => {
 
   return (
     <div>
-    <div  className="" >
+    <div  className="h-screen" >
     <div className="flex flex-col w-full px-2 mt-4">
       {/* Back Button */}
       <div>
