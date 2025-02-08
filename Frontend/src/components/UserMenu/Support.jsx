@@ -40,7 +40,7 @@ const Support = (props) => {
     mobileNumber: mobileNumber
 };
 try{
- const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/send-message`, userData);
+ const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/miscellaneous/send-message`, userData);
 if (response.status === 200) {
   toast.success('Message sent successfully');
 

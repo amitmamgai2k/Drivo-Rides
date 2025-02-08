@@ -218,3 +218,60 @@ module.exports.verifyOtp = async (req, res) => {
         res.status(500).json({ error: "Server error" });
     }
 };
+module.exports.deleteCaptain = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        const { captainId } = req.body;
+        if(!captainId) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+        const captain = await captainModel.findByIdAndDelete(captainId);
+        if (!captain) {
+            return res.status(404).json({ error: "Captain not found" });
+        }
+        res.status(200).json({ message: "Captain deleted successfully" });
+
+    } catch (error) {
+        console.error("Error deleting captain:", error);
+        res.status(500).json({ error: "Server error" });
+
+    }
+}
+module.exports.updateProfilePicture = async (req, res) => {
+    try {
+        const errors = validationResult(req);
+        if (!errors.isEmpty()) {
+            return res.status(400).json({ errors: errors.array() });
+        }
+        const { captainId } = req.body;
+        if(!captainId) {
+            return res.status(400).json({ error: "Missing required fields" });
+        }
+        const ProfilePictureLocalPath = req.file?.path;
+        if(!ProfilePictureLocalPath) {
+            return res.status(400).json({ error: "Profile picture is required" });
+        }
+        const ProfilePicture = await uploadOnCloudinary(ProfilePictureLocalPath);
+        if(!ProfilePicture) {
+            return res.status(400).json({ error: "Error uploading profile picture" });
+        }
+
+        const captain = await captainModel.findById(captainId);
+        if (!captain) {
+            return res.status(404).json({ error: "Captain not found" });
+        }
+        captain.ProfilePicture = ProfilePicture.url;
+        await captain.save();
+        res.status(200).json({ message: "Profile picture updated successfully" });
+
+    } catch (error) {
+        console.error("Error updating profile picture:", error);
+        res.status(500).json({ error: "Server error" });
+
+    }
+}
+module.exports.getRideHistory = async (req, res) => {};
+

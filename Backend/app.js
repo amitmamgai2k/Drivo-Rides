@@ -10,6 +10,7 @@ const captainRoutes = require('./routes/captain.routes.js');
 const mapsRoutes = require('./routes/maps.routes.js');
 const rideRoutes = require('./routes/ride.routes.js');
 const paymentRoutes = require('./routes/payment.route.js');
+const miscellaneousRoutes = require('./routes/miscellaneous.route.js');
 
 connectToDB();
 const cors = require('cors');
@@ -27,4 +28,5 @@ app.use('/captains',captainRoutes)
 app.use('/maps',mapsRoutes)
 app.use('/rides',rideRoutes)
 app.use('/payment', paymentRoutes);
+app.use('/miscellaneous',miscellaneousRoutes);
 module.exports = app;

@@ -70,5 +70,8 @@ router.post('/verify-otp', [
     body('newPassword').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long'),
 
 ], captainController.verifyOtp);
+router.delete('/delete', authMiddleware.authCaptain,captainController.deleteCaptain);
+router.post('/update-profile-picture', authMiddleware.authCaptain,upload.single('ProfileImage'), captainController.updateProfilePicture);
+router.get('/ride-history', authMiddleware.authCaptain, captainController.getRideHistory);
 
 module.exports = router;

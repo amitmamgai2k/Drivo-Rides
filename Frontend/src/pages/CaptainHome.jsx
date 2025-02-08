@@ -8,11 +8,15 @@ import ConfirmRidePopUp from "../components/ConfirmRidePopUp";
 import MapBackGround from "../components/MapBackGround";
 import { SocketContext } from '../context/SocketContext';
 import { CaptainDataContext } from "../context/CaptainContext";
+import DropdownMenu from "../components/CaptainMenu/DropDownMenu";
 import axios from "axios";
+import { Menu } from "lucide-react";
 
 const CaptainHome = () => {
   const [ridePopupPanel, setRidePopupPanel] = useState(false);
   const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false);
+ const[menuOpen,setMenuOpen] = useState(false)
+  const [panelOpen, setPanelOpen] = useState(false);
   const[ride,setRide] = useState(null)
 
   const ridePopupPanelRef = useRef(null);
@@ -143,25 +147,27 @@ socket.on('new-ride', (data) => {
       });
     }
   }, [confirmRidePopupPanel]);
-
+  const toggleMenu = (state) => {
+    setMenuOpen(state !== undefined ? state : !menuOpen); // Toggle menu state
+  };
   return (
     <div className="h-screen ">
       {/* Header Section */}
-      <div className="absolute top-4 left-4 z-10">
+      <div className={`absolute top-5 left-1 right-3 z-10 transition-opacity duration-300 flex flex-row justify-between items-center ${
+    panelOpen ? 'opacity-0' : 'opacity-100'
+  }`}>
         <img
 
           src={logo} height={80} width={150}
           alt="Uber Logo"
         />
+          <button className="text-3xl font-semibold"  onClick={() => toggleMenu()}>
+    <Menu size={35} strokeWidth={2} />
+  </button>
       </div>
 
-      {/* Logout Button */}
-      <Link
-        to="/captain-login"
-        className="fixed right-0 mr-10 top-5 h-10 w-10 object-contain bg-white flex items-center justify-center rounded-full shadow z-30"
-      >
-        <i className="ri-logout-box-r-line"></i>
-      </Link>
+      <DropdownMenu isOpen={menuOpen} toggleMenu={toggleMenu} />
+
     <div className="h-3/6">
       {/* Map Section */}
       <MapBackGround />
