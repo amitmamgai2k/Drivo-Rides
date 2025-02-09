@@ -2,14 +2,48 @@ import React, { useContext, useEffect, useState, useRef, useCallback } from "rea
 import { SocketContext } from '../context/SocketContext';
 import { UserDataContext } from '../context/UserContext';
 import { ArrowLeft, SendHorizontal, Video, VideoIcon, X } from "lucide-react";
-import VideoPage from "./videoPanel";
+import VideoPanel from "./videoPanel";
 
 const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [videoCall, setVideoCall] = useState(false);
+  const [roomID, setRoomID] = useState(null);
   const { socket } = useContext(SocketContext);
 
+  function randomID(len) {
+    let result = '';
+    if (result) return result;
+    var chars = '12345qwertyuiopasdfgh67890jklmnbvcxzMNBVCZXASDQWERTYHGFUIOLKJP',
+      maxPos = chars.length,
+      i;
+    len = len || 5;
+    for (i = 0; i < len; i++) {
+      result += chars.charAt(Math.floor(Math.random() * maxPos));
+    }
+    return result;
+  }
+  const startVideoCall = ()=>{
+    const newRoomID = randomID(5);
+    setRoomID(newRoomID);
+    setVideoCall(true);
+
+    //Notify the recipient about incoming call
+    socket.emit('start_video_call',{
+      roomId:newRoomID,
+      recipientId
+    })
+  };
+  useEffect(() => {
+    if(!socket) return;
+    socket.on("incoming_video_call",({roomID})=>{
+      setRoomID(roomID);
+      setVideoCall(true);
+    });
+    return () => {
+      socket.off("incoming_video_call");
+    }
+  },[socket]);
 
   // Message handler with useCallback to prevent recreating on every render
   const handleMessage = useCallback((message) => {
@@ -104,7 +138,7 @@ const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
             </div>
           </div>
           <div className="flex items-center space-x-2">
-            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" onClick={() => setVideoCall(true)}>
+            <button className="p-2 hover:bg-gray-100 rounded-full transition-colors" onClick={startVideoCall}>
               <VideoIcon className="w-6 h-6 text-gray-600" />
             </button>
             <button
@@ -166,7 +200,7 @@ const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
           </button>
         </div>
       </div>
-      {videoCall && <VideoPage isOpen={videoCall} setVideoCall={setVideoCall} />}
+      {videoCall && <VideoPanel roomID={roomID} isOpen={videoCall} setVideoCall={setVideoCall} />}
     </div>
   );
 };

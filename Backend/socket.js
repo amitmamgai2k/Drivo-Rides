@@ -129,6 +129,10 @@ const initializeSocket = (server) => {
                 await messageModel.deleteMany({rideId});
                 console.log('Chat cleared successfully');
             });
+            socket.on("start_video_call",({roomID,recipientId})=>{
+                console.log(`User ${userId} started video call with roomID ${roomID} and recipientId ${recipientId}`);
+                io.to(recipientId).emit("incoming_video_call", { roomID });
+            })
         });
 
 
