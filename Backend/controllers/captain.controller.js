@@ -1,4 +1,5 @@
 const captainModel = require('../models/captain.model');
+const rideModel = require('../models/ride.model');
 const {validationResult} = require('express-validator');
 const captainService = require('../services/captain.service');
 const BlacklistToken = require('../models/blacklistToken.model');
@@ -273,5 +274,48 @@ module.exports.updateProfilePicture = async (req, res) => {
 
     }
 }
-module.exports.getRideHistory = async (req, res) => {};
+module.exports.getRideHistory = async (req, res) => {
+    if (res.headersSent) return;
+
+    try {
+        const { userId } = req.body;
+        console.log("captain id",userId);
+        if (!userId) return res.status(400).json({ error: "UserId is required" });
+console.log('hhh');
+
+        const rides = await rideModel.find({ captain: userId })
+        .populate("captain")
+            .populate("user")
+            .lean();
+        console.log("rides",rides);
+
+
+        if (!rides?.length) return res.status(404).json({ message: "No rides found" });
+
+        const rideHistory = rides.map(ride => ({
+            rideID: ride._id,
+            UserFirstName: ride.user?.fullname?.firstname,
+            UserLastName: ride.user?.fullname?.lastname,
+            UserMobileNumber: ride.user?.mobileNumber,
+            UserProfilePicture: ride.user?.ProfilePicture,
+            date: ride.createdAt,
+            origin: ride.originText,
+            destination: ride.destinationText,
+            duration: ride.duration,
+            distance: ride.distance,
+            price: ride.price,
+            orderId: ride.orderID,
+            paymentID: ride.paymentID
+        }));
+        console.log('rideHistory',rideHistory);
+
+
+        return res.status(200).json({ rideHistory });
+
+    } catch (error) {
+        if (!res.headersSent) {
+            return res.status(500).json({ error: "Server error aa raha hai ride History se" });
+        }
+    }
+};
 

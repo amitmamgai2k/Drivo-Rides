@@ -1,8 +1,9 @@
 import React, { useState } from "react";
-import { ArrowLeft, UserCheck, Phone, Mail, Calendar, Camera,  LogOut, ChevronRight, Upload } from "lucide-react";
+import { ArrowLeft, UserCheck, Phone, Mail, Calendar, Camera,  LogOut, ChevronRight, Upload,Car } from "lucide-react";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Webcam from "react-webcam";
+import toast from "react-hot-toast";
 
 const Profile = (props) => {
   const [isLoading, setIsLoading] = useState(false);
@@ -40,10 +41,12 @@ const Profile = (props) => {
       );
 
       if (response.status === 200) {
+        toast.success("Profile picture updated successfully");
         console.log("Profile picture updated successfully");
       }
     } catch (error) {
       console.error("Error updating profile picture:", error);
+      toast.error("Failed to update profile picture");
     } finally {
       // Hide loading indicator
       setIsLoading(false);
@@ -79,9 +82,12 @@ const Profile = (props) => {
       );
 
       if (response.status === 200) {
+
+        toast.success("Profile picture updated successfully");
         console.log("Profile picture updated successfully");
       }
     } catch (error) {
+      toast.error("Failed to update profile picture");
       console.error("Error updating profile picture:", error);
     } finally {
       setIsLoading(false);
@@ -239,7 +245,7 @@ const Profile = (props) => {
                 </div>
                 <div className="flex-1">
                   <p className="text-sm text-gray-500">Account</p>
-                  <p className="text-gray-900">Verified as User</p>
+                  <p className="text-gray-900">Verified as Captain</p>
                 </div>
               </div>
             </div>
@@ -254,6 +260,36 @@ const Profile = (props) => {
                   <p className="text-gray-900">  {props.userData?.captain?.createdAt ? props.userData.captain.createdAt.slice(0, 4) : '2024'}</p>
                 </div>
               </div>
+            </div>
+            <div className="bg-gray-50 rounded-xl p-4 hover:bg-gray-100 transition-colors">
+              <div className="flex items-center space-x-4">
+                <div className="p-2 bg-yellow-100 rounded-lg">
+                  <Car className="text-yellow-600" size={20} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm text-gray-500">Vehicle Details</p>
+
+                  <p className="text-black"> <span className="text-black font-semibold">Vehicle Type -</span>  {props.userData?.captain?.vehicle.color} {props.userData?.captain?.vehicle.vehicleType}  </p>
+                  <p className="text-black">  <span className="text-black font-semibold">Vehicle Model -</span> {props.userData?.captain?.vehicle.model} </p>
+                  <p className="text-black">  <span className="text-black font-semibold">Number Plate -</span> { props.userData.captain.vehicle.plate}</p>
+
+                </div>
+              </div>
+            </div>
+            <div className="mt-2 border-t">
+              <Link
+                to="/captain-forgot-password"
+                state={{ userData: props.userData }}
+                className="w-full flex items-center justify-between px-4 py-3 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+              >
+                <div className="flex items-center space-x-4">
+                  <div className="bg-blue-200 rounded-lg p-2">
+                    <LogOut className="w-5 h-5" />
+                  </div>
+                  <span>Change Password</span>
+                </div>
+                <ChevronRight className="w-5 h-5" />
+              </Link>
             </div>
 
             <div className="mt-2 border-t">

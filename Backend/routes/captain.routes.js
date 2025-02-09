@@ -59,7 +59,7 @@ router.post(
 router.post('/login',[  body('email').isEmail().withMessage('Please enter a valid email'),
 body('password').isLength({ min: 6 }).withMessage('Password must be at least 6 characters long')], captainController.loginCaptain);
 router.get('/profile', authMiddleware.authCaptain,captainController.getProfile);
-router.get('/logout', authMiddleware.authCaptain,captainController.logoutCaptain);
+router.post('/logout', authMiddleware.authCaptain,captainController.logoutCaptain);
 router.post('/forgot-password', [
     body('email').isEmail().withMessage('Please enter a valid email'),
 ], captainController.forgotPassword);
@@ -72,6 +72,9 @@ router.post('/verify-otp', [
 ], captainController.verifyOtp);
 router.delete('/delete', authMiddleware.authCaptain,captainController.deleteCaptain);
 router.post('/update-profile-picture', authMiddleware.authCaptain,upload.single('ProfileImage'), captainController.updateProfilePicture);
-router.get('/ride-history', authMiddleware.authCaptain, captainController.getRideHistory);
+router.post('/ride-history',
+
+    [body('userId').isString().withMessage(' route Body mai id nhi aa rhai hai')],
+    captainController.getRideHistory);
 
 module.exports = router;

@@ -151,7 +151,7 @@ socket.on('new-ride', (data) => {
     setMenuOpen(state !== undefined ? state : !menuOpen); // Toggle menu state
   };
   return (
-    <div className="h-screen ">
+    <div className="h-screen w-full  ">
       {/* Header Section */}
       <div className={`absolute top-5 left-1 right-3 z-10 transition-opacity duration-300 flex flex-row justify-between items-center ${
     panelOpen ? 'opacity-0' : 'opacity-100'

@@ -21,7 +21,7 @@ function CaptainDetails() {
     }
 
     return (
-        <div className="h-3/6 px-4  bg-white shadow-lg rounded-t-3xl ">
+        <div className="h-3/6 px-4   bg-white shadow-lg rounded-t-3xl ">
             {/* Captain Header */}
             <div className="flex items-center justify-between gap-4 mb-6">
                 <div className="flex items-center gap-4">
@@ -50,7 +50,7 @@ function CaptainDetails() {
 
             {/* Captain Stats */}
             <div className="bg-gray-50 rounded-xl p-6 shadow-inner">
-                <div className="flex items-center justify-between gap-6">
+                <div className="flex items-center justify-center gap-6 px-7">
                     {/* Hours Online */}
                     <div className="flex-1 text-center bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                         <i className="text-2xl ri-time-line text-blue-600 mb-2"></i>

@@ -13,7 +13,7 @@ import {
 import Profile from './MyProfile';
 import About from '../UserMenu/About';
 import Support from '../UserMenu/Support';
-import RideHistory from '../UserMenu/RideHistory';
+import RideHistory from './RideHistory';
 import Feedback from '../UserMenu/Feedback';
 import Refer from '../UserMenu/ReferAndEarn';
 
@@ -53,6 +53,8 @@ function DropdownMenu({ isOpen, toggleMenu }) {
     try {
 
 const userId = captain.captain?._id;
+console.log("captain id",userId);
+
 
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/ride-history`, {userId} , {
 
@@ -91,8 +93,9 @@ const userId = captain.captain?._id;
 const handleLogout = async () => {
 
     try {
-        const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/captains/logout`, {
-           headers:{Authorization: `Bearer ${localStorage.getItem('token')}`} // Send cookies with the request
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/logout`, {
+
+           headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}
         });
 
         if (response.status === 200) {
@@ -103,7 +106,7 @@ const handleLogout = async () => {
             toast.success('Logout successful');
 
             // Redirect to login or home page
-            navigate('/user-login');
+            navigate('/captain-login');
         }
     } catch (error) {
         console.error('Error during logout:', error);
