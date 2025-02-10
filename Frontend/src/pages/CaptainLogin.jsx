@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../assets/logo.png';
 import { Mail, Lock, User } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const CaptainLogin = () => {
    const [email, setEmail] = useState('');
@@ -19,15 +20,23 @@ const CaptainLogin = () => {
            email: email,
            password: password
        };
-       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, userData);
-       if (response.status === 200) {
-           const data = response.data;
-           setCaptain(data.captain);
-           localStorage.setItem('token', data.token);
-           navigate('/captain-home');
-       }
-       setEmail('');
-       setPassword('');
+      try {
+        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/login`, userData);
+        if (response.status === 200) {
+            const data = response.data;
+            toast.success('Login successful');
+            console.log('data', data.token);
+
+            setCaptain(data.captain);
+            localStorage.setItem('token', data.token);
+            navigate('/captain-home');
+        }
+        setEmail('');
+        setPassword('');
+      } catch (error) {
+        toast.error(error.response.data.message);
+
+      }
    };
 
    return (

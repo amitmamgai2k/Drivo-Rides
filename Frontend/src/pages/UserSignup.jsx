@@ -4,6 +4,7 @@ import axios from 'axios';
 import { UserDataContext } from '../context/UserContext';
 import logo from '../assets/logo.png';
 import { Mail, Lock, User, Phone, Upload, X } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const UserSignup = () => {
     const [email, setEmail] = useState('');
@@ -74,14 +75,17 @@ const submitHandler = async (e) => {
 
             if (response.data && response.data.token) {
                 localStorage.setItem('token', response.data.token);
-                console.log("d",user);
+                toast.success('Registration successful');
+
+
 
                 setUser(response.data.user);
-                console.log("v",user);
+
 
                 navigate('/home');
             }
         } catch (error) {
+            toast.error(error.response.data);
             console.error('Registration error:', error.response?.data || error);
         }
     };

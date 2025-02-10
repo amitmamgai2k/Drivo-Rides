@@ -1,6 +1,7 @@
 import { useState, useRef,useEffect } from 'react';
 import { useNavigate,useLocation } from 'react-router-dom'; // Import useNavigate for navigation
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const OTPPage = () => {
   const [otp, setOtp] = useState(new Array(4).fill(''));
@@ -47,12 +48,15 @@ const OTPPage = () => {
         );
 
         if (response.status === 200) {
+          toast.success('OTP verified successfully');
+
           // OTP verification successful
           console.log('OTP verified successfully');
           alert('OTP verified successfully! Redirecting to login page...');
           navigate('/user-login'); // Redirect to login page
         }
       } catch (error) {
+        toast.error('OTP verification failed');
         console.error('OTP verification failed:', error);
         alert(
           error.response?.data?.error ||

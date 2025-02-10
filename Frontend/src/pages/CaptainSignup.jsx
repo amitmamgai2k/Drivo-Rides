@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { User, Mail, Lock, Phone, Car, Upload, X } from 'lucide-react';
 import logo from '../assets/logo.png';
+import toast from 'react-hot-toast';
 
 const CaptainSignup = () => {
     // Personal Information States
@@ -86,16 +87,17 @@ const CaptainSignup = () => {
             );
            console.log('Captain Registered',response);
             if (response.data && response.data.token) {
-                console.log('c',captain);
+
+                toast.success('Registration successful');
 
                 setCaptain(response.data.user);
-                console.log('vc',captain);
+
                 localStorage.setItem('token', response.data.token);
                 navigate('/captain-home');
             }
         } catch (error) {
             console.error('Error during registration:', error);
-            alert(error.response?.data?.message || 'Registration failed');
+            toast.error('Registration failed');
         }
     };
 

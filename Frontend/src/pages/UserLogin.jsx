@@ -5,6 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../assets/logo.png';
 import { Mail, Lock, Car } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const UserLogin = () => {
     const [email, setEmail] = useState('');
@@ -18,6 +19,7 @@ const UserLogin = () => {
             email: email,
             password: password
         };
+      try {
         const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/users/login`, userData);
         if (response.status === 200) {
             const data = response.data;
@@ -26,12 +28,17 @@ const UserLogin = () => {
 
             setUser(data.user);
             console.log('setUser',user);
+            toast.success('Login successful');
 
             localStorage.setItem('token', data.token);
             navigate('/home');
         }
         setEmail('');
         setPassword('');
+      } catch (error) {
+        toast.error('Login failed');
+
+      }
     };
 
     return (

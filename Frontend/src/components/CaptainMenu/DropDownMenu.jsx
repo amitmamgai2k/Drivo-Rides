@@ -90,29 +90,41 @@ console.log("captain id",userId);
 
 
 
-const handleLogout = async () => {
-
+  const handleLogout = async () => {
     try {
-        const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/captains/logout`, {
+      const token = localStorage.getItem('token');
+      if (!token) {
+        toast.error('No token found');
+        navigate('/captain-login');
+        return;
+      }
 
-           headers:{Authorization: `Bearer ${localStorage.getItem('token')}`}
-        });
-
-        if (response.status === 200) {
-            console.log(response.data.message); // "Logout successful"
-
-            // Clear local storage or user state if used
-            localStorage.removeItem('token');
-            toast.success('Logout successful');
-
-            // Redirect to login or home page
-            navigate('/captain-login');
+      const response = await axios.post(
+        `${import.meta.env.VITE_BASE_URL}/captains/logout`,
+        {}, // Empty body as we're sending token in headers
+        {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
         }
+      );
+
+      if (response.status === 200) {
+        // Clear local storage first
+        localStorage.removeItem('token');
+        toast.success('Logout successful');
+        navigate('/captain-login');
+      }
     } catch (error) {
-        console.error('Error during logout:', error);
-        toast.error('Logout failed');
+      console.error('Error during logout:', error);
+      if (error.response?.status === 401) {
+        // If unauthorized, clear token and redirect anyway
+        localStorage.removeItem('token');
+        navigate('/captain-login');
+      }
+      toast.error(error.response?.data?.error || 'Logout failed');
     }
-};
+  };
 
   const toggleProfile = (state) => {
     setShowProfile(state !== undefined ? state : !showProfile); // Toggle menu state

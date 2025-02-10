@@ -1,6 +1,7 @@
 import { useState, useRef,useEffect } from 'react';
 import { useNavigate,useLocation } from 'react-router-dom'; // Import useNavigate for navigation
 import axios from 'axios';
+import toast from 'react-hot-toast';
 
 const CaptainOtpVerification = () => {
   const [otp, setOtp] = useState(new Array(4).fill(''));
@@ -49,15 +50,12 @@ const CaptainOtpVerification = () => {
         if (response.status === 200) {
           // OTP verification successful
           console.log('OTP verified successfully');
-          alert('OTP verified successfully! Redirecting to login page...');
+          toast.success('OTP verified successfully! Redirecting to login page...');
           navigate('/captain-login'); // Redirect to login page
         }
       } catch (error) {
         console.error('OTP verification failed:', error);
-        alert(
-          error.response?.data?.error ||
-            'Failed to verify OTP. Please try again.'
-        );
+        toast.error('OTP verification failed');
       }
     } else {
       alert('Please fill all OTP digits');

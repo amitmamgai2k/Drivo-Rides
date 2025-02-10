@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import logo from '../assets/logo.png';
 import { Mail, Lock } from 'lucide-react';
+import toast from 'react-hot-toast';
 
 const CaptainForgotPassword = () => {
     const [email, setEmail] = useState('');
@@ -20,14 +21,17 @@ const CaptainForgotPassword = () => {
             );
 
             if (response.status === 200) {
+
                 setIsSuccess(true);
                 setEmail('');
                 setPassword('');
                 // Redirect to OTP verification page
                 setTimeout(() => navigate('/captain-otp-verify', { state: { email , password} }), 2000);
+                toast.success('OTP sent successfully');
             }
         } catch (error) {
             setErrorMessage(error.response?.data?.message || 'Something went wrong. Please try again.');
+            toast.error(error.response?.data?.message || 'Something went wrong. Please try again.');
         }
     };
 
