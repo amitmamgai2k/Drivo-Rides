@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useContext } from 'react';
-import { ChevronDown, Circle, MapPin, Menu } from 'lucide-react';
+import React, { useState, useEffect, useContext  } from 'react';
+import { ChevronDown, Circle, MapPin, Menu,LocateFixed } from 'lucide-react';
 import LocationSearchPanel from '../components/LocationSearchPanel';
 import { useRef } from 'react';
 import gsap from "gsap";
@@ -7,6 +7,7 @@ import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
 import { Oval } from 'react-loader-spinner';
+import toast from 'react-hot-toast';
 
 import VehiclesAvailable from '../components/VehiclesAvailable';
 import ConfirmedVehicle from '../components/ConfirmedVehicle';
@@ -67,6 +68,7 @@ const Home = () => {
   const handlePickupChange = async (e) => {
     setPickup(e.target.value);
     try {
+
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
         params: { address: e.target.value },
         headers: {
@@ -74,8 +76,13 @@ const Home = () => {
           'Content-Type': 'application/json',
         },
       });
-      setPickupSuggestions(response.data.data || []); // Extract the 'data' array
+
+      setPickupSuggestions(response.data.data || []);
+
+
+      // Extract the 'data' array
     } catch (error) {
+      toast.error("Error fetching pickup suggestions:", error);
       console.error("Error fetching pickup suggestions:", error);
     }
   };
@@ -98,6 +105,7 @@ const Home = () => {
     e.preventDefault();
     console.log('Pickup:', pickup, 'Drop:', drop);
   };
+
   useEffect(function () {
     if (vehiclePanel) {
       gsap.to(vehiclePanelRef.current, {
@@ -193,14 +201,13 @@ const Home = () => {
         },
       });
 
-      console.log("Fare Response:", fareResponse.data);
+     if(fareResponse.status === 200){
+      toast.success('Fare fetched successfully');
       setfare(fareResponse.data);
-      // setPickup(pickupCoordinates);
-      // console.log("pickup",pickup)
-      // setDrop(dropCoordinates);
-      // console.log("drop",drop)
       setVehiclePanel(true);
-    } catch (error) {
+    }
+  }catch (error) {
+    toast.error('Failed to fetch fare');
       console.error("Error fetching fare:", error);
     } finally {
       setLoading(false)
@@ -253,6 +260,42 @@ const Home = () => {
   const toggleMenu = (state) => {
     setMenuOpen(state !== undefined ? state : !menuOpen); // Toggle menu state
   };
+
+  const useCurrentLocation = () => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition((position) => {
+        const { latitude, longitude } = position.coords;
+        console.log("Latitude:", latitude, "Longitude:", longitude);
+        try {
+          const response  = axios.post(`${import.meta.env.VITE_BASE_URL}/maps/current-location`, {
+            latitude,
+            longitude
+          }, {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}`,
+            }
+          }).then((response) => {
+            if (response.status === 200) {
+              toast.success('Location fetched successfully');
+              setPickup(response.data.data);
+              console.log("Current Location:", response.data);
+
+            }
+          })
+
+
+        } catch (error) {
+          toast.error('Failed to fetch location');
+          console.error('Error during fetching location:', error);
+
+
+        }
+
+      });
+
+
+    }
+  }
   return (
     <div className="relative h-screen w-screen  bg-gray-100 mb-18">
       {/* UBER Text at top */}
@@ -337,6 +380,19 @@ const Home = () => {
               />
             </div>
           </form>
+          <div
+  onClick={() => useCurrentLocation()}
+  className="bg-blue-500 hover:bg-blue-600 focus:ring-blue-300
+    text-white px-4 py-2 rounded-lg mt-3 w-full flex items-center justify-center gap-2
+    transition-colors duration-300 ease-in-out
+    hover:border-2 hover:border-white
+    focus:outline-none focus:ring-2 "
+>
+  <LocateFixed size={20} />
+  <span>Use Current Location</span>
+</div>
+
+
           <button
             onClick={findTrip}
             className="bg-blue-500 hover:bg-blue-600 focus:ring-blue-300
@@ -383,7 +439,7 @@ const Home = () => {
 
         </div>
       </div>
-      <div ref={vehiclePanelRef} className=' fixed h-[60%] overflow-y-scroll w-full bottom-0 translate-y-full bg-white px-3 py-8  z-50'>
+      <div ref={vehiclePanelRef} className=' fixed h-[60%] overflow-y-scroll w-full bottom-0 translate-y-full bg-white px-3  z-50'>
 
 
         <VehiclesAvailable vehicleType={vehicleType}  setVehicleType={setVehicleType} fare={fare} setVehiclePanel={setVehiclePanel} setConfirmRidePanel={setConfirmRidePanel} />

@@ -4,7 +4,7 @@ import CaptainDetails from "../components/CaptainDetails";
 import RidePop from "../components/RidePop";
 import gsap from "gsap";
 import logo from "../assets/logo.png";
-import sound from "../assets/Notification.mp3";
+import sound from "../assets/messageNoti.mp3";
 
 import ConfirmRidePopUp from "../components/ConfirmRidePopUp";
 import MapBackGround from "../components/MapBackGround";
@@ -21,32 +21,17 @@ const CaptainHome = () => {
   const [panelOpen, setPanelOpen] = useState(false);
   const[ride,setRide] = useState(null)
 
-  const [notificationSound] = useState(new Audio(sound));
-const [playSound, setPlaySound] = useState(false);
+  const notificationSound = useRef(new Audio(sound));
+
 
   const ridePopupPanelRef = useRef(null);
   const confirmRidePopupPanelRef = useRef(null);
   const{socket} = useContext(SocketContext);
   const{captain} = useContext(CaptainDataContext);
-  // const notificationSound =useRef(new Audio(sound));
 
-  useEffect(() => {
-    if (playSound) {
-      notificationSound.play().catch((error) =>
-        console.error("Error playing notification sound:", error)
-      );
-    } else {
-      notificationSound.pause();
-      notificationSound.currentTime = 0; // Reset audio
-    }
-  }, [playSound]);
 
-  const notiSound = () => {
-    setPlaySound(true);
-  };
-  const stopSound = () => {
-    setPlaySound(false);
-  };
+
+
   useEffect(() => {
     // Check if captain data exists
     if (!captain?.captain?._id) {
@@ -99,21 +84,29 @@ useEffect(() => {
   console.log("Captain data loaded:", captain?.captain?._id);
 }, [captain]);
 
-socket.on('new-ride', (data) => {
-  console.log("Ride request received:", data);
-      setRide(data);
-      notiSound();
-      setRidePopupPanel(true);
-      setTimeout(() => {
-        notificationSound.pause();
-        notificationSound.currentTime = 0; // Reset to start
-      }, 1000);
 
+useEffect(() => {
+  // Function to handle new ride
+  const handleNewRide = async (data) => {
+    console.log("Ride request received:", data);
+    setRide(data);
 
-})
+    try {
+      await notificationSound.current.play();
+    } catch (error) {
+      console.error("Error playing sound:", error);
+    }
+    setRidePopupPanel(true);
+  };
+
+  socket.on('new-ride', handleNewRide);
+
+  return () => {
+    socket.off('new-ride', handleNewRide);
+  };
+}, [socket]);
   async function confirmRide() {
-    // Add the captain's ID before making the API request
-    // console.log("Ride id :", ride._id);
+
     console.log("Captain  id:", captain.captain._id);
     const captainId = captain.captain._id;
 
@@ -136,7 +129,8 @@ socket.on('new-ride', (data) => {
 
       setRide(response.data.data);
       console.log("Ride confirmed:", response.data);
-      stopSound();
+
+
       setConfirmRidePopupPanel(true);
       setRidePopupPanel(false);
     } catch (error) {

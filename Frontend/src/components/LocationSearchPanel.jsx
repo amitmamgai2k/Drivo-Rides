@@ -1,14 +1,13 @@
 import React from 'react';
 import { MapPin } from 'lucide-react';
-const LocationSearchPanel = ({ suggestions = [], setPickup, setDrop, activeField, setPanelOpen, setVehiclePanel }) => {
+const LocationSearchPanel = ({ suggestions = [], setPickup, setDrop, activeField }) => {
   const handleSuggestionClick = (suggestion) => {
     if (activeField === 'pickup') {
       setPickup(suggestion); // Set the selected suggestion as pickup
     } else if (activeField === 'destination') {
       setDrop(suggestion); // Set the selected suggestion as drop
     }
-    // setPanelOpen(false);
-    // setVehiclePanel(true);
+
   };
 
   return (

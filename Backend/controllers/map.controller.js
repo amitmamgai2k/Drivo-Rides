@@ -82,3 +82,21 @@ module.exports.getSuggestions = async (req, res) => {
         res.status(500).json({ error: "Unable to fetch suggestions" });
     }
 };
+module.exports.getCurrentLocation = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+        const {longitude,latitude} = req.body;
+        const currentLocation = await mapsService.getCurrentLocation(longitude,latitude);
+        console.log("Current Location:", currentLocation);
+
+        res.status(200).json({
+            data: currentLocation,
+        });
+    } catch (error) {
+        console.error("Error fetching current location:", error.message);
+        res.status(500).json({ error: "Unable to get current location" });
+    }
+};

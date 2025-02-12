@@ -28,4 +28,7 @@ router.get('/get-suggestions',
     query('address').isString().isLength({ min: 3 }),
     mapController.getSuggestions
 )
+router.post('/current-location',
+    mapController.getCurrentLocation
+);
 module.exports = router;

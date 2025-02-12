@@ -1,5 +1,5 @@
 import React from 'react';
-import { User } from 'lucide-react'; // Importing the User icon from lucide-react
+import { User,ArrowLeft } from 'lucide-react'; // Importing the User icon from lucide-react
 import car from '../assets/car.png';
 import bike from '../assets/bike.png';
 import auto from '../assets/auto.png';
@@ -36,6 +36,7 @@ const VehiclesAvailable = (props) => {
 
     return (
         <div className="flex flex-col gap-4 p-4 mb-10 w-full">
+            <ArrowLeft onClick={() => props.setVehiclePanel(false)}/>
             <h1 className="font-bold text-2xl">Choose a Vehicle</h1>
             {vehiclesData.map((vehicle, index) => (
                 <div

@@ -201,3 +201,29 @@ function calculateDistance(lat1, lon1, lat2, lon2) {
 function toRad(degrees) {
     return degrees * (Math.PI / 180);
 }
+
+
+module.exports.getCurrentLocation = async (longitude, latitude) => {
+    try {
+        const apiKey = process.env.MAPS_API;
+
+        const response = await axios.get('https://api.openrouteservice.org/geocode/reverse', {
+            params: {
+                "point.lon": longitude,
+                "point.lat": latitude,
+                api_key: apiKey,
+            },
+        });
+
+        // Extract the "label" from feature 0
+        const locationLabel = response.data.features[0]?.properties?.label || "Location not found";
+
+
+
+        return locationLabel;
+
+    } catch (error) {
+        console.error("Error fetching location:", error);
+        return "Error fetching location";
+    }
+};
