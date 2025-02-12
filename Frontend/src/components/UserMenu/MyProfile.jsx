@@ -1,15 +1,18 @@
 import React, { useState } from "react";
 import { ArrowLeft, UserCheck, Phone, Mail, Calendar, Camera, Edit2, LogOut, ChevronRight, Upload } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 import axios from "axios";
 import Webcam from "react-webcam";
+import toast from 'react-hot-toast';
+
 
 const Profile = (props) => {
   const [isLoading, setIsLoading] = useState(false);
   const [showOptions, setShowOptions] = useState(false);
   const [showWebcam, setShowWebcam] = useState(false);
   const [capturedImage, setCapturedImage] = useState(null);
-
+  const navigate = useNavigate();
 
 
   if (!props.showProfile) return null;
@@ -40,9 +43,11 @@ const Profile = (props) => {
       );
 
       if (response.status === 200) {
+        toast.success("Profile picture updated successfully");
         console.log("Profile picture updated successfully");
       }
     } catch (error) {
+      toast.error("Failed to update profile picture");
       console.error("Error updating profile picture:", error);
     } finally {
       // Hide loading indicator
@@ -79,9 +84,11 @@ const Profile = (props) => {
       );
 
       if (response.status === 200) {
+        toast.success("Profile picture updated successfully");
         console.log("Profile picture updated successfully");
       }
     } catch (error) {
+      toast.error("Failed to update profile picture");
       console.error("Error updating profile picture:", error);
     } finally {
       setIsLoading(false);
@@ -89,6 +96,11 @@ const Profile = (props) => {
 
     setShowWebcam(false);
   };
+  const handleForgot = ()=>{
+    navigate('/user-forgot-password');
+    toast.success('Redirecting to forgot password page...');
+
+  }
 
 
   return (
@@ -258,10 +270,29 @@ const Profile = (props) => {
 
             <div className="mt-2 border-t">
               <Link
+
+                onClick={()=>handleForgot()}
+
+                className="w-full flex items-center justify-between px-4 py-3 text-yellow-700 hover:bg-blue-50 rounded-lg transition-colors"
+              >
+
+                <div className="flex items-center space-x-4">
+                  <div className="bg-yellow-100 rounded-lg p-2">
+                    <LogOut className="w-5 h-5" />
+                  </div>
+                  <span>Change Password</span>
+                </div>
+                <ChevronRight className="w-5 h-5" />
+              </Link>
+            </div>
+            <div className="mt-2 border-t">
+              <Link
                 to="/delete-account"
+
                 state={{ userData: props.userData }}
                 className="w-full flex items-center justify-between px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
               >
+
                 <div className="flex items-center space-x-4">
                   <div className="bg-pink-200 rounded-lg p-2">
                     <LogOut className="w-5 h-5" />

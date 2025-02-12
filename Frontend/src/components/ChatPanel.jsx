@@ -3,13 +3,15 @@ import { SocketContext } from '../context/SocketContext';
 import { UserDataContext } from '../context/UserContext';
 import { ArrowLeft, SendHorizontal, Video, VideoIcon, X } from "lucide-react";
 import VideoPanel from "./videoPanel";
+import messageNoti from '../assets/messageNoti.mp3';
 
-const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
+const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId,setIsChatOpen }) => {
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [videoCall, setVideoCall] = useState(false);
   const [roomID, setRoomID] = useState(null);
   const { socket } = useContext(SocketContext);
+  const MessageNotification = useRef(new Audio(messageNoti));
 
   function randomID(len) {
     let result = '';
@@ -56,6 +58,8 @@ const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
       if (messageExists) {
         return prev;
       }
+      setIsChatOpen(true);
+      MessageNotification.current.play();
 
       return [...prev, message];
     });
@@ -70,11 +74,14 @@ const ChatPanel = ({ isOpen, onClose, Name, Image, rideId, recipientId }) => {
 
     // Add new listener
     socket.on('receive_message', handleMessage);
+
+
     console.log("Socket listener set up");
 
     // Cleanup on unmount or when dependencies change
     return () => {
       socket.off('receive_message', handleMessage);
+
       console.log("Socket listener cleaned up");
     };
   }, [socket, handleMessage]);

@@ -1,90 +1,165 @@
-import React, { useEffect, useState } from "react";
+//MapBackground.jsx
+import React, { useEffect, useRef, useState } from "react";
+import L from 'leaflet';
+import 'leaflet/dist/leaflet.css';
+import 'leaflet-routing-machine';
+import 'leaflet-routing-machine/dist/leaflet-routing-machine.css';
+import axios from 'axios';
 
-const MapBackground = ({ panelOpen, setVehiclePanel }) => {
-  const [map, setMap] = useState(null); // Store map instance
-  const [currentLocation, setCurrentLocation] = useState([28.6139, 77.209]); // Default to New Delhi
-  const [zoomLevel, setZoomLevel] = useState(6); // Default zoom level to show a large region
+// Fix default icon issues
+delete L.Icon.Default.prototype._getIconUrl;
+L.Icon.Default.mergeOptions({
+  iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon-2x.png',
+  iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-icon.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+});
 
+const MapBackGround = ({ panelOpen, setVehiclePanel, pickup, drop, vehiclePanel }) => {
+  const mapRef = useRef(null);
+  const routingRef = useRef(null);
+  const containerRef = useRef(null);
+  const currentLocationMarkerRef = useRef(null);
+  const [currentLocation, setCurrentLocation] = useState(null);
+
+  // Initialize map and get current location
   useEffect(() => {
-    const loadMapplsScript = () => {
-      if (!document.getElementById("mappls-sdk")) {
-        const script = document.createElement("script");
-        script.id = "mappls-sdk";
-        const apiKey = import.meta.env.VITE_MAP_API_KEY;
-        script.src = `https://apis.mappls.com/advancedmaps/api/${apiKey}/map_sdk?layer=vector&v=3.0`;
-        script.async = true;
-        script.defer = true;
-        script.onload = () => {
-          console.log("Mappls SDK loaded successfully");
-          initializeMap();
-        };
-        script.onerror = () => {
-          console.error("Failed to load Mappls SDK");
-        };
-        document.body.appendChild(script);
-      } else {
-        initializeMap();
-      }
-    };
+    if (!mapRef.current && containerRef.current) {
+      mapRef.current = L.map(containerRef.current, {
+        center: [28.6139, 77.209],
+        zoom: 13,
+        zoomControl: false,
+      });
 
-    const initializeMap = () => {
-      if (window.mappls && document.getElementById("map-container")) {
-        const mapInstance = new window.mappls.Map("map-container", {
-          center: currentLocation, // Default center
-          zoom: zoomLevel, // Default zoom level
-          zoomControl: false,
-          scaleControl: false,
-          location: false,
-          logo: false,
-          attributionControl: false,
-          fullscreenControl: false,
-        });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+      }).addTo(mapRef.current);
 
-        setMap(mapInstance); // Save map instance
-
-        // Fetch user's current location
-        fetchCurrentLocation(mapInstance);
-      } else {
-        console.error("Mappls SDK not loaded or map container missing");
-      }
-    };
-
-    const fetchCurrentLocation = (mapInstance) => {
+      // Get current location
       if ("geolocation" in navigator) {
         navigator.geolocation.getCurrentPosition(
           (position) => {
             const { latitude, longitude } = position.coords;
-            const userLocation = [latitude, longitude];
-            setCurrentLocation(userLocation); // Update state
-            setZoomLevel(12); // Adjust zoom level for city view
+            setCurrentLocation([latitude, longitude]);
 
-            // Update map's center and zoom
-            mapInstance.setView(userLocation, 12);
+            mapRef.current.setView([latitude, longitude], 15);
 
-            // Add a marker at the user's location
-            new window.mappls.Marker({
-              map: mapInstance,
-              position: userLocation,
-            }).addTo(mapInstance);
+            if (currentLocationMarkerRef.current) {
+              currentLocationMarkerRef.current.remove();
+            }
 
-            console.log("User's location set on the map:", userLocation);
+            currentLocationMarkerRef.current = L.marker([latitude, longitude])
+              .addTo(mapRef.current)
+              .openPopup();
+
+            // Add accuracy circle
+            L.circle([latitude, longitude], {
+              radius: position.coords.accuracy,
+              color: '#3b82f6',
+              fillColor: '#3b82f6',
+              fillOpacity: 0.15
+            }).addTo(mapRef.current);
           },
           (error) => {
-            console.error("Failed to fetch location:", error.message);
-            alert(
-              "Unable to access location. Please enable location services or try again."
-            );
+            console.error("Error getting location:", error);
           },
-          { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 } // High accuracy options
+          {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+          }
         );
-      } else {
-        console.error("Geolocation is not supported by this browser.");
-        alert("Geolocation is not supported by this browser.");
+      }
+    }
+
+    return () => {
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+        currentLocationMarkerRef.current = null;
+      }
+    };
+  }, []);
+
+  // Handle routing when vehiclePanel becomes true
+  useEffect(() => {
+    const createRoute = async () => {
+      if (!pickup || !drop || !vehiclePanel || !mapRef.current) {
+        return;
+      }
+
+      try {
+        const [pickupRes, dropRes] = await Promise.all([
+          axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
+            params: { address: pickup },
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          }),
+          axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
+            params: { address: drop },
+            headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
+          })
+        ]);
+
+        const pickupCoords = [pickupRes.data.latitude, pickupRes.data.longitude];
+        const dropCoords = [dropRes.data.latitude, dropRes.data.longitude];
+
+        if (routingRef.current) {
+          routingRef.current.remove();
+        }
+
+        // Create route
+        routingRef.current = L.Routing.control({
+          waypoints: [
+            L.latLng(pickupCoords[0], pickupCoords[1]),
+            L.latLng(dropCoords[0], dropCoords[1])
+          ],
+          router: L.Routing.osrmv1({
+            serviceUrl: 'https://router.project-osrm.org/route/v1',
+            profile: 'driving'
+          }),
+          lineOptions: {
+            styles: [{ color: 'green', weight: 6 }]
+          },
+          show: false,
+          addWaypoints: false,
+          draggableWaypoints: false,
+          fitSelectedRoutes: true
+        }).addTo(mapRef.current);
+
+        // Add simple markers
+        L.marker(pickupCoords)
+          .addTo(mapRef.current)
+          .bindPopup('Pickup Location')
+          .openPopup();
+
+
+        L.marker(dropCoords)
+          .addTo(mapRef.current)
+          .bindPopup('Drop Location')
+          .openPopup();
+
+
+        // Fit bounds
+        const bounds = L.latLngBounds([pickupCoords, dropCoords]);
+        mapRef.current.fitBounds(bounds, { padding: [50, 50] });
+
+      } catch (error) {
+        console.error("Error creating route:", error);
       }
     };
 
-    loadMapplsScript();
-  }, []); // Runs once when the component mounts
+    if (vehiclePanel) {
+      createRoute();
+    }
+  }, [vehiclePanel, pickup, drop]);
+
+  // Handle map resize
+  useEffect(() => {
+    if (mapRef.current) {
+      setTimeout(() => {
+        mapRef.current.invalidateSize();
+      }, 300);
+    }
+  }, [panelOpen]);
 
   return (
     <div
@@ -94,12 +169,19 @@ const MapBackground = ({ panelOpen, setVehiclePanel }) => {
       }`}
     >
       <div
-        id="map-container"
-        className="w-full h-full object-cover"
+        ref={containerRef}
+        className="w-full h-full"
         style={{ zIndex: 0 }}
-      ></div>
+      />
+      <style>
+        {`
+          .leaflet-routing-container {
+            display: none !important;
+          }
+        `}
+      </style>
     </div>
   );
 };
 
-export default MapBackground;
+export default MapBackGround;

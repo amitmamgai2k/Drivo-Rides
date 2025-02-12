@@ -33,13 +33,16 @@ const Home = () => {
   const [fare, setfare] = useState({})
   const [vehicleType, setVehicleType] = useState(null)
   const [ride, setRide] = useState(null)
+
   const vehiclePanelRef = useRef(null);
   const confirmRidePanelRef = useRef(null);
   const vehiceleFoundRef = useRef(null);
   const waitingForDriverRef = useRef(null);
   const { socket } = useContext(SocketContext)
   const { user } = useContext(UserDataContext)
+
   const navigate = useNavigate();
+
 
   useEffect(() => {
 
@@ -50,6 +53,7 @@ const Home = () => {
   }, [user]);
 
   socket.on('ride-confirmed', ride => {
+
     console.log("Ride confirmed at Home:", ride);
     setwaitingForDriver(true);
     setVehicleFound(false);
@@ -265,7 +269,14 @@ const Home = () => {
         </button>
       </div>
       <DropdownMenu isOpen={menuOpen} toggleMenu={toggleMenu} />
-      <MapBackGround panelOpen={panelOpen} setVehiclePanel={setVehiclePanel} />
+      {/* <MapBackGround panelOpen={panelOpen} setVehiclePanel={setVehiclePanel} /> */}
+      <MapBackGround
+  panelOpen={panelOpen}
+  setVehiclePanel={setVehiclePanel}
+  pickup={pickup}  // Pass the pickup coordinates
+  drop={drop}      // Pass the drop coordinates
+  vehiclePanel={vehiclePanel}  // Pass the panel state
+/>
 
 
       {/* Ride finder panel */}
@@ -372,10 +383,10 @@ const Home = () => {
 
         </div>
       </div>
-      <div ref={vehiclePanelRef} className=' fixed w-full bottom-0 translate-y-full bg-white px-3 py-8  z-50'>
+      <div ref={vehiclePanelRef} className=' fixed h-[60%] overflow-y-scroll w-full bottom-0 translate-y-full bg-white px-3 py-8  z-50'>
 
 
-        <VehiclesAvailable vehicleType={vehicleType} setVehicleType={setVehicleType} fare={fare} setVehiclePanel={setVehiclePanel} setConfirmRidePanel={setConfirmRidePanel} />
+        <VehiclesAvailable vehicleType={vehicleType}  setVehicleType={setVehicleType} fare={fare} setVehiclePanel={setVehiclePanel} setConfirmRidePanel={setConfirmRidePanel} />
 
       </div>
       <div

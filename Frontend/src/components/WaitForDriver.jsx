@@ -93,6 +93,7 @@ const WaitForDriver = (props) => {
       <ChatPanel
   isOpen={isChatOpen}
   onClose={() => setIsChatOpen(false)}
+  setIsChatOpen = {setIsChatOpen}
   Name={`${props.ride?.captain?.fullname?.firstname || "Driver"} ${
     props.ride?.captain?.fullname?.lastname || ""
   }`}

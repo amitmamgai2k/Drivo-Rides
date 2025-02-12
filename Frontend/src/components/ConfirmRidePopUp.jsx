@@ -196,6 +196,7 @@ const ConfirmRidePopUp = (props) => {
      <ChatPanel
        isOpen={isChatOpen}
        onClose={() => setIsChatOpen(false)}
+       setIsChatOpen = {setIsChatOpen}
        Name={`${props.ride?.user?.fullname?.firstname || "Driver"} ${
          props.ride?.user?.fullname?.lastname || ""
        }`}
