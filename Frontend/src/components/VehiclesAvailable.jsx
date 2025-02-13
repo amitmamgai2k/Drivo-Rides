@@ -59,7 +59,9 @@ const VehiclesAvailable = (props) => {
                         </h4>
                         <h5 className="font-medium text-sm">{vehicle.time}</h5>
                         <p className="font-normal text-xs text-gray-600">{vehicle.para}</p>
+                        <input type="text" placeholder='Enter Cupon Code' className="border border-gray-300 rounded-md px-2 py-1 mt-2 w-full" />
                     </div>
+
                     {/* Handle undefined fare by providing a fallback value */}
                     <h2 className="font-medium text-base">
                         ₹{props.fare?.[vehicle.fareKey] || 'N/A'}

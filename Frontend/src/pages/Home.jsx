@@ -464,7 +464,7 @@ const Home = () => {
       </div>
       <div
         ref={vehiceleFoundRef}
-        className="fixed w-full bottom-0  h-screen bg-white px-3 py-3  translate-y-full z-40"
+        className="fixed w-full bottom-0   bg-white px-3 py-3  translate-y-full z-40"
 
       >
         <LookingForDriver

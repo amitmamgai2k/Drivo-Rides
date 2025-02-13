@@ -1,6 +1,8 @@
-import React from 'react'
+import React,{useState} from 'react'
 import { MapPin, ArrowLeft } from 'lucide-react';
+import GamePanel from './GamePanel';
 function LookingForDriver(props) {
+
     const vehiclesData = [
         {
           img1: '../src/assets/car.png',
@@ -15,7 +17,7 @@ function LookingForDriver(props) {
           payMethod: 'Cash',
         },
       ];
-
+      const[gamePanelOpen, setGamePanelOpen] = useState(false);
       const vehicle = vehiclesData[0];
 
       const onBackClick = () => {
@@ -93,6 +95,13 @@ function LookingForDriver(props) {
         </div>
       </div>
     </div>
+    <p className='text-sm text-center text-gray-700 mb-2'>Till looking for a driver play a game</p>
+    <div  onClick={() => setGamePanelOpen(true)} className='flex justify-center text-white  items-center space-x-2 bg-black p-2 rounded-full transition-colors border-2 border-solid'>
+      Launch Game
+    </div>
+    {gamePanelOpen && (
+        <GamePanel setGamePanelOpen={setGamePanelOpen} />
+      )}
 
 
 
