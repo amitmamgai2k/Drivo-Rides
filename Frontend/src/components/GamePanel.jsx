@@ -4,6 +4,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import ScratchCoupon from './ScratchCard';
 
+
 const MathQuiz = (props) => {
   const [score, setScore] = useState(0);
   const [currentQuestion, setCurrentQuestion] = useState(null);
@@ -52,15 +53,27 @@ const MathQuiz = (props) => {
 
   const getCuponCode = async () => {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/miscellaneous/get-cupon-code`);
-      if (response.status === 200) {
-        toast.success('Coupon code fetched successfully');
-        setCuponCode(response.data.data.cuponCode);
-      }
+        const response = await axios.post(
+            `${import.meta.env.VITE_BASE_URL}/miscellaneous/get-cupon-code`,
+            {}, // Empty object because POST usually requires a body
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+
+        if (response.status === 200) {
+            toast.success('Coupon code fetched successfully');
+            console.log('Cupon Code:', response.data);
+            setCuponCode(response.data);
+
+        }
     } catch (error) {
-      toast.error("Can't generate Coupon Code");
+        toast.error("Can't generate Coupon Code");
+        console.error("Error fetching coupon:", error);
     }
-  };
+};
 
   const startNewGame = () => {
     setScore(0);
@@ -193,7 +206,7 @@ const MathQuiz = (props) => {
       {scratchCard && (
         <div className="fixed inset-0 flex items-center justify-center  bg-black bg-opacity-50 z-50">
 
-            <ScratchCoupon scratchCard={setScratchCard} />
+            <ScratchCoupon scratchCard={setScratchCard} CuponCode={CuponCode} />
         </div>
       )}
     </div>

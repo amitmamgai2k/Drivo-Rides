@@ -6,7 +6,8 @@ const ScratchCoupon = (props) => {
   const [scratchPercentage, setScratchPercentage] = useState(0);
   const [isDrawing, setIsDrawing] = useState(false);
   const lastPoint = useRef(null);
-  const couponCode = "SAVE50NOW";
+
+
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -103,13 +104,13 @@ const ScratchCoupon = (props) => {
     <div className="flex flex-col items-center gap-4 p-4 ">
 
 
-      <div className="relative w-[300px] h-[150px] select-none mt-[150%] bg-white rounded-xl shadow-xl overflow-hidden">
+      <div className="relative w-[300px] h-[150px] select-none mt-[150%] animate-bounce bg-white rounded-xl shadow-xl overflow-hidden">
 
         {/* Background Card */}
         <div className="absolute inset-0  flex items-center justify-center bg-gradient-to-br from-blue-600 to-blue-300">
           <div className={`text-center transition-all duration-300 ${isRevealed ? "text-3xl" : "text-2xl"}`}>
-            <p className="font-bold text-white tracking-wider">
-              {isRevealed ? couponCode : "Scratch Here"}
+            <p className="font-bold text-yellow-400 tracking-wider">
+              {isRevealed ? props.CuponCode ||'Better Luck Next Time' : "Scratch Here"}
             </p>
             {!isRevealed && (
               <p className="text-sm mt-2 opacity-80">(Scratch Card to reveal)</p>

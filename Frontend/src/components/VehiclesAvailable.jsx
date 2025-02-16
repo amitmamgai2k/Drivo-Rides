@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
 import { User, ArrowLeft, BadgePercent, SendHorizontal } from 'lucide-react';
+import axios from 'axios';
+import toast from 'react-hot-toast';
 import car from '../assets/car.png';
 import bike from '../assets/bike.png';
 import auto from '../assets/auto.png';
 
 const VehiclesAvailable = (props) => {
-    console.log('props.fare:', props.fare);
-
     const [couponCodes, setCouponCodes] = useState({
         car: '',
         motorcycle: '',
@@ -19,8 +19,14 @@ const VehiclesAvailable = (props) => {
         auto: ''
     });
 
-    // Valid coupon codes and their discount percentages
-    const validCoupons = {
+    const [discountApplied, setDiscountApplied] = useState({
+        car: false,
+        motorcycle: false,
+        auto: false
+    });
+
+    // Discount rates for valid coupons (handled on frontend)
+    const discountRates = {
         'SAVE50': 0.5,  // 50% off
         'SAVE20': 0.2   // 20% off
     };
@@ -52,60 +58,79 @@ const VehiclesAvailable = (props) => {
         },
     ];
 
-    const handleCouponValidation = (vehicle) => {
+    // Validate coupon with backend
+    const validateCouponCode = async (vehicle) => {
         const fareKey = vehicle.fareKey;
         const couponCode = couponCodes[fareKey].trim().toUpperCase();
 
         if (!couponCode) {
-            // No coupon code entered, proceed normally
-            props.setVehicleType(fareKey);
-            props.setConfirmRidePanel(true);
-            props.setVehiclePanel(false);
+            toast.error('Please enter a coupon code');
             return;
         }
 
-        const discount = validCoupons[couponCode];
+        try {
+            const response = await axios.post(
+                `${import.meta.env.VITE_BASE_URL}/miscellaneous/validate-coupon-code`,
+                { couponCodes: couponCode },
+                { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
+            );
 
-        if (discount) {
-            // Valid coupon code
-            const originalFare = props.fare[fareKey];
-            const discountedFare = originalFare * (1 - discount);
+            if (response.status === 200) {
+                toast.success('Coupon code applied successfully');
 
-            props.setfare({
-                ...props.fare,
-                [fareKey]: Math.round(discountedFare)
-            });
+                if (!discountApplied[fareKey]) {
+                    const discount = discountRates[couponCode] || 0;
+                    if (discount > 0) {
+                        const originalFare = props.fare[fareKey];
+                        const discountedFare = Math.round(originalFare * (1 - discount));
 
-            // Proceed with ride confirmation
-            props.setVehicleType(fareKey);
-            props.setConfirmRidePanel(true);
-            props.setVehiclePanel(false);
+                        props.setfare((prevFare) => ({
+                            ...prevFare,
+                            [fareKey]: discountedFare
+                        }));
 
-            // Reset error
-            setError(prevErrors => ({
-                ...prevErrors,
-                [fareKey]: ''
-            }));
-        } else {
-            // Invalid coupon code
-            setError(prevErrors => ({
+                        setDiscountApplied((prev) => ({
+                            ...prev,
+                            [fareKey]: true
+                        }));
+                    }
+                }
+            }
+        } catch (error) {
+            toast.error('Invalid coupon code');
+            setError((prevErrors) => ({
                 ...prevErrors,
                 [fareKey]: 'Invalid coupon code'
             }));
         }
     };
 
+    // Handle input change for coupon
     const handleCouponChange = (vehicleFareKey, value) => {
-        setCouponCodes(prevCodes => ({
+        setCouponCodes((prevCodes) => ({
             ...prevCodes,
             [vehicleFareKey]: value
         }));
 
         // Reset error when user starts typing again
-        setError(prevErrors => ({
+        setError((prevErrors) => ({
             ...prevErrors,
             [vehicleFareKey]: ''
         }));
+    };
+
+    // Confirm Ride & Proceed to Next Step
+    const handleConfirm = (vehicle) => {
+        const fareKey = vehicle.fareKey;
+
+        if (discountApplied[fareKey] || !couponCodes[fareKey]) {
+            // ✅ Proceed to next step only if discount is applied OR no coupon is entered
+            props.setVehicleType(fareKey);
+            props.setConfirmRidePanel(true);
+            props.setVehiclePanel(false);
+        } else {
+            toast.error('Please apply a valid coupon code first!');
+        }
     };
 
     return (
@@ -131,8 +156,8 @@ const VehiclesAvailable = (props) => {
                         <p className="font-normal text-xs text-gray-600">{vehicle.para}</p>
 
                         {/* Coupon Input */}
-                        <div className="flex gap-2 items-center justify-between">
-                            <BadgePercent />
+                        <div className="flex gap-3 items-center justify-between">
+                            <BadgePercent size={36} className='mt-1' />
                             <input
                                 type="text"
                                 placeholder="Enter Code"
@@ -140,8 +165,8 @@ const VehiclesAvailable = (props) => {
                                 onChange={(e) => handleCouponChange(vehicle.fareKey, e.target.value)}
                                 className="border border-gray-600 rounded-md px-2 py-1 mt-2 w-full"
                             />
-                            <button onClick={() => handleCouponValidation(vehicle)}>
-                                <SendHorizontal />
+                            <button onClick={() => validateCouponCode(vehicle)}>
+                                <SendHorizontal size={36} className='mt-2 bg-blue-100 text-blue-600 p-2 rounded-lg' />
                             </button>
                         </div>
 
@@ -155,6 +180,12 @@ const VehiclesAvailable = (props) => {
                         <h2 className="font-medium text-base">
                             ₹{props.fare?.[vehicle.fareKey] || 'N/A'}
                         </h2>
+                        <button
+                            onClick={() => handleConfirm(vehicle)}
+                            className="bg-white text-green-600 border-2 border-green-500 border-solid mt-9 px-4 py-2 rounded-lg"
+                        >
+                            Confirm
+                        </button>
                     </div>
                 </div>
             ))}

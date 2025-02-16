@@ -7,8 +7,8 @@ const { body } = require('express-validator');
 
 
  router.post('/send-message', miscellaneousController.sendMessage);
- router.get('/get-cupon-code',miscellaneousController.getCuponCode);
-
+ router.post('/get-cupon-code',authMiddleware.authUser,miscellaneousController.getCuponCode);
+router.post('/validate-coupon-code',authMiddleware.authUser,miscellaneousController.validateCouponCode);
 
 module.exports = router;
 
