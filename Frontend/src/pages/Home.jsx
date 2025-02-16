@@ -442,7 +442,7 @@ const Home = () => {
       <div ref={vehiclePanelRef} className=' fixed h-[60%] overflow-y-scroll w-full bottom-0 translate-y-full bg-white px-3  z-50'>
 
 
-        <VehiclesAvailable vehicleType={vehicleType}  setVehicleType={setVehicleType} fare={fare} setVehiclePanel={setVehiclePanel} setConfirmRidePanel={setConfirmRidePanel} />
+        <VehiclesAvailable vehicleType={vehicleType} setfare={setfare}  setVehicleType={setVehicleType} fare={fare} setVehiclePanel={setVehiclePanel} setConfirmRidePanel={setConfirmRidePanel} />
 
       </div>
       <div

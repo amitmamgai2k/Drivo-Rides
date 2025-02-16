@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ArrowLeft } from 'lucide-react';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import ScratchCoupon from './ScratchCard';
 
 const MathQuiz = (props) => {
   const [score, setScore] = useState(0);
@@ -11,37 +12,16 @@ const MathQuiz = (props) => {
   const [isCorrect, setIsCorrect] = useState(false);
   const [questionCount, setQuestionCount] = useState(0);
   const [CuponCode, setCuponCode] = useState('');
+  const [scratchCard, setScratchCard] = useState(false);
 
   const generateQuestion = () => {
     const operations = ['+', '-', '*'];
     const operation = operations[Math.floor(Math.random() * operations.length)];
     let num1, num2;
 
-
-    const getCuponCode = async () => {
-
-      try {
-        const response  = await axios.post(`${import.meta.env.VITE_BASE_URL}/miscellaneous/get-cupon-code`);
-
-        if (response.status === 200) {
-          toast.success('Cupon code fetched successfully');
-          console.log('Response cuppon',response.data);
-
-          setCuponCode(response.data.data.cuponCode);
-
-         }
-     } catch (error) {
-        toast.error("Cant't generate Cupon Code");
-
-      }
-
-
-    }
-
-
-    if(score==100){
-
-       getCuponCode();
+    if (score === 10) {
+      setScratchCard(true);
+      getCuponCode();
     }
 
     switch (operation) {
@@ -62,25 +42,24 @@ const MathQuiz = (props) => {
         num2 = Math.floor(Math.random() * 10) + 1;
     }
 
-    let answer;
-    switch (operation) {
-      case '+':
-        answer = num1 + num2;
-        break;
-      case '-':
-        answer = num1 - num2;
-        break;
-      case '*':
-        answer = num1 * num2;
-        break;
-      default:
-        answer = num1 + num2;
-    }
+    const answer = eval(`${num1} ${operation} ${num2}`);
 
     return {
       question: `${num1} ${operation} ${num2} = ?`,
-      answer: answer
+      answer,
     };
+  };
+
+  const getCuponCode = async () => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/miscellaneous/get-cupon-code`);
+      if (response.status === 200) {
+        toast.success('Coupon code fetched successfully');
+        setCuponCode(response.data.data.cuponCode);
+      }
+    } catch (error) {
+      toast.error("Can't generate Coupon Code");
+    }
   };
 
   const startNewGame = () => {
@@ -89,6 +68,7 @@ const MathQuiz = (props) => {
     setShowResult(false);
     setUserAnswer('');
     setCurrentQuestion(generateQuestion());
+    setScratchCard(false);
   };
 
   useEffect(() => {
@@ -103,10 +83,10 @@ const MathQuiz = (props) => {
     setShowResult(true);
 
     if (isAnswerCorrect) {
-      setScore(prev => prev + 10);
+      setScore((prev) => prev + 10);
     }
 
-    setQuestionCount(prev => prev + 1);
+    setQuestionCount((prev) => prev + 1);
   };
 
   const nextQuestion = () => {
@@ -116,19 +96,26 @@ const MathQuiz = (props) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 px-4  flex flex-col justify-center">
-        <h1 className='font-bold text-2xl text-center mb-4 text-green-600'>Play Game and Win a Cuppon</h1>
-        <ArrowLeft className='mb-2' onClick={()=>props.setGamePanelOpen(false)}/>
+    <div  className="min-h-screen bg-gray-100 px-4 flex flex-col justify-center items-center ">
+      <h1 className="font-bold text-2xl text-center mb-4 text-green-600">
+        Play Game and Win a Coupon
+      </h1>
+      <ArrowLeft className="mb-2 cursor-pointer" onClick={() => props.setGamePanelOpen(false)} />
+
       <div className="relative w-full max-w-md mx-auto">
-        {/* Background design */}
+        {/* Background Design */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-400 to-blue-600 shadow-lg transform -skew-y-6 sm:skew-y-0 sm:-rotate-6 rounded-3xl"></div>
 
-        {/* Main content */}
+        {/* Main Content */}
         <div className="relative bg-white shadow-lg rounded-3xl p-6 sm:p-10">
           {/* Header */}
           <div className="flex flex-col sm:flex-row justify-between items-center mb-6">
-            <h2 className="text-xl sm:text-2xl font-bold text-blue-600 mb-2 sm:mb-0">Math Quiz</h2>
-            <div className="text-lg sm:text-xl font-bold text-green-600">Score: {score}</div>
+            <h2 className="text-xl sm:text-2xl font-bold text-blue-600 mb-2 sm:mb-0">
+              Math Quiz
+            </h2>
+            <div className="text-lg sm:text-xl font-bold text-green-600">
+              Score: {score}
+            </div>
           </div>
 
           {/* Question Area */}
@@ -165,15 +152,14 @@ const MathQuiz = (props) => {
               {/* Result & Next Question */}
               {showResult && (
                 <div className="space-y-4">
-                  <div className={`text-center text-lg font-bold p-3 rounded-lg ${
-                    isCorrect
-                      ? 'bg-green-100 text-green-700'
-                      : 'bg-red-100 text-red-700'
-                  }`}>
+                  <div
+                    className={`text-center text-lg font-bold p-3 rounded-lg ${
+                      isCorrect ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'
+                    }`}
+                  >
                     {isCorrect
                       ? '✨ Correct! Great job! ✨'
-                      : `Wrong! The answer was ${currentQuestion.answer}`
-                    }
+                      : `Wrong! The answer was ${currentQuestion.answer}`}
                   </div>
                   <button
                     onClick={nextQuestion}
@@ -202,6 +188,14 @@ const MathQuiz = (props) => {
           </div>
         </div>
       </div>
+
+      {/* Scratch Card Modal */}
+      {scratchCard && (
+        <div className="fixed inset-0 flex items-center justify-center  bg-black bg-opacity-50 z-50">
+
+            <ScratchCoupon scratchCard={setScratchCard} />
+        </div>
+      )}
     </div>
   );
 };
