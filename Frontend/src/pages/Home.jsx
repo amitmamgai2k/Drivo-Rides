@@ -241,7 +241,8 @@ const Home = () => {
 
         origin: pickup,
         destination: drop,
-        vehicleType
+        vehicleType,
+        Ridefare: fare[vehicleType]
       }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,

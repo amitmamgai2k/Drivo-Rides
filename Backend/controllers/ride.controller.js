@@ -14,8 +14,8 @@ const createRide = async (req, res) => {
             });
         }
 
-        const { origin, destination, vehicleType } = req.body;
-        console.log("Origin:", origin, "Destination:", destination, "Vehicle Type:", vehicleType);
+        const { origin, destination, vehicleType,Ridefare } = req.body;
+        console.log("Origin:", origin, "Destination:", destination, "Vehicle Type:", vehicleType, 'rIDEFARE',Ridefare);
 
 
         const ride = await rideService.createRide(
@@ -23,6 +23,7 @@ const createRide = async (req, res) => {
             origin,
             destination,
             vehicleType,
+            Ridefare
 
         );
 

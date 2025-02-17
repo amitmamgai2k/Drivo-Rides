@@ -49,16 +49,31 @@ module.exports.getCuponCode = async (req, res) => {
 module.exports.validateCouponCode = async (req, res) => {
     try {
         const userId = req.user.id;
-        const {  couponCodes } = req.body;
+        const {  couponCodes,fare } = req.body;
+        console.log("User ID:", userId, "Coupon Code:", couponCodes, "Fare:", fare);
+
         const user = await UserModel.findById(userId);
         if (!user) {
             return res.status(404).json({ message: "User not found" });
         }
         if (user.couponCode === couponCodes && Date.now() < user.couponExpiry) {
-            res.status(200).json({ message: "Coupon code is valid" });
-        } else {
-            res.status(400).json({ message: "Invalid coupon code" });
+            console.log('Valid Coupon Code');
+
         }
+        const coupon = await CuponModel.findOne({code:couponCodes, isActive:true})
+        if (!coupon) {
+            return res.status(400).json({ success: false, message: "Invalid or expired coupon" });
+        }
+        let discountAmount = 0;
+        if (coupon.type === "percentage") {
+            discountAmount = (fare * coupon.discount) / 100;
+        } else if (coupon.type === "fixed") {
+            discountAmount = coupon.discount;
+        }
+
+        const discountedFare = Math.max(0, fare - discountAmount);
+        res.status(200).json({ success: true, discountedFare });
+
     } catch (error) {
         console.error("Error validating coupon code:", error);
         res.status(500).json({ message: "Internal Server Error", error });

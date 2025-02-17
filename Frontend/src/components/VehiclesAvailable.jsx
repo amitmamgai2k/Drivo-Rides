@@ -61,6 +61,7 @@ const VehiclesAvailable = (props) => {
     // Validate coupon with backend
     const validateCouponCode = async (vehicle) => {
         const fareKey = vehicle.fareKey;
+        console.log("fareKey",props.fare[fareKey]);
         const couponCode = couponCodes[fareKey].trim().toUpperCase();
 
         if (!couponCode) {
@@ -71,7 +72,9 @@ const VehiclesAvailable = (props) => {
         try {
             const response = await axios.post(
                 `${import.meta.env.VITE_BASE_URL}/miscellaneous/validate-coupon-code`,
-                { couponCodes: couponCode },
+                { couponCodes: couponCode,
+                  fare: props.fare[fareKey]
+                 },
                 { headers: { Authorization: `Bearer ${localStorage.getItem('token')}` } }
             );
 
@@ -79,10 +82,7 @@ const VehiclesAvailable = (props) => {
                 toast.success('Coupon code applied successfully');
 
                 if (!discountApplied[fareKey]) {
-                    const discount = discountRates[couponCode] || 0;
-                    if (discount > 0) {
-                        const originalFare = props.fare[fareKey];
-                        const discountedFare = Math.round(originalFare * (1 - discount));
+                      const discountedFare = response.data.discountedFare;;
 
                         props.setfare((prevFare) => ({
                             ...prevFare,
@@ -93,7 +93,7 @@ const VehiclesAvailable = (props) => {
                             ...prev,
                             [fareKey]: true
                         }));
-                    }
+
                 }
             }
         } catch (error) {
@@ -122,6 +122,9 @@ const VehiclesAvailable = (props) => {
     // Confirm Ride & Proceed to Next Step
     const handleConfirm = (vehicle) => {
         const fareKey = vehicle.fareKey;
+
+
+
 
         if (discountApplied[fareKey] || !couponCodes[fareKey]) {
             // ✅ Proceed to next step only if discount is applied OR no coupon is entered

@@ -48,10 +48,10 @@ const getFare = async (origin, destination) => {
 };
 
 // Function to create a ride
-const createRide = async (user, origin, destination, vehicleType) => {
+const createRide = async (user, origin, destination, vehicleType,Ridefare) => {
     console.log("Origin:", origin, "Destination:", destination, "Vehicle Type:", vehicleType, "User:", user);
 
-    if (!user || !origin || !destination || !vehicleType) {
+    if (!user || !origin || !destination || !vehicleType ) {
         throw new Error('Missing required fields for ride creation');
     }
     const originCoordinates = await mapService.getAddressCoordinates(origin);
@@ -65,7 +65,7 @@ const createRide = async (user, origin, destination, vehicleType) => {
         throw new Error('Invalid vehicle type');
     }
 
-    const { fare, distanceTime } = await getFare(originCoords, destinationCoords);
+    const distanceTime = await mapService.getDistanceTimeForRide(originCoords, destinationCoords);
 
     try {
             const ride = await rideModel.create({
@@ -74,7 +74,7 @@ const createRide = async (user, origin, destination, vehicleType) => {
             destination: destinationCoords,
             originText: origin,
             destinationText: destination,
-            price: fare[vehicleType],
+            price: Ridefare,
             duration: distanceTime.duration.toFixed(2),
             distance: distanceTime.distance,
             otp: getOtp(4),
