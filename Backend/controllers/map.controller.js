@@ -100,3 +100,21 @@ module.exports.getCurrentLocation = async (req, res) => {
         res.status(500).json({ error: "Unable to get current location" });
     }
 };
+module.exports.getNearestCaptains = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+        return res.status(400).json({ errors: errors.array() });
+    }
+    try {
+        const {longitude,latitude,radius} = req.body;
+        console.log("Longitude:", longitude, "Latitude:", latitude, "Radius:", radius);
+
+        const nearestCaptains = await mapsService.getNearestCaptains(28.6139, 77.209,100000);
+        res.status(200).json({
+            data: nearestCaptains,
+        });
+    } catch (error) {
+        console.error("Error fetching nearest captains:", error.message);
+        res.status(500).json({ error: "Unable to get nearest captains" });
+    }
+};

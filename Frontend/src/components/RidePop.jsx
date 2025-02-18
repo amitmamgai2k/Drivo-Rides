@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, ArrowLeft,CreditCard } from 'lucide-react';
+import { MapPinHouse, MapPin, ArrowLeft,CreditCard } from 'lucide-react';
 
 const RidePop = (props) => {
   const vehiclesData = [
@@ -56,14 +56,14 @@ const RidePop = (props) => {
         {/* Location Info */}
         <div className="space-y-4">
           <div className="flex items-start space-x-3">
-            <MapPin className="w-5 h-5 text-gray-500" />
+            <MapPinHouse size = {36} className=" text-red-500 bg-red-200 p-2 rounded-lg" />
             <div>
               <h3 className="font-semibold text-lg">{vehicle.srcLocation}</h3>
               <p className="text-gray-600 text-sm">{props.ride?.originText}</p>
             </div>
           </div>
           <div className="flex items-start space-x-3">
-            <MapPin className="w-5 h-5 text-gray-500" />
+            <MapPin size = {36} className=" text-green-500 bg-green-200 p-2 rounded-lg" />
             <div>
               <h3 className="font-semibold text-lg">{vehicle.destLocation}</h3>
               <p className="text-gray-600 text-sm">{props.ride?.destinationText}</p>
@@ -74,7 +74,7 @@ const RidePop = (props) => {
         {/* Fare and Payment Info */}
         <div className="flex space-x-2 items-center p-2bg-gray-50 rounded-lg">
           <div >
-           <CreditCard className='w-6 h-6 text-gray-500'/>
+           <CreditCard size = {36} className=' text-blue-700 bg-blue-300 p-2 rounded-lg'/>
             </div>
             <div className='flex flex-col'>
             <p className="font-semibold text-lg">₹{props.ride?.price}</p>

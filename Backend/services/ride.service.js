@@ -164,7 +164,7 @@ const confirmRide = async ({ rideId, captain }) => {
     const ride = await rideModel.findOne({ _id: rideId ,captain:captain._id}).populate('user').populate('captain');
 
 
-console.log("Ride found:", ride);
+
 if (ride && ride.captain._id.toString() !== captain._id.toString()) {
     throw new Error('Captain mismatch for this ride');
 }
@@ -176,10 +176,10 @@ if (ride && ride.captain._id.toString() !== captain._id.toString()) {
    if(ride.status !== 'ongoing'){
     throw new Error('Ride is not ongoing');
    }
-//    await rideModel.findOneAndUpdate(
-//     { _id: rideId },
-//     { status: 'completed' }
-// );
+   await rideModel.findOneAndUpdate(
+    { _id: rideId },
+    { status: 'completed' }
+);
     return ride;
  }
 module.exports = {

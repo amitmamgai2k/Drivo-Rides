@@ -1,5 +1,6 @@
 import React, { useRef, useState, useEffect,useContext } from "react";
 import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CaptainDetails from "../components/CaptainDetails";
 import RidePop from "../components/RidePop";
 import gsap from "gsap";
@@ -13,8 +14,10 @@ import { CaptainDataContext } from "../context/CaptainContext";
 import DropdownMenu from "../components/CaptainMenu/DropDownMenu";
 import axios from "axios";
 import { Menu } from "lucide-react";
+import toast from "react-hot-toast";
 
 const CaptainHome = () => {
+  const navigate = useNavigate();
   const [ridePopupPanel, setRidePopupPanel] = useState(false);
   const [confirmRidePopupPanel, setConfirmRidePopupPanel] = useState(false);
  const[menuOpen,setMenuOpen] = useState(false)
@@ -105,6 +108,20 @@ useEffect(() => {
     socket.off('new-ride', handleNewRide);
   };
 }, [socket]);
+ useEffect(() => {
+  const cancleRide = (data) => {
+    console.log("Ride cancelled:", data);
+    setConfirmRidePopupPanel(false);
+    navigate('/captain-home');
+    setRide(null);
+
+    toast('Ride Cancle by the Rider ');
+  }
+   socket.on('ride-cancelled',cancleRide)
+   return () => {
+    socket.off('ride-cancelled', cancleRide);
+  };
+ },[socket])
   async function confirmRide() {
 
     console.log("Captain  id:", captain.captain._id);

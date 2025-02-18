@@ -70,6 +70,7 @@ const MapBackGround = ({ panelOpen, setVehiclePanel, pickup, drop, vehiclePanel 
         );
       }
     }
+    fetchNearbyCaptains(28.6139, 77.209);
 
     return () => {
       if (mapRef.current) {
@@ -79,7 +80,19 @@ const MapBackGround = ({ panelOpen, setVehiclePanel, pickup, drop, vehiclePanel 
       }
     };
   }, []);
-
+  const fetchNearbyCaptains = async (latitude, longitude) => {
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/maps/nearby`,
+        { lat: latitude, lng: longitude, radius: 1000 },
+        {
+        headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
+      });
+     console.log("captains",response.data);
+     (response.data.captains);
+    } catch (error) {
+      console.error("Error fetching captains:", error);
+    }
+  };
   // Handle routing when vehiclePanel becomes true
   useEffect(() => {
     const createRoute = async () => {

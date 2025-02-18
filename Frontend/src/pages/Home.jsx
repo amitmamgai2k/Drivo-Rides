@@ -202,7 +202,7 @@ const Home = () => {
       });
 
      if(fareResponse.status === 200){
-      toast.success('Fare fetched successfully');
+      toast.success('Vehicle Found');
       setfare(fareResponse.data);
       setVehiclePanel(true);
     }
@@ -249,13 +249,38 @@ const Home = () => {
         }
 
       })
+      toast.success('Ride created successfully');
       console.log("Create Ride Debugger", response.data);
 
 
 
 
     } catch (error) {
+      toast.error('Failed to create ride');
       console.error("Error creating ride:", error.response?.data || error.message);
+    }
+  }
+  async function CancleRide(){
+    try {
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/ride-cancel`,{
+        rideId:ride._id
+      }, {
+        headers: {
+          Authorization: `Bearer ${localStorage.getItem('token')}`,
+        }
+
+      });
+      if(response.status === 200){
+        toast.success('Ride cancelled successfully');
+        setRide(null);
+        setwaitingForDriver(false);
+        navigate('/home');
+      }
+
+    } catch (error) {
+      toast.error('Failed to cancel ride');
+      console.error("Error cancelling ride:", error.response?.data || error.message);
+
     }
   }
   const toggleMenu = (state) => {
@@ -488,7 +513,7 @@ const Home = () => {
       // className='fixed w-full bottom-0  translate-y-full h-screen bg-white px-3 py-3 z-10 '
 
       >
-        <WaitForDriver waitingForDriver={waitingForDriver} setwaitingForDriver={setwaitingForDriver} ride={ride}
+        <WaitForDriver waitingForDriver={waitingForDriver} CancleRide={CancleRide} setwaitingForDriver={setwaitingForDriver} ride={ride}
           setVehicleFound={setVehicleFound}
 
         />

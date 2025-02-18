@@ -4,6 +4,7 @@ import ChatPanel from './ChatPanel';
 const WaitForDriver = (props) => {
   const [isChatOpen, setIsChatOpen] = useState(false);
   console.log("WaitFor Driver",props.ride)
+
   const shareRideHandler = () => {
     if (navigator.share) {
       const shareData = {
@@ -84,7 +85,7 @@ const WaitForDriver = (props) => {
 
         <button
           className="w-full bg-black text-white py-4 rounded-lg font-semibold"
-          onClick={()=>{props.setwaitingForDriver(false)}}
+            onClick={props.CancleRide}
         >
           Cancel Ride
         </button>

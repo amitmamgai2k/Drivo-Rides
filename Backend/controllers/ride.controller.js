@@ -176,6 +176,50 @@ const startRide = async (req, res) => {
         });
     }
 }
+const cancelRide = async(req,res)=>{
+    const erros = validationResult(req);
+    if (!erros.isEmpty()) {
+        return res.status(400).json({
+            status: 'error',
+            errors: erros.array(),
+        });
+    }
+    try {
+    const {rideId} = req.body;
+  if(!rideId){
+    console.log('Ride Id is Required For Cancle a Ride');
+  }
+
+  const cancleRide = await rideModel.findByIdAndUpdate(rideId,{$set:{status:'cancelled'}}).populate('user').populate('captain');
+
+  if(!cancleRide){
+    console.log('Ride Not Found')
+
+  }
+  console.log('cancleRide',cancleRide);
+
+  sendMessageToSocketId(cancleRide.captain.socketId, {
+    event: 'ride-cancelled',
+    data:cancleRide
+});
+
+  return res.status(200).json({
+    status: 'success',
+    message: 'Ride Cancelled Successfully',
+  });
+
+
+    }
+    catch(error){
+        console.log('Error Cancle Ride',error);
+        return res.status(error.status || 500).json({
+            status: 'error',
+            message: error.message || 'Internal server error',
+        });
+
+
+    }
+}
 const endRide = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -216,4 +260,4 @@ const endRide = async (req, res) => {
 
 
 
-module.exports = {  createRide, getFare,confirmRide,startRide,endRide };
+module.exports = {  createRide, getFare,confirmRide,startRide,endRide,cancelRide };

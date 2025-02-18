@@ -31,4 +31,5 @@ router.get('/get-suggestions',
 router.post('/current-location',
     mapController.getCurrentLocation
 );
+router.post('/nearby',mapController.getNearestCaptains);
 module.exports = router;

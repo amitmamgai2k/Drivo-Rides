@@ -79,3 +79,18 @@ module.exports.validateCouponCode = async (req, res) => {
         res.status(500).json({ message: "Internal Server Error", error });
     }
 };
+module.exports.SendCuponCode = async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const user = await UserModel.findById(userId);
+        if (!user) {
+            return res.status(404).json({ message: "User not found" });
+        }
+        const cuponCode = user.couponCode;
+        const cuponExpiry = user.couponExpiry;
+        res.status(200).json({ cuponCode, cuponExpiry });
+    } catch (error) {
+        console.error("Error fetching coupon code:", error);
+        res.status(500).json({ message: "Internal Server Error", error });
+    }
+};

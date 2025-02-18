@@ -227,3 +227,36 @@ module.exports.getCurrentLocation = async (longitude, latitude) => {
         return "Error fetching location";
     }
 };
+module.exports.getNearestCaptains = async (longitude, latitude, radius) => {
+
+        console.log("Search Parameters:", { latitude, longitude, radius });
+
+        // Using $geoWithin with coordinates in the current schema format
+        const captains = await capatainModel.find({
+            'location.latitude': { $exists: true },
+            'location.longitude': { $exists: true },
+            status: 'online', // Only find online captains
+        }).exec();
+
+        // Manual filtering for captains within radius
+        const nearbyCaptains = captains.filter(captain => {
+            if (!captain.location.latitude || !captain.location.longitude) return false;
+
+            // Calculate distance using Haversine formula
+            const distance = calculateDistance(
+                latitude,
+                longitude,
+                captain.location.latitude,
+                captain.location.longitude
+            );
+
+            console.log(`Captain ${captain._id} is ${distance}km away`);
+            return distance <= radius;
+        });
+
+        console.log(`Found ${nearbyCaptains.length} captains within ${radius}km`);
+        return nearbyCaptains;
+
+}
+
+

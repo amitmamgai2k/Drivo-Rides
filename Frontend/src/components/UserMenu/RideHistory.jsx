@@ -13,10 +13,10 @@ const RideHistory = (props) => {
     fname: ride.captainFirstName,
     lname: ride.captainLastName,
     mobile: ride.captainMobileNumber,
-    vehicleType: ride.captainVehicleDetails.vehicleType,
-    vehiclePlate: ride.captainVehicleDetails.plate,
-    vehicleModel: ride.captainVehicleDetails.model,
-    vehicleColor: ride.captainVehicleDetails.color,
+    vehicletype: ride.captainVehicleDetails?.vehicleType,
+    vehiclePlate: ride.captainVehicleDetails?.plate,
+    vehicleModel: ride.captainVehicleDetails?.model,
+    vehicleColor: ride.captainVehicleDetails?.color,
     captainImage: ride.captainProfilePicture,
     date: new Date(ride.date).toLocaleDateString(),
     time: new Date(ride.date).toLocaleTimeString(),
@@ -175,7 +175,7 @@ const RideHistory = (props) => {
                     <div className="flex items-center gap-2">
                     <IdCard className="w-5 h-5 text-orange-600" />
                       <div>
-                        <div className="text-xs text-gray-500">{ride.vehicleType.toUpperCase()} PLATE NUMBER</div>
+                        <div className="text-xs text-gray-500">{ride.vehicletype.toUpperCase()} PLATE NUMBER</div>
                         <div className="font-medium">{ride.vehiclePlate}</div>
                       </div>
                     </div>

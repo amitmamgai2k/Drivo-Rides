@@ -59,6 +59,7 @@ router.post('/confirm',authMiddleware.authCaptain,
         rideController.startRide
 
     )
+    router.post('/ride-cancel',authMiddleware.authUser,rideController.cancelRide);
     router.post('/end-ride',authMiddleware.authCaptain,
         body('rideId').isMongoId().withMessage('Invalid ride ID'),
         rideController.endRide

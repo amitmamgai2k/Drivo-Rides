@@ -44,7 +44,7 @@ const initializeSocket = (server) => {
                     return socket.emit('error', 'Invalid location');
 
                 }
-                console.log(`User ${userId} updated location ${location}`);
+
 
 
                 await capatainModel.findByIdAndUpdate(userId, {

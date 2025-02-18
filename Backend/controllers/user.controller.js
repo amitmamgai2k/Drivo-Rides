@@ -310,7 +310,7 @@ module.exports.getRideHistory = async (req, res) => {
         const { userId } = req.body;
         if (!userId) return res.status(400).json({ error: "UserId is required" });
 
-        const rides = await rideModel.find({ user: userId })
+        const rides = await rideModel.find({ user: userId, status: "completed" })
             .populate("user")
             .populate("captain")
             .lean();

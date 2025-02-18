@@ -127,7 +127,7 @@ const VehiclesAvailable = (props) => {
 
 
         if (discountApplied[fareKey] || !couponCodes[fareKey]) {
-            // ✅ Proceed to next step only if discount is applied OR no coupon is entered
+            toast.success('Vehicle selected successfully');
             props.setVehicleType(fareKey);
             props.setConfirmRidePanel(true);
             props.setVehiclePanel(false);

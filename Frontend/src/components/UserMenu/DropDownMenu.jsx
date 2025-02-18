@@ -9,6 +9,7 @@ import {
   LogOut,
   ArrowLeft,
   ChevronRight,
+  Gift
 } from 'lucide-react';
 import Profile from './MyProfile';
 import About from './About';
@@ -20,6 +21,7 @@ import { UserDataContext } from '../../context/UserContext';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
+import RewardsPanel from './MyRewards';
 
 
 
@@ -34,6 +36,8 @@ function DropdownMenu({ isOpen, toggleMenu }) {
   const [feedback, setFeedback] = useState(false);
   const [refer, setRefer] = useState(false);
   const [rideHistoryData, setRideHistoryData] = useState([]);
+  const [rewardPanel, setRewardPanel] = useState(false);
+  const [Coupon, setCoupon] = useState({})
 
 
 
@@ -66,21 +70,49 @@ const userId = user.user?._id;
 
       }
     } catch (error) {
-      toast.error('Failed to fetch ride history');
+      toast.error('No Ride History! ');
       console.error('Error during fetching rides:', error);
+    }
+
+  }
+  const GetCuponCode = async()=>{
+    try {
+        const response = await axios.get(
+            `${import.meta.env.VITE_BASE_URL}/miscellaneous/get-cupon-code`,
+            {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                }
+            }
+        );
+
+        if (response.status === 200) {
+            toast.success('Coupon code fetched successfully');
+            console.log('Cupon Code:', response.data);
+            setCoupon(response.data);
+
+
+
+        }
+
+    } catch (error) {
+        toast.error("No Cupon code available");
+        console.error("Error fetching coupon:", error);
+
     }
 
   }
 
   const menuItems = [
-    { icon: CircleUserRound, label: 'My Profile', action: () => setShowProfile(true) },
-    { icon: AppWindowMac, label: 'About', action: () => setAbout(true) },
-    { icon: Contact, label: 'Contact', action: () => setContactUs(true) },
-    { icon: History, label: 'Past Rides', action: () => {setRideHistory(true); getRideHistory()} ,},
-    { icon: MessagesSquare, label: 'Feedback', action: () => setFeedback(true) },
-    { icon: Wallet, label: 'Refer And Earn', action: () => setRefer(true) },
+    { icon: CircleUserRound, label: 'My Profile', action: () => setShowProfile(true), textColour: 'text-red-600', background: 'bg-red-100' },
+    { icon: Gift, label: 'My Rewards', action: () => {setRewardPanel(true); GetCuponCode()}, textColour: 'text-blue-600', background: 'bg-blue-100' },
+    { icon: AppWindowMac, label: 'About', action: () => setAbout(true), textColour: 'text-green-600', background: 'bg-green-100' },
+    { icon: Contact, label: 'Contact', action: () => setContactUs(true), textColour: 'text-yellow-600', background: 'bg-yellow-100' },
+    { icon: History, label: 'Past Rides', action: () => { setRideHistory(true); getRideHistory(); }, textColour: 'text-purple-600', background: 'bg-purple-100' },
+    { icon: MessagesSquare, label: 'Feedback', action: () => setFeedback(true), textColour: 'text-pink-600', background: 'bg-pink-100' },
+    { icon: Wallet, label: 'Refer And Earn', action: () => setRefer(true), textColour: 'text-indigo-600', background: 'bg-indigo-100' }
   ];
-  console.log('User data:', userData);
+
 
 
 
@@ -126,6 +158,9 @@ const handleLogout = async () => {
   const toggleRefer = (state) => {
     setRefer(state !== undefined ? state : !refer); // Toggle menu state
   }
+  const toggleRewardPanel = (state) => {
+    setRewardPanel(state !== undefined ? state : !rewardPanel); // Toggle menu state
+  }
 
 
   return (
@@ -166,10 +201,10 @@ const handleLogout = async () => {
             <button
               key={index}
               onClick={item.action}
-              className="w-full flex items-center justify-between px-6 py-3 hover:bg-gray-50 transition-colors"
+              className="w-full flex items-center justify-between px-6 py-3  hover:bg-gray-200 transition-colors"
             >
-              <div className="flex items-center space-x-4">
-                <item.icon className="w-5 h-5 text-gray-600 font-semibold" />
+              <div className="flex items-center space-x-4 ">
+                <item.icon size={40} className={` text-gray-600 ${item.background} ${item.textColour} font-semibold p-2 rounded-lg`} />
                 <span className="text-gray-700">{item.label}</span>
               </div>
             </button>
@@ -210,12 +245,25 @@ const handleLogout = async () => {
         className="fixed  bg-black bg-opacity-50 z-30"
       >
 
+
         <About
           toggleAbout={toggleAbout}
           About={about}
         />
         </div>
 
+      )}
+      {rewardPanel && (
+        <div
+        className="fixed  bg-black bg-opacity-50 z-30"
+      >
+        <RewardsPanel
+          toggleRewardPanel={toggleRewardPanel}
+          toggleContact={toggleContact}
+          rewardPanel={rewardPanel}
+          Coupon={Coupon}
+        />
+        </div>
       )}
        {ContactUs && (
         <div

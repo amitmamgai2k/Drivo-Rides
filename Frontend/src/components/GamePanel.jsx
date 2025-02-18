@@ -64,7 +64,7 @@ const MathQuiz = (props) => {
         );
 
         if (response.status === 200) {
-            toast.success('Coupon code fetched successfully');
+            toast.success('Congratulations! You won a Coupon Code');
             console.log('Cupon Code:', response.data);
             setCuponCode(response.data);
 

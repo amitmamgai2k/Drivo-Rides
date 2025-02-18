@@ -1,5 +1,5 @@
 import React,{useState} from 'react'
-import { MapPin, ArrowLeft } from 'lucide-react';
+import { MapPin, ArrowLeft,MapPinHouse } from 'lucide-react';
 import GamePanel from './GamePanel';
 function LookingForDriver(props) {
 
@@ -62,8 +62,8 @@ function LookingForDriver(props) {
       <div className="space-y-4">
         {/* Pickup Location */}
         <div className="flex items-start space-x-3">
-          <div className="mt-1">
-            <MapPin className="w-5 h-5 text-gray-500" />
+          <div className="mt-1 bg-cyan-200 p-2 rounded-lg">
+            <MapPinHouse className="w-5 h-5 text-cyan-500" />
           </div>
           <div>
             <h3 className="font-semibold text-lg">{vehicle.srcLocation}</h3>
@@ -73,8 +73,8 @@ function LookingForDriver(props) {
 
         {/* Destination */}
         <div className="flex items-start space-x-3">
-          <div className="mt-1">
-            <MapPin className="w-5 h-5 text-gray-500 fill-current" />
+          <div className="mt-1 bg-orange-100 p-2 rounded-lg">
+            <MapPin className="w-5 h-5 text-orange-500 " />
           </div>
           <div>
             <h3 className="font-semibold text-lg">{vehicle.destLocation}</h3>

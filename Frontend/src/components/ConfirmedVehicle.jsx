@@ -41,14 +41,14 @@ const ConfirmedVehicle = (props ) => {
         </div>
         <div className="space-y-4">
           <div className="flex items-start space-x-3">
-            <MapPin className="w-5 h-5 text-gray-500" />
+            <MapPin  size={36} className=" text-sky-500 bg-sky-100 p-2 rounded-lg" />
             <div>
               <h3 className="font-semibold text-lg">{vehicle.srcLocation}</h3>
               <p className="text-gray-600 text-sm">{props.pickup}</p>
             </div>
           </div>
           <div className="flex items-start space-x-3">
-            <MapPinHouse className="w-5 h-5 text-gray-500" />
+            <MapPinHouse size={36} className="  text-violet-500 bg-violet-100 p-2 rounded-lg" />
 
             <div>
               <h3 className="font-semibold text-lg">{vehicle.destLocation}</h3>
