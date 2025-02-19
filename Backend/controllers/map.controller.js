@@ -109,9 +109,12 @@ module.exports.getNearestCaptains = async (req, res) => {
         const {longitude,latitude,radius} = req.body;
         console.log("Longitude:", longitude, "Latitude:", latitude, "Radius:", radius);
 
-        const nearestCaptains = await mapsService.getNearestCaptains(28.6139, 77.209,100000);
+        const nearestCaptains = await mapsService.getNearestCaptains(longitude,latitude,radius);
+        const locations = nearestCaptains.map(captain => captain.location);
+       console.log("Nearest Captains:",locations);
+
         res.status(200).json({
-            data: nearestCaptains,
+            data: locations,
         });
     } catch (error) {
         console.error("Error fetching nearest captains:", error.message);

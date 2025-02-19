@@ -8,7 +8,7 @@ import logo from "../assets/logo.png";
 import sound from "../assets/messageNoti.mp3";
 
 import ConfirmRidePopUp from "../components/ConfirmRidePopUp";
-import MapBackGround from "../components/MapBackGround";
+import MapBackGround from "../components/CaptainMap";
 import { SocketContext } from '../context/SocketContext';
 import { CaptainDataContext } from "../context/CaptainContext";
 import DropdownMenu from "../components/CaptainMenu/DropDownMenu";

@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import ChatPanel from './ChatPanel';
+import toast from 'react-hot-toast';
 
 const ConfirmRidePopUp = (props) => {
   const [otp, setOtp] = useState(['', '', '', '']);
@@ -57,9 +58,6 @@ const ConfirmRidePopUp = (props) => {
   const submitHandler = async () => {
     try {
       const otpString = otp.join(''); // Convert OTP array to a string
-     console.log("rideId", props.ride._id);
-     console.log("captain Id in confrim ride popup", props.ride.captain._id);
-
       const response = await axios.get(
         `${import.meta.env.VITE_BASE_URL}/rides/start-ride`,
         {
@@ -77,14 +75,18 @@ const ConfirmRidePopUp = (props) => {
         props.setConfirmRidePopupPanel(false);
         props.setRidePopupPanel(false);
        const   ride = props.ride;
+       toast.success('Ride started successfully');
          console.log("riding confirm ridee popup props data",props.ride);
+
 
         navigate('/captain-riding', { state: { ride }   });
       }
     } catch (error) {
+      toast.error('OTP verification failed!');
       console.error('Error starting ride:', error);
     }
   };
+  const isOtpComplete = otp.every((digit) => digit !== "");
 
   return (
     <div>
@@ -174,18 +176,20 @@ const ConfirmRidePopUp = (props) => {
 
       {/* Action Buttons */}
       <div className="mt-6 mb-3">
-        <button
-          onClick={() => {
-            props.setConfirmRidePopupPanel(false);
-            submitHandler()
+      <button
+        disabled={!isOtpComplete} // Button only enables if all 4 OTP inputs are filled
+        onClick={submitHandler}
+        className={`w-full flex items-center justify-center py-4 rounded-lg font-semibold transition-all duration-200 mb-4
+          ${
+            isOtpComplete
+              ? "bg-blue-600 text-white hover:bg-blue-400 cursor-pointer"
+              : "bg-gray-400 text-gray-800 opacity-30 cursor-not-allowed"
+          }`}
+      >
+        Confirm
+      </button>
+</div>
 
-          }}
-
-          className="w-full flex items-center justify-center bg-black text-white py-4 rounded-lg font-semibold hover:bg-blue-400 transition-colors duration-200 mb-4 cursor-pointer"
-        >
-          Confirm
-        </button>
-      </div>
 
 
 
