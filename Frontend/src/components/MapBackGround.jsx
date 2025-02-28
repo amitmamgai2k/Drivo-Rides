@@ -92,7 +92,7 @@ const MapBackGround = ({ panelOpen, setVehiclePanel, pickup, drop, vehiclePanel 
       if (captain.latitude && captain.longitude) {
         const newMarker = L.marker([captain.latitude, captain.longitude], {
           icon: L.icon({
-            iconUrl: "https://cdn-icons-png.flaticon.com/512/684/684908.png",
+            iconUrl: "https://cdn4.iconfinder.com/data/icons/map-pins-2/256/13-1024.png",
             iconSize: [30, 40],
             iconAnchor: [15, 40],
           }),

@@ -9,6 +9,7 @@ import {
   LogOut,
   ArrowLeft,
   ChevronRight,
+  LayoutDashboard
 } from 'lucide-react';
 import Profile from './MyProfile';
 import About from '../UserMenu/About';
@@ -16,7 +17,6 @@ import Support from '../UserMenu/Support';
 import RideHistory from './RideHistory';
 import Feedback from '../UserMenu/Feedback';
 import Refer from '../UserMenu/ReferAndEarn';
-
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
@@ -35,6 +35,7 @@ function DropdownMenu({ isOpen, toggleMenu }) {
   const [feedback, setFeedback] = useState(false);
   const [refer, setRefer] = useState(false);
   const [rideHistoryData, setRideHistoryData] = useState([]);
+
   console.log('User',captain);
 
 
@@ -78,13 +79,17 @@ console.log("captain id",userId);
   }
 
   const menuItems = [
-    { icon: CircleUserRound, label: 'My Profile', action: () => setShowProfile(true) },
-    { icon: AppWindowMac, label: 'About', action: () => setAbout(true) },
-    { icon: Contact, label: 'Contact', action: () => setContactUs(true) },
-    { icon: History, label: 'Past Rides', action: () => {setRideHistory(true); getRideHistory()} ,},
-    { icon: MessagesSquare, label: 'Feedback', action: () => setFeedback(true) },
-    { icon: Wallet, label: 'Refer And Earn', action: () => setRefer(true) },
-  ];
+    { icon: CircleUserRound, label: 'My Profile', action: () => setShowProfile(true), textColour: 'text-red-600', background: 'bg-red-100' },
+    { icon: LayoutDashboard, label: 'Dashboard', action: () =>  navigate('/captain-dashboard'), textColour: 'text-blue-600', background: 'bg-blue-100' },
+    { icon: AppWindowMac, label: 'About', action: () => setAbout(true), textColour: 'text-blue-600', background: 'bg-blue-100' },
+
+    { icon: Contact, label: 'Contact', action: () => setContactUs(true), textColour: 'text-green-600', background: 'bg-green-100' },
+    { icon: History, label: 'Past Rides', action: () => { setRideHistory(true); getRideHistory(); }, textColour: 'text-yellow-600', background: 'bg-yellow-100' },
+    { icon: MessagesSquare, label: 'Feedback', action: () => setFeedback(true), textColour: 'text-purple-600', background: 'bg-purple-100' },
+    { icon: Wallet, label: 'Refer And Earn', action: () => setRefer(true), textColour: 'text-orange-600', background: 'bg-orange-100' },
+
+];
+
   console.log('User data:', userData);
 
 
@@ -187,7 +192,7 @@ console.log("captain id",userId);
               className="w-full flex items-center justify-between px-6 py-3 hover:bg-gray-50 transition-colors"
             >
               <div className="flex items-center space-x-4">
-                <item.icon className="w-5 h-5 text-gray-600 font-semibold" />
+                <item.icon size={40} className={` text-gray-600 ${item.background} ${item.textColour} font-semibold p-2 rounded-lg`}  />
                 <span className="text-gray-700">{item.label}</span>
               </div>
             </button>

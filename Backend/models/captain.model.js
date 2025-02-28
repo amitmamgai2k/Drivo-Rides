@@ -112,7 +112,7 @@ TotalEarnings:{
 
 
 
-});
+},{timestamps:true});
 captainSchema.pre('save', function (next) {
     if (this.hoursWorked) {
         this.hoursWorked = Math.round(this.hoursWorked * 100) / 100;

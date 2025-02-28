@@ -333,8 +333,8 @@ const Home = () => {
         <img src={logo} alt="hello" height={80} width={150} />
 
         {/* Menu icon on the right */}
-        <button className="text-3xl font-semibold" onClick={() => toggleMenu()}>
-          <Menu size={35} strokeWidth={2} />
+        <button className="text-3xl font-semibold p-2 bg-white rounded-lg opacity-60" onClick={() => toggleMenu()}>
+          <Menu size={35}  strokeWidth={2} />
         </button>
       </div>
       <DropdownMenu isOpen={menuOpen} toggleMenu={toggleMenu} />

@@ -94,6 +94,8 @@ module.exports.getProfile = async (req, res) => {
             return res.status(404).json({ error: "Captain not found" });
         }
         res.status(200).json({ captain });
+
+
     } catch (err) {
         console.error("Error getting captain profile:", err);
         res.status(500).json({ error: "Server error" });
@@ -316,6 +318,43 @@ console.log('hhh');
         if (!res.headersSent) {
             return res.status(500).json({ error: "Server error aa raha hai ride History se" });
         }
+    }
+};
+
+module.exports.getDashboard = async (req, res) => {
+    try {
+        const { id } = req.captain;
+
+        if (!id) {
+            return res.status(400).json({ error: "Captain ID is required" });
+        }
+
+
+        const rides = await rideModel.find({ captain: id ,status: { $in: ["cancelled", "completed"]}}).lean();
+
+        let cancelledCount = 0;
+        let completedCount = 0;
+        let rideDetails = [];
+
+        rides.forEach(ride => {
+            if (ride.status === "cancelled") {
+                cancelledCount++;
+            } else if (ride.status === "completed") {
+                completedCount++;
+            }
+            rideDetails.push({
+               origin: ride.originText,
+               destination: ride.destinationText,
+               price: ride.price,
+               status: ride.status,
+            date: ride.createdAt
+            })
+        });
+        res.status(200).json({ cancelledRides: cancelledCount, completedRides: completedCount, rideDetails });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: "Internal Server Error" });
     }
 };
 

@@ -198,8 +198,8 @@ useEffect(() => {
           src={logo} height={80} width={150}
           alt="Uber Logo"
         />
-          <button className="text-3xl font-semibold"  onClick={() => toggleMenu()}>
-    <Menu size={35} strokeWidth={2} />
+          <button className="text-3xl font-semibold bg-white  p-2 rounded-lg opacity-60"  onClick={() => toggleMenu()}>
+    <Menu size={35}  strokeWidth={2} />
   </button>
       </div>
 

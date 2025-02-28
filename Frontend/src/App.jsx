@@ -20,6 +20,7 @@ import CaptainOtpVerification from './pages/CaptainOtpVerification';
 import PrivacyPolicy from './pages/CompanyPolicies/PrivacyPolicy';
 import TermsAndConditions from './pages/CompanyPolicies/TermsAndConditions';
 import DeleteAccount from './components/UserMenu/DeleteAccount';
+import CaptainDashBoard from './pages/CompanyPolicies/CaptainDashBoard';
 
 
 const App = () => {
@@ -48,6 +49,7 @@ const App = () => {
        <Route path = '/user-logout' element = {<UserProtectedWrapper><UserLogout/></UserProtectedWrapper>} />
        <Route path = '/captain-home' element = {<CaptainProtectedWrapper><CaptainHome/></CaptainProtectedWrapper>} />
        <Route path = '/captain-logout' element = {<CaptainProtectedWrapper><CaptainLogout/></CaptainProtectedWrapper>} />
+       <Route path = '/captain-dashboard' element = {<CaptainProtectedWrapper><CaptainDashBoard/></CaptainProtectedWrapper>} />
 
       <Route path = '/Drivo-Rides-privacy-policy' element = {<PrivacyPolicy/>} />
       <Route path = '/Drivo-Rides-Terms-and-Conditions' element = {<TermsAndConditions/>} />

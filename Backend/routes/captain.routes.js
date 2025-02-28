@@ -76,5 +76,6 @@ router.post('/ride-history',
 
     [body('userId').isString().withMessage(' route Body mai id nhi aa rhai hai')],
     captainController.getRideHistory);
+router.get('/dashboard', authMiddleware.authCaptain,captainController.getDashboard);
 
 module.exports = router;
