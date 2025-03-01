@@ -1,7 +1,12 @@
+import { Route, Routes } from 'react-router-dom'
+import AdminAuth from './Pages/AdminAuth/AdminLogin'
 export default function App() {
   return (
-    <h1 className="text-3xl font-bold underline">
-      Hello world!
-    </h1>
+    <>
+<Routes>
+  <Route path = '/admin-auth' element = {<AdminAuth/>} />
+</Routes>
+    </>
+
   )
 }
