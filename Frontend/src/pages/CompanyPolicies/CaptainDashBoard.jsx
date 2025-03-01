@@ -1,6 +1,7 @@
 import { useContext,useEffect,useState } from "react";
 import axios from "axios";
 import toast from "react-hot-toast";
+import { useLocation } from "react-router-dom";
 import {
     ArcElement,
     BarElement,
@@ -45,6 +46,8 @@ function CaptainDashboard() {
     const [completedRides, setcompletedRides] = useState(0)
     const [rideDetails, setRideDetails] = useState([]);
     const navigate = useNavigate();
+    const location = useLocation();
+
     const captainData = useContext(CaptainDataContext);
      console.log('captainData',captainData);
      useEffect(() => {
@@ -337,7 +340,7 @@ function CaptainDashboard() {
                 <h2 className="text-xl font-semibold text-white">Recent Rides</h2>
                 <p className="text-gray-400 text-sm mt-1">Latest trip details</p>
             </div>
-            <button className="text-sm text-sky-400 hover:text-sky-300 transition-colors font-medium flex items-center">
+            <button  className="text-sm text-sky-400 hover:text-sky-300 transition-colors font-medium flex items-center">
                 View All
                 <ChevronUp className="h-4 w-4 ml-1 rotate-90" />
             </button>

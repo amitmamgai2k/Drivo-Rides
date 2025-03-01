@@ -80,7 +80,7 @@ console.log("captain id",userId);
 
   const menuItems = [
     { icon: CircleUserRound, label: 'My Profile', action: () => setShowProfile(true), textColour: 'text-red-600', background: 'bg-red-100' },
-    { icon: LayoutDashboard, label: 'Dashboard', action: () =>  navigate('/captain-dashboard'), textColour: 'text-blue-600', background: 'bg-blue-100' },
+    { icon: LayoutDashboard, label: 'Dashboard', action: () =>  navigate('/captain-dashboard' ), textColour: 'text-pink-800', background: 'bg-pink-100' },
     { icon: AppWindowMac, label: 'About', action: () => setAbout(true), textColour: 'text-blue-600', background: 'bg-blue-100' },
 
     { icon: Contact, label: 'Contact', action: () => setContactUs(true), textColour: 'text-green-600', background: 'bg-green-100' },

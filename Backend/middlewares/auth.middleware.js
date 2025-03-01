@@ -50,3 +50,4 @@ module.exports.authCaptain = async (req, res, next) => {
         res.status(500).json({ error: "Server error" });
     }
 };
+module.exports.authAdmin = async (req, res, next) => {};
