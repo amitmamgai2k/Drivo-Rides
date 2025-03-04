@@ -11,6 +11,11 @@ const rideSchema = new mongoose.Schema({
         ref: 'captain',
         default: null
     },
+    payment:{
+        type:mongoose.Schema.Types.ObjectId,
+        ref:'Payment',
+        default:null
+    },
     origin: {
         type: [Number], // [longitude, latitude]
         required: true,
@@ -75,6 +80,10 @@ const rideSchema = new mongoose.Schema({
         type: String,
         required: true,
         select: false
+    },
+    feedback:{
+        type:Number,
+        default:0
     }
 }, {
     timestamps: true

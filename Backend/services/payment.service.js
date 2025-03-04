@@ -3,15 +3,12 @@ const { Cashfree } = require('cashfree-pg');
 
 require('dotenv').config();
 
-// Configure Cashfree credentials
+
 Cashfree.XClientId = process.env.PAYMENT_CLIENT_ID;
 Cashfree.XClientSecret = process.env.PAYMENT_CLIENT_SECRET;
 Cashfree.XEnvironment = Cashfree.Environment.SANDBOX;
 
-/**
- * Generate a unique order ID
- * @returns {string} A 12-character unique order ID
- */
+
 const generateOrderId = () => {
   const uniqueId = crypto.randomBytes(16).toString('hex');
   const hash = crypto.createHash('sha256');
@@ -20,15 +17,12 @@ const generateOrderId = () => {
   return orderId.substr(0, 12);
 };
 
-/**
- * Create a payment session
- * @returns {object} Response from Cashfree
- */
-const createPaymentSession = async () => {
+
+const createPaymentSession = async (price) => {
   const orderId = generateOrderId();
 
   const request = {
-    order_amount: 1.0,
+    order_amount: price,
     order_currency: 'INR',
     order_id: orderId,
     customer_details: {
@@ -47,11 +41,7 @@ const createPaymentSession = async () => {
   }
 };
 
-/**
- * Verify payment by fetching payment details
- * @param {string} orderId Order ID
- * @returns {object} Payment details
- */
+
 const verifyPayment = async (orderId) => {
   try {
     const response = await Cashfree.PGOrderFetchPayments('2023-08-01', orderId);

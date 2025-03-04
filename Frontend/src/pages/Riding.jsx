@@ -12,6 +12,8 @@ const Riding = (props) => {
     const { ride } = location.state || {};
     const { socket } = useContext(SocketContext);
     const navigate = useNavigate();
+    console.log("Ride Details:", ride._id);
+
 
     const [orderId, setOrderId] = useState("");
     const [cashfree, setCashfree] = useState(null);
@@ -28,7 +30,9 @@ const Riding = (props) => {
 
     const getSessionId = async () => {
         try {
-            const res = await axios.get(`${import.meta.env.VITE_BASE_URL}/payment/payment`);
+            const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/payment/payment`,{
+                price:ride.price
+            });
             if (res.data && res.data.payment_session_id) {
                 setOrderId(res.data.order_id);
                 return res.data.payment_session_id;
@@ -41,8 +45,10 @@ const Riding = (props) => {
     const verifyPayment = async () => {
         try {
             const res = await axios.post(`${import.meta.env.VITE_BASE_URL}/payment/verify`, {
-                orderId,
+                orderId,rideId: ride._id
             });
+            console.log("Payment Verification Response:", res.data);
+
             if (res.data) {
                 console.log("Payment verified successfully!");
                 navigate("/home");
