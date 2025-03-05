@@ -1,5 +1,7 @@
 const { get } = require('http');
 const rideModel = require('../models/ride.model');
+const captainModel = require('../models/captain.model');
+const userModel = require('../models/user.model');
 const mapService = require('./maps.service');
 const crypto = require('crypto');
 const { sendMessageToSocketId } = require('../socket');
@@ -180,6 +182,22 @@ if (ride && ride.captain._id.toString() !== captain._id.toString()) {
     { _id: rideId },
     { status: 'completed' }
 );
+  const cap = await captainModel.findById(ride.captain);
+  cap.todayHoursWorked += ride.duration;
+  cap.todayEarnings += ride.price;
+  cap.todayDistanceTravelled += ride.distance;
+  cap.todayRidesDone+=1;
+  cap.hoursWorkedoursWorked += ride.duration;
+  cap.TotalEarnings += ride.price;
+  cap.distanceTravelled += ride.distance;
+  cap.RideDone+=1;
+  await cap.save();
+  const user = await userModel.findById(ride.user);
+  user.hoursRide+=ride.duration;
+user.distanceTravelled+=ride.distance;
+user.RideDone+=1;
+user.TotalExepense+=ride.price;
+await user.save();
     return ride;
  }
 module.exports = {

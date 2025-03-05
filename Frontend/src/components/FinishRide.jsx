@@ -1,9 +1,10 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { MapPin, ArrowLeft, CreditCard,MapPinHouse } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import { SocketContext } from '../context/SocketContext';
+import toast from 'react-hot-toast';
 
 
 const FinishRide = (props) => {
@@ -74,6 +75,17 @@ const FinishRide = (props) => {
   socket.on('error', (message) => {
       console.error(message);
   });
+
+  useEffect(() => {
+    socket.on("payment-success", () => {
+        toast.success(" Payment successful, redirecting captain...");
+        navigate("/captain-home");
+    });
+
+    return () => {
+        socket.off("payment-success");
+    };
+}, []);
 
 
 

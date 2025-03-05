@@ -6,6 +6,7 @@ import axios from "axios";
 import MapBackground from "../components/MapBackGround";
 import { MapPin, Navigation, Home, CreditCard, Car } from 'lucide-react';
 import logo from '../assets/logo.png';
+import {toast }from 'react-hot-toast'
 
 const Riding = (props) => {
     const location = useLocation();
@@ -17,6 +18,7 @@ const Riding = (props) => {
 
     const [orderId, setOrderId] = useState("");
     const [cashfree, setCashfree] = useState(null);
+    const [paymentInitiated, setPaymentInitiated] = useState(false);
 
     // Initialize Cashfree SDK
     const initializeSDK = async () => {
@@ -51,15 +53,24 @@ const Riding = (props) => {
 
             if (res.data) {
                 console.log("Payment verified successfully!");
-                navigate("/home");
+
             }
         } catch (error) {
             console.error(error);
         }
     };
-
+    useEffect(() => {
+        if (orderId && paymentInitiated) {
+            verifyPayment();
+        }
+    }, [orderId, paymentInitiated]);
     const handlePayment = async (e) => {
         e.preventDefault();
+        if (!cashfree) {
+            console.error("Cashfree SDK is not initialized yet.");
+            toast.error("Payment gateway not ready. Please try again.");
+            return;
+        }
         try {
             const sessionId = await getSessionId();
             console.log("Session ID:", sessionId);
@@ -70,7 +81,8 @@ const Riding = (props) => {
             };
 
             cashfree.checkout(checkoutOptions).then(() => {
-                verifyPayment();
+                setPaymentInitiated(true);
+
             });
             console.log("Payment started successfully!");
 
@@ -78,10 +90,21 @@ const Riding = (props) => {
             console.error(error);
         }
     };
-
     socket.on("ride-ended", () => {
         navigate("/home");
     });
+
+    useEffect(() => {
+        socket.on("payment-success", () => {
+            toast.success("Payment successful, redirecting rider...");
+            navigate("/home");
+        });
+
+        return () => {
+            socket.off("payment-success");
+        };
+    }, []);
+
 
     return (
         <div className="h-screen bg-gray-50">

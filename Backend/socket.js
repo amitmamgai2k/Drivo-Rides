@@ -58,35 +58,35 @@ const initializeSocket = (server) => {
 
 
             })
-            socket.on('update-captain-details', async (data) => {
-                const { userId, clientId, TodayEarnings, HoursWorked, DistanceTravelled, RideDone } = data;
-                if (!TodayEarnings || !HoursWorked || !DistanceTravelled || !RideDone) {
-                    return socket.emit('error', 'Invalid details')
-                }
-                console.log(`User ${userId} updated details ${userId}`);
+            // socket.on('update-captain-details', async (data) => {
+            //     const { userId, clientId, TodayEarnings, HoursWorked, DistanceTravelled, RideDone } = data;
+            //     if (!TodayEarnings || !HoursWorked || !DistanceTravelled || !RideDone) {
+            //         return socket.emit('error', 'Invalid details')
+            //     }
+            //     console.log(`User ${userId} updated details ${userId}`);
 
-                await capatainModel.findByIdAndUpdate(userId, {
-                    $inc: {
-                        TotalEarnings: TodayEarnings,
-                        hoursWorked: HoursWorked,
-                        distanceTravelled: DistanceTravelled,
-                        RideDone: RideDone
-                    }
-                });
-                await userModel.findByIdAndUpdate(clientId, {
-                    $inc: {
-                        hoursRide: HoursWorked,
-                        distanceTravelled: DistanceTravelled,
-                        RideDone: RideDone,
-                        TotalExepense: TodayEarnings
+            //     await capatainModel.findByIdAndUpdate(userId, {
+            //         $inc: {
+            //             TotalEarnings: TodayEarnings,
+            //             hoursWorked: HoursWorked,
+            //             distanceTravelled: DistanceTravelled,
+            //             RideDone: RideDone
+            //         }
+            //     });
+            //     await userModel.findByIdAndUpdate(clientId, {
+            //         $inc: {
+            //             hoursRide: HoursWorked,
+            //             distanceTravelled: DistanceTravelled,
+            //             RideDone: RideDone,
+            //             TotalExepense: TodayEarnings
 
-                    }
-                })
-                console.log('Captain details updated successfully');
-                socket.emit('update-success', 'Details updated');
+            //         }
+            //     })
+            //     console.log('Captain details updated successfully');
+            //     socket.emit('update-success', 'Details updated');
 
 
-            });
+            // });
             socket.on('send_message', async (messageData) => {
                 console.log('Received message:', messageData);
                 try {

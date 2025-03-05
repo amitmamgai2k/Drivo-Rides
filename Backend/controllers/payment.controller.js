@@ -2,6 +2,9 @@
 const paymentService = require('../services/payment.service');
 const Payment = require('../models/payment.model');
 const Ride = require('../models/ride.model');
+const {sendMessageToSocketId} = require('../socket');
+const captainModel = require('../models/captain.model');
+const userModel = require('../models/user.model');
 
 
 const createPaymentSession = async (req, res) => {
@@ -34,13 +37,12 @@ const verifyPayment = async (req, res) => {
     const payment = paymentDetails[0];
     console.log("Extracted Payment Data:", payment);
 
-    const ride = await Ride.findById(rideId);
+    const ride = await Ride.findById(rideId).populate('user').populate('captain');
     if (!ride) {
       return res.status(404).json({ error: "Ride not found." });
     }
 
-    ride.orderID = orderId;
-    await ride.save();
+
 
     let paymentMethod = "UNKNOWN";
     let upiId = null;
@@ -54,6 +56,14 @@ const verifyPayment = async (req, res) => {
         upiId = payment.payment_method.upi.upi_id;
       }
     }
+
+    ride.orderID = orderId;
+    ride.status = "completed";
+    ride.paymentMethod = paymentMethod;
+    ride.paymentID = payment.cf_payment_id;
+
+    await ride.save();
+
 
     const newPayment = new Payment({
       orderId: payment.order_id,
@@ -72,8 +82,28 @@ const verifyPayment = async (req, res) => {
     });
 
     await newPayment.save();
-    console.log("Payment saved successfully:", newPayment);
+    const captain = await captainModel.findById(ride.captain);
+    captain.todayHoursWorked += ride.duration;
+    captain.todayEarnings += ride.price;
+    captain.todayDistanceTravelled += ride.distance;
+    captain.todayRidesDone+=1;
+    captain.hoursWorkedoursWorked += ride.duration;
+    captain.TotalEarningsEarnings += ride.price;
+    captain.distanceTravelled += ride.distance;
+    captain.RideDone+=1;
 
+    await captain.save();
+
+    const user = await userModel.findById(ride.user);
+
+user.hoursRide+=ride.duration;
+user.distanceTravelled+=ride.distance;
+user.RideDone+=1;
+user.TotalExepense+=ride.price;
+await user.save();
+
+    sendMessageToSocketId(ride.user.socketId, { event: "payment-success" , data: newPayment});
+    sendMessageToSocketId(ride.captain.socketId, { event: "payment-success" , data: newPayment});
     res.status(200).json({ success: true, message: "Payment verified and saved", payment: newPayment });
   } catch (error) {
     console.error("Error verifying payment:", error);

@@ -72,9 +72,9 @@ const rideSchema = new mongoose.Schema({
         type: String,
         default: 0
     },
-    signature: {
+    paymentMethod: {
         type: String,
-        default: null
+        default: 'Cash'
     },
     otp: {
         type: String,

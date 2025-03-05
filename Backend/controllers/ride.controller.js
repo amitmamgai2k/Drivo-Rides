@@ -232,7 +232,7 @@ const endRide = async (req, res) => {
 
 
     try {
-        // Assuming `req.captain` contains the captain object
+
         const ride = await rideService.endRide({
             rideId,
             captain: req.captain,

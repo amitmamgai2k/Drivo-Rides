@@ -43,7 +43,7 @@ function CaptainDetails() {
                     </div>
                 </div>
                 <div className="text-center bg-green-50 px-4 py-2 rounded-lg">
-                    <h4 className="text-lg font-bold text-green-700">₹ {captain?.captain?.TotalEarnings.toFixed(2)}</h4>
+                    <h4 className="text-lg font-bold text-green-700">₹ {captain?.captain?.todayEarnings.toFixed(2)}</h4>
                     <p className="text-xs text-green-600">Today's Earning</p>
                 </div>
             </div>
@@ -54,14 +54,14 @@ function CaptainDetails() {
                     {/* Hours Online */}
                     <div className="flex-1 text-center bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                         <i className="text-2xl ri-time-line text-blue-600 mb-2"></i>
-                        <h4 className="text-lg font-bold">{captain?.captain?.hoursWorked.toFixed(2) }</h4>
+                        <h4 className="text-lg font-bold">{captain?.captain?.todayHoursWorked.toFixed(2) }</h4>
                         <p className="text-sm text-gray-600">Hours Online</p>
                     </div>
 
                     {/* Distance Covered */}
                     <div className="flex-1 text-center bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                         <i className="text-2xl ri-speed-up-fill text-green-600 mb-2"></i>
-                        <h4 className="text-lg font-bold">{captain?.captain?.distanceTravelled.toFixed(2)}</h4>
+                        <h4 className="text-lg font-bold">{captain?.captain?.todayDistanceTravelled.toFixed(2)}</h4>
 
                         <p className="text-sm text-gray-600">KM Covered</p>
                     </div>
@@ -69,11 +69,16 @@ function CaptainDetails() {
                     {/* Rides Completed */}
                     <div className="flex-1 text-center bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-shadow">
                         <i className="text-2xl ri-route-line text-purple-600 mb-2"></i>
-                        <h4 className="text-lg font-bold">{captain?.captain?.RideDone}</h4>
+                        <h4 className="text-lg font-bold">{captain?.captain?.todayRidesDone}</h4>
                         <p className="text-sm text-gray-600">Rides Done</p>
                     </div>
                 </div>
             </div>
+            <p className="mt-4 text-gray-700 text-sm text-center">
+    Captains earn more by completing more rides, as their income is directly linked to
+    the number of trips they complete. Higher ride frequency not only boosts earnings
+    but also increases incentives and bonuses, making every ride count!
+</p>
 
 
         </div>
