@@ -88,6 +88,10 @@ const captainSchema = new mongoose.Schema({
     otpExpires: {
         type: Number
     },
+    feedback: {
+        type: Number,
+        default: 0
+    },
 
 
     todayHoursWorked: { type: Number, default: 0 },

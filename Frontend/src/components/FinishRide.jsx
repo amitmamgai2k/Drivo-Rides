@@ -49,15 +49,7 @@ const FinishRide = (props) => {
       console.log("Captain object: ", props.ride?.captain);
 
 
-      socket.emit("update-captain-details",{
-         userId:props.ride?.captain?._id,
-         clientId:props.ride?.user?._id,
-         TodayEarnings:props.ride.price,
-         HoursWorked:props.ride.duration,
-         DistanceTravelled:props.ride.distance,
-         RideDone : 1
 
-      })
       socket.emit("clear-chat-message",{
          rideId:props.ride._id
       })
