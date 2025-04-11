@@ -17,11 +17,29 @@ import {
   AreaChart,
   Area,
 } from "recharts";
+import { fetchMetricsData } from "../Redux/Slices/AdminDashBoardData";
+import { useDispatch, useSelector } from "react-redux";
+import { useEffect } from "react";
 
-export default function DashboardOverview({ metricsData, monthlyData, rideStatusData, weeklyRides }) {
+export default function DashboardOverview({  monthlyData, rideStatusData, weeklyRides }) {
+  const dispatch = useDispatch();
+  const{metricsData,loading,error} = useSelector((state) => state.dashboard);
+  useEffect(() => {
+    dispatch(fetchMetricsData());
+  }, [dispatch]);
+  if (loading) {
+    return <div className="text-gray-100">Loading...</div>;
+  }
+  if (error) {
+    return <div className="text-red-500">Error: {error}</div>;
+  }
+
+
+
+
   return (
     <div className="mt-4 text-gray-100">
-      <h2 className="text-3xl font-bold mb-6 text-neon-green">Dashboard Overview</h2>
+      <h2 className="text-3xl font-bold mb-6 text-neon-green">Admin Dashboard</h2>
 
       {/* Top Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
@@ -39,7 +57,7 @@ export default function DashboardOverview({ metricsData, monthlyData, rideStatus
                 </p>
                 <p className="text-2xl font-bold text-neon-green">{metric.value}</p>
                 <p
-                  className={`text-sm ${
+                  className={`text-sm ₹{
                     metric.trend.startsWith("+") ? "text-green-400" : "text-pink-400"
                   }`}
                 >

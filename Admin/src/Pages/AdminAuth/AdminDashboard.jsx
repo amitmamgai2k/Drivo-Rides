@@ -31,7 +31,7 @@ import {
 } from "../../Helpers/mockData";
 
 export default function AdminDashboard() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("Dashboard");
 
   const navItems = [

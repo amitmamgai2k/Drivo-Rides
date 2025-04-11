@@ -2,6 +2,10 @@ const adminModel = require('../models/admin.model');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const rideModel = require('../models/ride.model');
+const captainModel = require('../models/captain.model');
+const  userModel = require('../models/user.model');
+
 
 module.exports.addAdmin = async (req, res) => {
     try {
@@ -59,3 +63,147 @@ module.exports.login = async (req, res) => {
         res.status(500).json({ message: error.message });
     }
 };
+async function totalCompletedRides() {
+    try {
+      const rides = await rideModel.find({ status: "completed" });
+      console.log('rides count:', rides.length);
+      return rides.length;
+    } catch (error) {
+      console.error('Error fetching completed rides:', error);
+      return 0;
+    }
+  }
+  async function totalOngoingRides() {
+    try {
+      const rides = await rideModel.find({ status: "ongoing" });
+      return rides.length;
+    } catch (error) {
+      console.error('Error fetching ongoing rides:', error);
+      return 0;
+    }
+  }
+async function totalCancelledRides() {
+    try {
+      const rides = await rideModel.find({ status: "cancelled" });
+      return rides.length;
+    } catch (error) {
+      console.error('Error fetching cancelled rides:', error);
+      return 0;
+    }
+  }
+async function totalPendingRides() {
+    try {
+      const rides = await rideModel.find({ status: "pending" });
+      return rides.length;
+    } catch (error) {
+      console.error('Error fetching pending rides:', error);
+      return 0;
+    }
+  }
+  async function totalAcceptedRides() {
+    try {
+      const rides = await rideModel.find({ status: "accepted" });
+      return rides.length;
+    } catch (error) {
+      console.error('Error fetching accepted rides:', error);
+      return 0;
+    }
+  }
+  async function totalEarning(){
+    try {
+        const totalEarnings = await rideModel.aggregate([
+            { $match: { status: "completed" } },
+            { $group: { _id: null, total: { $sum: "$price" } } },
+            { $project: { _id: 0, total: 1 } },
+        ]);
+        return totalEarnings[0].total;
+
+
+    } catch (error) {
+        console.error('Error fetching total earnings:', error);
+        return 0;
+
+    }
+
+  }
+  async function totalActiveCaptains(){
+    try {
+        const activeCaptains =await captainModel.find({ status: { $in: ['online', 'offline'] } });
+        console.log('active captains count:', activeCaptains.length);
+        return activeCaptains.length;
+
+    } catch (error) {
+        console.error('Error fetching active captains:', error);
+        return 0;
+
+    }
+  }
+    async function totalActiveRiders(){
+        try {
+            const activeRiders = await userModel.find({email:{$ne:null}});
+            console.log('active riders count:', activeRiders.length);
+            return activeRiders.length;
+
+        } catch (error) {
+            console.error('Error fetching active riders:', error);
+            return 0;
+
+        }
+    }
+
+
+module.exports.getMetricsData = async (req, res) => {
+    console.log('getMetricsData');
+    if(!req.admin) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+
+      const totalRides = await totalCompletedRides();
+      const totalEarnings = await totalEarning();
+      const activeCaptains = await totalActiveCaptains();
+      const activeRiders = await totalActiveRiders();
+
+
+      const metricsData = [
+        {
+          label: "Total Rides",
+          value: totalRides,
+          trend: "+15.2%",
+          color: "bg-neon-green",
+          icon: "car",
+        },
+        {
+          label: "Total Earnings",
+          value: `₹${totalEarnings.toLocaleString()}`,
+          trend: "+20.5%",
+          color: "bg-teal-400",
+          icon: "dollar",
+        },
+        {
+          label: "Total Active Captains",
+          value: activeCaptains.toString(),
+          trend: "+8.7%",
+          color: "bg-blue-400",
+          icon: "users",
+        },
+        {
+          label: "Total Active Riders",
+          value: activeRiders.toString(),
+          trend: "-3.1%",
+          color: "bg-pink-500",
+          icon: "clock",
+        },
+      ];
+
+
+
+      res.status(200).json({ data: { metricsData } });
+      console.log("Metrics data sent successfully");
+
+    } catch (error) {
+      console.error("Error fetching dashboard metrics:", error.message);
+      return res.status(500).json({ message: "Server Error", error: error.message });
+    }
+  };
