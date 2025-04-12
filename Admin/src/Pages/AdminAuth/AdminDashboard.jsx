@@ -24,7 +24,6 @@ import {
   monthlyData,
   rideStatusData,
   weeklyRides,
-  recentRides,
   captainsData,
   userData,
   supportTickets,
@@ -57,7 +56,7 @@ export default function AdminDashboard() {
           />
         );
       case "Rides":
-        return <RidesTable recentRides={recentRides} />;
+        return <RidesTable setSidebarOpen={setSidebarOpen} />;
       case "Captains":
         return <CaptainsTable captainsData={captainsData} />;
       case "Users":

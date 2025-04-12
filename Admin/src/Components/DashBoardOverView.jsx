@@ -20,13 +20,17 @@ import {
 import { fetchMetricsData } from "../Redux/Slices/AdminDashBoardData";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
+import { Car, DollarSign, Users, Clock } from "lucide-react";
 
-export default function DashboardOverview({  monthlyData, rideStatusData, weeklyRides }) {
+export default function DashboardOverview({ monthlyData, rideStatusData, weeklyRides }) {
   const dispatch = useDispatch();
-  const{metricsData,loading,error} = useSelector((state) => state.dashboard);
+  const { metricsData, loading, error } = useSelector((state) => state.dashboard);
+  console.log("Metrics Data:", metricsData);
+
   useEffect(() => {
     dispatch(fetchMetricsData());
   }, [dispatch]);
+
   if (loading) {
     return <div className="text-gray-100">Loading...</div>;
   }
@@ -34,8 +38,44 @@ export default function DashboardOverview({  monthlyData, rideStatusData, weekly
     return <div className="text-red-500">Error: {error}</div>;
   }
 
+  // Create a mapping of icon strings to components
+  const iconComponents = {
+    Car: Car,
+    DollarSign: DollarSign,
+    Users: Users,
+    Clock: Clock
+  };
 
-
+  const cards = [
+    {
+      label: "Total Rides",
+      value: metricsData?.totalRides || 0,
+      trend: "+15.2%",
+      color: "bg-purple-500",
+      icon: 'Car',
+    },
+    {
+      label: "Total Earnings",
+      value: `₹${metricsData?.totalEarnings?.toLocaleString() || 0}`,
+      trend: "+20.5%",
+      color: "bg-teal-400",
+      icon: 'DollarSign',
+    },
+    {
+      label: "Total Active Captains",
+      value: metricsData?.activeCaptains || 0,
+      trend: "+8.7%",
+      color: "bg-blue-400",
+      icon: 'Users',
+    },
+    {
+      label: "Total Active Riders",
+      value: metricsData?.activeRiders || 0,
+      trend: "-3.1%",
+      color: "bg-pink-500",
+      icon: 'Clock',
+    },
+  ];
 
   return (
     <div className="mt-4 text-gray-100">
@@ -43,8 +83,10 @@ export default function DashboardOverview({  monthlyData, rideStatusData, weekly
 
       {/* Top Metrics Row */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-        {metricsData.map((metric) => {
-          const Icon = metric.icon;
+        {cards.map((metric) => {
+          // Get the correct component based on the icon string
+          const IconComponent = iconComponents[metric.icon] || null;
+
           return (
             <motion.div
               key={metric.label}
@@ -57,7 +99,7 @@ export default function DashboardOverview({  monthlyData, rideStatusData, weekly
                 </p>
                 <p className="text-2xl font-bold text-neon-green">{metric.value}</p>
                 <p
-                  className={`text-sm ₹{
+                  className={`text-sm ${
                     metric.trend.startsWith("+") ? "text-green-400" : "text-pink-400"
                   }`}
                 >
@@ -65,7 +107,7 @@ export default function DashboardOverview({  monthlyData, rideStatusData, weekly
                 </p>
               </div>
               <div className={`p-3 rounded-full ${metric.color} text-black`}>
-                <Icon size={20} />
+                {IconComponent && <IconComponent size={20} />}
               </div>
             </motion.div>
           );

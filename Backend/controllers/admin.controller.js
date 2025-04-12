@@ -152,58 +152,94 @@ async function totalPendingRides() {
     }
 
 
-module.exports.getMetricsData = async (req, res) => {
-    console.log('getMetricsData');
-    if(!req.admin) {
-        return res.status(401).json({ message: "Unauthorized" });
-    }
-
-    try {
-
-      const totalRides = await totalCompletedRides();
-      const totalEarnings = await totalEarning();
-      const activeCaptains = await totalActiveCaptains();
-      const activeRiders = await totalActiveRiders();
+    module.exports.getMetricsData = async (req, res) => {
 
 
-      const metricsData = [
-        {
-          label: "Total Rides",
-          value: totalRides,
-          trend: "+15.2%",
-          color: "bg-neon-green",
-          icon: "car",
-        },
-        {
-          label: "Total Earnings",
-          value: `₹${totalEarnings.toLocaleString()}`,
-          trend: "+20.5%",
-          color: "bg-teal-400",
-          icon: "dollar",
-        },
-        {
-          label: "Total Active Captains",
-          value: activeCaptains.toString(),
-          trend: "+8.7%",
-          color: "bg-blue-400",
-          icon: "users",
-        },
-        {
-          label: "Total Active Riders",
-          value: activeRiders.toString(),
-          trend: "-3.1%",
-          color: "bg-pink-500",
-          icon: "clock",
-        },
-      ];
+        if (!req.admin) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        try {
+          const totalRides = await totalCompletedRides();
+          const totalEarnings = await totalEarning();
+          const activeCaptains = await totalActiveCaptains();
+          const activeRiders = await totalActiveRiders();
+
+          const metricsData = {
+            totalRides,
+            totalEarnings,
+            activeCaptains,
+            activeRiders,
+          };
+
+          res.status(200).json({ data: metricsData });
+          console.log("Metrics data sent successfully");
+        } catch (error) {
+          console.error("Error fetching dashboard metrics:", error.message);
+          return res.status(500).json({ message: "Server Error", error: error.message });
+        }
+      };
+      module.exports.getRecentRides = async (req, res) => {
+        if (!req.admin) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        try {
+          const recentRides = await rideModel
+            .find()
+            .sort({ createdAt: -1 })
+            .populate("user", "fullname")
+            .populate("captain", "fullname")
+            .exec();
+
+          const simplifiedRides = recentRides.map((ride) => {
+            const userFullName = ride.user?.fullname
+              ? `${ride.user.fullname.firstname} ${ride.user.fullname.lastname || ""}`.trim()
+              : "N/A";
+
+            const captainFullName = ride.captain?.fullname
+              ? `${ride.captain.fullname.firstname} ${ride.captain.fullname.lastname || ""}`.trim()
+              : "Pending";
+
+            return {
+              id: ride._id,
+              user: userFullName,
+              captain: captainFullName,
+              from: ride.originText,
+              to: ride.destinationText,
+              amount: ride.price,
+              status: ride.status
+            };
+          });
+          console.log('simplifiedRides:', simplifiedRides);
 
 
+          res.status(200).json({ data: simplifiedRides });
+          console.log("Recent rides data sent successfully");
+        } catch (error) {
+          console.error("Error fetching recent rides:", error);
+          res.status(500).json({ message: "Server Error", error: error.message });
+        }
+      };
+      module.exports.getRideDataWithID = async (req, res) => {
+        if (!req.admin) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
 
-      res.status(200).json({ data: { metricsData } });
-      console.log("Metrics data sent successfully");
+        try {
+          const rideId = req.params.rideId;
+          const ride = await rideModel.findById(rideId)
+            .populate("user")
+            .populate("captain")
+            .exec();
 
-    } catch (error) {
-      console.error("Error fetching dashboard metrics:", error.message);
-      return res.status(500).json({ message: "Server Error", error: error.message });
-    }
-  };
+          if (!ride) {
+            return res.status(404).json({ message: "Ride not found" });
+          }
+          res.status(200).json({ data: ride });
+          console.log("Ride data sent successfully");
+        } catch (error) {
+          console.error("Error fetching ride data:", error.message);
+          return res.status(500).json({ message: "Server Error", error: error.message });
+        }
+      };

@@ -8,6 +8,8 @@ const { body } = require('express-validator');
 router.post("/create-admin", adminController.addAdmin);
 router.post('/login',adminController.login);
 router.get('/dashboard/metrics',authAdmin, adminController.getMetricsData);
+router.get('/dashboard/recentRides',authAdmin, adminController.getRecentRides);
+router.get('/dashboard/recentRides/:rideId',authAdmin, adminController.getRideDataWithID);
 
 module.exports = router;
 
