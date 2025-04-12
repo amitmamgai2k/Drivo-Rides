@@ -4,6 +4,7 @@ import { fetchRideDataWithID } from "../Redux/Slices/AdminDashBoardData";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import {useNavigate} from "react-router-dom";
+import { Eye, MapPin, MoreHorizontal, Pencil } from "lucide-react";
 
 export default function RidesTable({ setSidebarOpen }) {
   const dispatch = useDispatch();
@@ -160,10 +161,7 @@ export default function RidesTable({ setSidebarOpen }) {
                           className="p-1 text-gray-400 hover:text-white transition-colors"
                           title="View Details"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                          </svg>
+                         <Eye size={30} className=" text-gray-500 mr-2 bg-green-200 hover:bg-green-300 p-2 rounded-lg"/>
                         </button>
 
                         {/* Edit button */}
@@ -172,9 +170,7 @@ export default function RidesTable({ setSidebarOpen }) {
                           className="p-1 text-gray-400 hover:text-white transition-colors"
                           title="Edit Ride"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                          </svg>
+                         <Pencil size={30} className=" text-gray-500 mr-2 bg-violet-200 hover:bg-violet-300 p-2 rounded-lg" />
                         </button>
 
                         {/* Map view button */}
@@ -183,9 +179,7 @@ export default function RidesTable({ setSidebarOpen }) {
                           className="p-1 text-gray-400 hover:text-white transition-colors"
                           title="View on Map"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                          </svg>
+                          <MapPin size={30} className=" text-gray-500 mr-2 bg-yellow-200 hover:bg-yellow-300 p-2 rounded-lg" />
                         </button>
 
                         {/* Context menu (options) button */}
@@ -193,9 +187,7 @@ export default function RidesTable({ setSidebarOpen }) {
                           className="p-1 text-gray-400 hover:text-white transition-colors"
                           title="More Options"
                         >
-                          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 5v.01M12 12v.01M12 19v.01M12 6a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2zm0 7a1 1 0 110-2 1 1 0 010 2z" />
-                          </svg>
+                          <MoreHorizontal size={30} className=" text-gray-500 mr-2 bg-blue-200 hover:bg-blue-300 p-2 rounded-lg" />
                         </button>
                       </div>
                     </td>
