@@ -48,6 +48,7 @@ const AdminAuth = createSlice({
             state.role = "";
             state.data = {};
             state.token = "";
+            toast.success('Logged Out');
             localStorage.removeItem('isLoggedIn');
             localStorage.removeItem('role');
             localStorage.removeItem('data');

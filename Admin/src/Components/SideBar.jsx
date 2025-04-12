@@ -1,7 +1,19 @@
 import React from "react";
 import { LogOut, Menu } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { logout } from "../Redux/Slices/AdminAuth";
+import {useNavigate} from "react-router-dom";
 
 export default function Sidebar({ sidebarOpen, setSidebarOpen, activeTab, setActiveTab, navItems }) {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logout());
+    navigate("/admin-auth");
+
+    console.log("Logging out...");
+  };
   return (
     <>
       {/* Sidebar */}
@@ -35,7 +47,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeTab, setAct
             ))}
           </nav>
           <div className="px-4 py-3 border-t border-neon-green/20">
-            <button className="flex items-center w-full hover:bg-[#2a2a2a] px-3 py-2 rounded text-sm text-neon-green transition">
+            <button onClick={() => {handleLogout()}} className="flex items-center w-full hover:bg-[#2a2a2a] px-3 py-2 rounded text-sm text-neon-green transition">
               <LogOut size={18} className="mr-2" />
               Logout
             </button>
