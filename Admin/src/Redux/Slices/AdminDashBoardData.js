@@ -73,6 +73,31 @@ export const fetchRideDataWithID = createAsyncThunk(
     }
   }
 );
+export const fetchCaptainsData = createAsyncThunk(
+  'dashboard/fetchCaptains',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get('/admin/dashboard/captains');
+      console.log("captainsData", response.data);
+      return response.data;
+    } catch (error) {
+      toast.error('Failed to load captains data');
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+export const fetchUsersData = createAsyncThunk(
+  'dashboard/fetchUsers',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get('/admin/dashboard/users');
+      return response.data;
+    } catch (error) {
+      toast.error('Failed to load users data');
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
 
 const dashboardSlice = createSlice({
   name: 'dashboard',
@@ -145,14 +170,38 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchRideDataWithID.fulfilled, (state, action) => {
         state.loading = false;
-
-
         state.rideDataWithID = action.payload.data;
       })
       .addCase(fetchRideDataWithID.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch ride data';
-      });
+      })
+      .addCase(fetchCaptainsData.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCaptainsData.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log("captainsData", action.payload.data);
+
+        state.captainsData = action.payload.data;
+      })
+      .addCase(fetchCaptainsData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch captains data';
+      })
+      .addCase(fetchUsersData.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchUsersData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.usersData = action.payload.data;
+      }
+      )
+      .addCase(fetchUsersData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch users data';
+      }
+      );
   }
 });
 

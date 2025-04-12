@@ -58,9 +58,9 @@ export default function AdminDashboard() {
       case "Rides":
         return <RidesTable setSidebarOpen={setSidebarOpen} />;
       case "Captains":
-        return <CaptainsTable captainsData={captainsData} />;
+        return <CaptainsTable setSidebarOpen={setSidebarOpen} />;
       case "Users":
-        return <UsersTable userData={userData} />;
+        return <UsersTable userData={userData} setSidebarOpen={setSidebarOpen} />;
       case "Support":
         return <SupportTickets supportTickets={supportTickets} />;
       case "Payments":

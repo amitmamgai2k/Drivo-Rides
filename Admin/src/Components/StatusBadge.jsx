@@ -24,10 +24,17 @@ export default function StatusBadge({ status }) {
     case "Closed":
       color = "bg-gray-500 text-white";
       break;
+    case "online":
+      color = "bg-green-500/20 text-green-300";
+      break;
+    case "offline":
+      color = "bg-red-500/20 text-red-300";
+      break;
     default:
       color = "bg-gray-600 text-white";
       break;
   }
+
 
   return (
     <span className={`px-2 py-1 rounded-full text-xs font-semibold ${color}`}>

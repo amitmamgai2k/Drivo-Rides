@@ -211,11 +211,11 @@ async function totalPendingRides() {
               status: ride.status
             };
           });
-          console.log('simplifiedRides:', simplifiedRides);
+
 
 
           res.status(200).json({ data: simplifiedRides });
-          console.log("Recent rides data sent successfully");
+
         } catch (error) {
           console.error("Error fetching recent rides:", error);
           res.status(500).json({ message: "Server Error", error: error.message });
@@ -237,9 +237,36 @@ async function totalPendingRides() {
             return res.status(404).json({ message: "Ride not found" });
           }
           res.status(200).json({ data: ride });
-          console.log("Ride data sent successfully");
+
         } catch (error) {
           console.error("Error fetching ride data:", error.message);
           return res.status(500).json({ message: "Server Error", error: error.message });
         }
       };
+      module.exports.getCaptainsData = async (req, res) => {
+        if (!req.admin) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+        try {
+          const captains = await captainModel.find().exec();
+          res.status(200).json({ data: captains });
+          console.log("captains data sent successfully");
+
+        } catch (error) {
+          console.error("Error fetching captains data:", error.message);
+          return res.status(500).json({ message: "Server Error", error: error.message });
+
+        }
+      }
+      module.exports.getUsersData = async (req, res) => {
+        if (!req.admin) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+        try {
+          const users = await userModel.find().exec();
+          res.status(200).json({ data: users });
+        } catch (error) {
+          console.error("Error fetching users data:", error.message);
+          return res.status(500).json({ message: "Server Error", error: error.message });
+        }
+      }
