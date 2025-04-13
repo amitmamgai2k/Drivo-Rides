@@ -75,9 +75,13 @@ export const fetchRideDataWithID = createAsyncThunk(
 );
 export const fetchCaptainsData = createAsyncThunk(
   'dashboard/fetchCaptains',
-  async (_, { rejectWithValue }) => {
+  async (captainId = null, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get('/admin/dashboard/captains');
+      const endpoint = captainId
+        ? `/admin/dashboard/captains/${captainId}` // single captain
+        : '/admin/dashboard/captains'; // all captains
+
+      const response = await axiosInstance.get(endpoint);
       console.log("captainsData", response.data);
       return response.data;
     } catch (error) {
@@ -86,6 +90,24 @@ export const fetchCaptainsData = createAsyncThunk(
     }
   }
 );
+export const updateCaptainData = createAsyncThunk(
+    'admin/updateCaptainData',
+    async ({ userID, data }, { rejectWithValue }) => {
+      console.log("updateCaptainData", userID, data);
+
+      try {
+        const response = await axiosInstance.post(`/admin/captains/${userID}`,  data );
+        toast.success('Captain data updated successfully');
+        return response.data;
+      } catch (error) {
+        toast.error('Failed to update captain data');
+        return rejectWithValue(error.response?.data);
+      }
+    }
+  );
+
+
+
 export const fetchUsersData = createAsyncThunk(
   'dashboard/fetchUsers',
   async (_, { rejectWithValue }) => {
@@ -189,8 +211,17 @@ const dashboardSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch captains data';
       })
-      .addCase(fetchUsersData.pending, (state) => {
+      .addCase(updateCaptainData.pending, (state) => {
         state.loading = true;
+      })
+      .addCase(updateCaptainData.fulfilled, (state, action) => {
+        state.loading = false;
+        toast.success('Captain data updated successfully');
+
+      })
+      .addCase(updateCaptainData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to update captain data';
       })
       .addCase(fetchUsersData.fulfilled, (state, action) => {
         state.loading = false;

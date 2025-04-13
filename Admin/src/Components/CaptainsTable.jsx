@@ -3,10 +3,13 @@ import StatusBadge from "./StatusBadge";
 import { fetchCaptainsData } from "../Redux/Slices/AdminDashBoardData";
 import { useDispatch, useSelector } from "react-redux";
 import { Eye, Trash, UserRoundPen } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 export default function CaptainsTable({ setSidebarOpen }) {
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const { captainsData = [] } = useSelector((state) => state.dashboard);
+
 
   useEffect(() => {
     dispatch(fetchCaptainsData());
@@ -26,8 +29,7 @@ export default function CaptainsTable({ setSidebarOpen }) {
     status: cap.status || "Unknown",
   }));
   const handleViewDetails = (userId) => {
-
-    console.log("View details for user ID:", userId);
+    navigate(`/admin-dashboard/captains/${userId}`, { state: { userId } });
   }
   const handleEditDetails = (userId) => {
 

@@ -247,17 +247,28 @@ async function totalPendingRides() {
         if (!req.admin) {
           return res.status(401).json({ message: "Unauthorized" });
         }
-        try {
-          const captains = await captainModel.find().exec();
-          res.status(200).json({ data: captains });
-          console.log("captains data sent successfully");
 
+        const captainId = req.params.id;
+
+
+
+        try {
+          if (captainId) {
+            const captain = await captainModel.findById(captainId).exec();
+            if (!captain) {
+              return res.status(404).json({ message: "Captain not found" });
+            }
+            return res.status(200).json({ data: captain });
+          } else {
+            const captains = await captainModel.find().exec();
+            return res.status(200).json({ data: captains });
+          }
         } catch (error) {
           console.error("Error fetching captains data:", error.message);
           return res.status(500).json({ message: "Server Error", error: error.message });
-
         }
-      }
+      };
+
       module.exports.getUsersData = async (req, res) => {
         if (!req.admin) {
           return res.status(401).json({ message: "Unauthorized" });
@@ -270,3 +281,62 @@ async function totalPendingRides() {
           return res.status(500).json({ message: "Server Error", error: error.message });
         }
       }
+
+      module.exports.updateCaptainData = async (req, res) => {
+        if (!req.admin) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        const { id } = req.params;
+        const updatedData = req.body;
+
+        try {
+          const captain = await captainModel.findById(id);
+          if (!captain) {
+            return res.status(404).json({ message: "Captain not found" });
+          }
+
+          // Check if updated email is already used by another captain
+          if (updatedData.email) {
+            const existingEmail = await captainModel.findOne({ email: updatedData.email, _id: { $ne: id } });
+            if (existingEmail) {
+              return res.status(400).json({ message: "Email is already in use by another captain" });
+            }
+            captain.email = updatedData.email;
+          }
+
+          // Check if updated mobile number is already used by another captain
+          if (updatedData.mobileNumber) {
+            const existingMobile = await captainModel.findOne({ mobileNumber: updatedData.mobileNumber, _id: { $ne: id } });
+            if (existingMobile) {
+              return res.status(400).json({ message: "Mobile number is already in use by another captain" });
+            }
+            captain.mobileNumber = updatedData.mobileNumber;
+          }
+          if(updatedData.vehiclePlate){
+            const existingPlate = await captainModel.findOne({ 'vehicle.plate': updatedData.vehiclePlate, _id: { $ne: id } });
+            if (existingPlate) {
+              return res.status(400).json({ message: "Vehicle plate is already in use by another captain" });
+            }
+          }
+
+
+          if (updatedData.firstname) captain.fullname.firstname = updatedData.firstname;
+          if (updatedData.lastname) captain.fullname.lastname = updatedData.lastname;
+          if (updatedData.vehicleModel) captain.vehicle.model = updatedData.vehicleModel;
+          if (updatedData.vehicleType) captain.vehicle.vehicleType = updatedData.vehicleType;
+          if (updatedData.vehiclePlate) captain.vehicle.plate = updatedData.vehiclePlate;
+          if (updatedData.vehicleColor) captain.vehicle.color = updatedData.vehicleColor;
+          if (updatedData.vehicleCapacity) captain.vehicle.capacity = updatedData.vehicleCapacity;
+
+          await captain.save();
+
+          res.status(200).json({ message: "Captain updated successfully", data: captain });
+
+        } catch (error) {
+          console.error("Error updating captain:", error.message);
+          res.status(500).json({ message: "Server Error", error: error.message });
+        }
+      };
+
+

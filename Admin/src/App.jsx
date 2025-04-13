@@ -1,7 +1,9 @@
 import { Route, Routes } from 'react-router-dom'
 import AdminLogin from './Pages/AdminAuth/AdminLogin'
 import AdminDashboard from './Pages/AdminAuth/AdminDashboard'
-import RideId from './Pages/RideTablePages/RideId'
+import RideId from './Pages/SingleIdPages/RideId';
+import CaptainId from './Pages/SingleIdPages/CaptainId';
+
 export default function App() {
   return (
     <>
@@ -9,6 +11,7 @@ export default function App() {
   <Route path = '/admin-auth' element = {<AdminLogin/>} />
   <Route path = '/admin-dashboard' element = {<AdminDashboard/>} />
  <Route path = '/admin-dashboard/rides/:rideId' element = {<RideId/>} />
+  <Route path = '/admin-dashboard/captains/:captainId' element = {<CaptainId/>} />
 </Routes>
     </>
 

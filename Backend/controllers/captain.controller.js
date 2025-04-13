@@ -7,7 +7,7 @@ const rideService = require('../services/ride.service');
 const bcrypt = require("bcrypt"); // Use bcrypt for hashing passwords
 const sendMail = require('../utils/sendMail');
 const uploadOnCloudinary = require('../utils/cloudinary');
-const sendRegistrationMessage = require('../utils/sendSMS');
+const {sendRegistrationMessage} = require('../utils/sendSMS');
 module.exports.registerCaptain = async (req, res) => {
     try {
         const errors = validationResult(req);
@@ -49,7 +49,7 @@ module.exports.registerCaptain = async (req, res) => {
 
             });
             const token = await captain.generateAuthToken();
-              await sendRegistrationMessage(mobileNumber, fullname.firstname, fullname.lastname);
+            //   await sendRegistrationMessage(mobileNumber, fullname.firstname, fullname.lastname);
         res.status(201).json({ captain, token });
     } catch (err) {
         console.error("Error registering captain:", err);

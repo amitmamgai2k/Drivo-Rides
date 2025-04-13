@@ -10,8 +10,9 @@ router.post('/login',adminController.login);
 router.get('/dashboard/metrics',authAdmin, adminController.getMetricsData);
 router.get('/dashboard/recentRides',authAdmin, adminController.getRecentRides);
 router.get('/dashboard/recentRides/:rideId',authAdmin, adminController.getRideDataWithID);
-router.get('/dashboard/captains',authAdmin, adminController.getCaptainsData);
+router.get('/dashboard/captains/:id?',authAdmin, adminController.getCaptainsData);
 router.get('/dashboard/users',authAdmin, adminController.getUsersData);
+router.post('/captains/:id', authAdmin, adminController.updateCaptainData);
 
 module.exports = router;
 
