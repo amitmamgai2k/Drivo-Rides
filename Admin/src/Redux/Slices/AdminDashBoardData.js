@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import toast from "react-hot-toast";
 import axiosInstance from "../../Helpers/axiosInstance";
+import { use } from "react";
 
 const initialState = {
   isLoggedIn: localStorage.getItem('isLoggedIn') === 'true' || false,
@@ -97,7 +98,7 @@ export const updateCaptainData = createAsyncThunk(
 
       try {
         const response = await axiosInstance.post(`/admin/captains/${userID}`,  data );
-        toast.success('Captain data updated successfully');
+
         return response.data;
       } catch (error) {
         toast.error('Failed to update captain data');
@@ -105,21 +106,38 @@ export const updateCaptainData = createAsyncThunk(
       }
     }
   );
+  export const deleteCaptain = createAsyncThunk(
+    'admin/deleteCaptain',
+    async (userId, { rejectWithValue }) => {
+      try {
+        const response = await axiosInstance.delete(`/admin/captains/${userId}`);
 
+        return response.data;
+      } catch (error) {
+        toast.error('Failed to delete captain');
+        return rejectWithValue(error.response?.data);
+      }
 
+    });
 
 export const fetchUsersData = createAsyncThunk(
   'dashboard/fetchUsers',
-  async (_, { rejectWithValue }) => {
+  async (userId = null, { rejectWithValue }) => {
     try {
-      const response = await axiosInstance.get('/admin/dashboard/users');
+      const endpoint = captainId
+        ? `/admin/dashboard/users/${userId}` // single user
+        : '/admin/dashboard/user'; // all users
+
+      const response = await axiosInstance.get(endpoint);
+      console.log("UsersData", response.data);
       return response.data;
     } catch (error) {
-      toast.error('Failed to load users data');
+      toast.error('Failed to load user data');
       return rejectWithValue(error.response?.data);
     }
   }
 );
+
 
 const dashboardSlice = createSlice({
   name: 'dashboard',
@@ -222,6 +240,20 @@ const dashboardSlice = createSlice({
       .addCase(updateCaptainData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to update captain data';
+      })
+      .addCase(deleteCaptain.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteCaptain.fulfilled, (state, action) => {
+        state.loading = false;
+        toast.success('Captain deleted successfully');
+      })
+      .addCase(deleteCaptain.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to delete captain';
+      })
+      .addCase(fetchUsersData.pending, (state) => {
+        state.loading = true;
       })
       .addCase(fetchUsersData.fulfilled, (state, action) => {
         state.loading = false;

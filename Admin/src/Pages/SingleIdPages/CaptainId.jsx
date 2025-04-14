@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCaptainsData, updateCaptainData } from '../../Redux/Slices/AdminDashBoardData';
@@ -7,9 +7,10 @@ import { User, Mail, Phone, MapPin, Car, DollarSign, Clock, BarChart, Calendar, 
 function CaptainId() {
   const dispatch = useDispatch();
   const location = useLocation();
-  const { userId } = location?.state || {};
+  const { userId, editMode } = location?.state || {};
+  const [isEditMode, setIsEditMode] = useState(editMode || false);
+
   const { captainsData = {} } = useSelector((state) => state.dashboard);
-  const [isEditing, setIsEditing] = useState(false);
   const [errors, setErrors] = useState({});
   const [formData, setFormData] = useState({
     email: '',
@@ -113,15 +114,15 @@ function CaptainId() {
   };
 
   const handleEditToggle = () => {
-    if (isEditing) {
+    if (isEditMode) {
       if (validateForm()) {
         console.log("Saving changes:", formData);
         console.log("User ID:", userId);
         dispatch(updateCaptainData({ userID: userId, data: formData }));
-        setIsEditing(false);
+        setIsEditMode(false);
       }
     } else {
-      setIsEditing(true);
+      setIsEditMode(true);
     }
   };
 
@@ -137,7 +138,7 @@ function CaptainId() {
       vehicleColor: captainsData.vehicle?.color || '',
       vehicleCapacity: captainsData.vehicle?.capacity || ''
     });
-    setIsEditing(false);
+    setIsEditMode(false);
     setErrors({});
   };
 
@@ -171,7 +172,7 @@ function CaptainId() {
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold text-gray-800">Captain Profile</h2>
         <div className="flex space-x-2">
-          {isEditing && (
+          {isEditMode && (
             <button
               onClick={handleCancelEdit}
               className="flex items-center bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-md shadow transition-colors"
@@ -180,13 +181,15 @@ function CaptainId() {
               Cancel
             </button>
           )}
-          <button
-            onClick={handleEditToggle}
-            className={`flex items-center ${isEditing ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white px-4 py-2 rounded-md shadow transition-colors`}
-          >
-            {isEditing ? <Save size={18} className="mr-2" /> : <Edit size={18} className="mr-2" />}
-            {isEditing ? "Save Changes" : "Edit Profile"}
-          </button>
+          {editMode && (
+            <button
+              onClick={handleEditToggle}
+              className={`flex items-center ${isEditMode ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white px-4 py-2 rounded-md shadow transition-colors`}
+            >
+              {isEditMode ? <Save size={18} className="mr-2" /> : <Edit size={18} className="mr-2" />}
+              {isEditMode ? "Save Changes" : "Edit Profile"}
+            </button>
+          )}
         </div>
       </div>
 
@@ -206,7 +209,7 @@ function CaptainId() {
               ></span>
             </div>
             <div className="text-center md:text-left">
-              {isEditing ? (
+              {isEditMode ? (
                 <div className="flex flex-col space-y-2 md:flex-row md:space-y-0 md:space-x-2">
                   <div className="w-full md:w-auto">
                     <input
@@ -265,14 +268,14 @@ function CaptainId() {
             <div className="space-y-6">
               <h4 className="text-lg font-semibold border-b border-gray-200 pb-2 mb-4 text-gray-800">Personal Information</h4>
 
-              {/* Email Field - Replaced InfoItem */}
+              {/* Email Field */}
               <div className="flex items-start space-x-3">
                 <div className="mt-0.5">
                   <Mail size={30} className="text-blue-600 p-2 bg-blue-100 rounded-lg" />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-700">Email</p>
-                  {isEditing ? (
+                  {isEditMode ? (
                     <div>
                       <input
                         type="text"
@@ -293,14 +296,14 @@ function CaptainId() {
                 </div>
               </div>
 
-              {/* Mobile Number Field - Replaced InfoItem */}
+              {/* Mobile Number Field */}
               <div className="flex items-start space-x-3">
                 <div className="mt-0.5">
                   <Phone size={30} className="text-blue-600 p-2 bg-blue-100 rounded-lg" />
                 </div>
                 <div className="flex-1">
                   <p className="text-sm font-medium text-gray-700">Mobile Number</p>
-                  {isEditing ? (
+                  {isEditMode ? (
                     <div>
                       <input
                         type="text"
@@ -373,7 +376,7 @@ function CaptainId() {
             <div className="space-y-6">
               <h4 className="text-lg font-semibold border-b border-gray-200 pb-2 mb-4 text-gray-800">Vehicle Details</h4>
 
-              {isEditing ? (
+              {isEditMode ? (
                 <>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
