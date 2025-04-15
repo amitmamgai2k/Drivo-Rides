@@ -11,8 +11,8 @@ const initialState = {
   totalDrivers: 0,
   totalEarnings: 0,
   totalBookings: 0,
+  rideStatusDatas: [],
   monthlyData: [],
-  rideStatusData: [],
   weeklyRides: [],
   loading: false,
   error: null
@@ -133,6 +133,19 @@ export const fetchUsersData = createAsyncThunk(
       return response.data;
     } catch (error) {
       toast.error('Failed to load user data');
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+export const fetchRidesStatusData = createAsyncThunk(
+  'dashboard/fetchRidesStatus',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get('/admin/dashboard/ridesStatus');
+      console.log("RidesStatusData", response.data);
+      return response.data;
+    } catch (error) {
+      toast.error('Failed to load rides status data');
       return rejectWithValue(error.response?.data);
     }
   }
@@ -263,6 +276,19 @@ const dashboardSlice = createSlice({
       .addCase(fetchUsersData.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch users data';
+      }
+      )
+      .addCase(fetchRidesStatusData.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchRidesStatusData.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log("RidesStatusData", action.payload.data);
+        state.ridesStatusDatas = action.payload.data;
+      })
+      .addCase(fetchRidesStatusData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch rides status data';
       }
       );
   }

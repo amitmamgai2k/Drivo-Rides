@@ -17,18 +17,22 @@ import {
   AreaChart,
   Area,
 } from "recharts";
-import { fetchMetricsData } from "../Redux/Slices/AdminDashBoardData";
+import { fetchMetricsData, fetchRidesStatusData } from "../Redux/Slices/AdminDashBoardData";
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { Car, DollarSign, Users, Clock } from "lucide-react";
 
-export default function DashboardOverview({ monthlyData, rideStatusData, weeklyRides }) {
+export default function DashboardOverview({ monthlyData, weeklyRides }) {
   const dispatch = useDispatch();
   const { metricsData, loading, error } = useSelector((state) => state.dashboard);
-  console.log("Metrics Data:", metricsData);
+  const { ridesStatusDatas = [] } = useSelector((state) => state?.dashboard || {});
 
   useEffect(() => {
     dispatch(fetchMetricsData());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchRidesStatusData());
   }, [dispatch]);
 
   if (loading) {
@@ -38,7 +42,23 @@ export default function DashboardOverview({ monthlyData, rideStatusData, weeklyR
     return <div className="text-red-500">Error: {error}</div>;
   }
 
-  // Create a mapping of icon strings to components
+  const transformedRideStatusData = ridesStatusDatas.map(item => {
+    // Define colors for each status
+    const statusColors = {
+      completed: "#00FF7F",  // Green
+      pending: "#FFA500",    // Orange
+      ongoing: "#00FFFF",    // Cyan
+      cancelled: "#FF1493",  // Pink
+      accepted: "#4169E1"    // Royal Blue
+    };
+
+    return {
+      name: item._id.charAt(0).toUpperCase() + item._id.slice(1),
+      value: item.count,
+      color: statusColors[item._id] || "#CCCCCC"
+    };
+  });
+
   const iconComponents = {
     Car: Car,
     DollarSign: DollarSign,
@@ -115,8 +135,9 @@ export default function DashboardOverview({ monthlyData, rideStatusData, weeklyR
       </div>
 
       {/* Charts Row */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6 mb-6">
-        <div className="bg-[#1a1a1a] rounded-lg shadow-neon p-6 xl:col-span-2 border border-neon-green/20">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-6 mb-6">
+        {/* Bar Chart - Now takes up less space */}
+        <div className="bg-[#1a1a1a] rounded-lg shadow-neon p-6 xl:col-span-1 border border-neon-green/20">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-neon-green">Monthly Rides & Earnings</h3>
             <select className="bg-[#2a2a2a] border border-neon-green/20 rounded px-2 py-1 text-sm text-neon-green">
@@ -124,11 +145,14 @@ export default function DashboardOverview({ monthlyData, rideStatusData, weeklyR
               <option>Last 12 months</option>
             </select>
           </div>
-          <div className="w-full h-72">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={monthlyData}>
+          <div className="w-full" style={{ height: "300px" }}>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart
+                data={monthlyData}
+                margin={{ top: 10, right: 10, left: 0, bottom: 20 }}
+              >
                 <CartesianGrid strokeDasharray="3 3" stroke="#333333" />
-                <XAxis dataKey="month" stroke="#aaa" />
+                <XAxis dataKey="month" stroke="#aaa" angle={-45} textAnchor="end" height={50} />
                 <YAxis stroke="#aaa" />
                 <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid #2a2a2a" }} labelStyle={{ color: "#fff" }} />
                 <Legend wrapperStyle={{ color: "#ddd" }} />
@@ -140,26 +164,35 @@ export default function DashboardOverview({ monthlyData, rideStatusData, weeklyR
           </div>
         </div>
 
-        <div className="bg-[#1a1a1a] rounded-lg shadow-neon p-6 border border-neon-green/20">
-          <h3 className="text-lg font-semibold mb-4 text-neon-green">Ride Status Distribution</h3>
-          <div className="w-full h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
+        {/* Pie Chart - Now takes up more space */}
+        <div className="bg-[#1a1a1a] rounded-lg shadow-neon p-6 xl:col-span-1 border border-neon-green/20">
+          <h3 className="text-lg font-semibold mb-4 text-neon-green self-center">Ride Status Distribution</h3>
+          <div className="w-full" style={{ height: "400px" }}>
+            <ResponsiveContainer width="100%" height={400}>
+              <PieChart margin={{ top: 0, right: 0, left: 0, bottom: 0 }}>
                 <Pie
-                  data={rideStatusData}
+                  data={transformedRideStatusData}
                   cx="50%"
                   cy="50%"
-                  labelLine={false}
-                  outerRadius={80}
+                  labelLine={true}
+                  outerRadius={150}
+                  innerRadius={60}
                   dataKey="value"
                   label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
                 >
-                  {rideStatusData.map((entry, index) => (
+                  {transformedRideStatusData.map((entry, index) => (
                     <Cell key={`cell-${index}`} fill={entry.color} />
                   ))}
                 </Pie>
-                <Tooltip contentStyle={{ backgroundColor: "#1a1a1a", border: "1px solid #2a2a2a" }} labelStyle={{ color: "#fff" }} />
-                <Legend wrapperStyle={{ color: "#ddd" }} />
+                <Tooltip
+                  contentStyle={{ backgroundColor: "white", color: "red", border: "2px solid text-black" }}
+                />
+                <Legend
+                  wrapperStyle={{ color: "#ddd", paddingTop: "20px" }}
+                  layout="horizontal"
+                  verticalAlign="bottom"
+                  align="center"
+                />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -177,9 +210,12 @@ export default function DashboardOverview({ monthlyData, rideStatusData, weeklyR
               <option>2 Weeks Ago</option>
             </select>
           </div>
-          <div className="w-full h-64">
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={weeklyRides}>
+          <div className="w-full" style={{ height: "300px" }}>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart
+                data={weeklyRides}
+                margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
+              >
                 <defs>
                   <linearGradient id="colorRides" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#00FFFF" stopOpacity={0.8} />

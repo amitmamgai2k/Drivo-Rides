@@ -360,5 +360,28 @@ async function totalPendingRides() {
           res.status(500).json({ message: "Server Error", error: error.message });
         }
       };
+      module.exports.getRidesStatus = async (req, res) => {
+        if (!req.admin) {
+          return res.status(401).json({ message: "Unauthorized" });
+        }
+
+        try {
+          const ridesStatus = await rideModel.aggregate([
+            {
+              $group: {
+                _id: "$status",
+                count: { $sum: 1 },
+
+              }
+            }
+          ]);
+          console.log("Rides Status:", ridesStatus);
+
+          res.status(200).json({ data: ridesStatus });
+        } catch (error) {
+          console.error("Error fetching rides status:", error.message);
+          res.status(500).json({ message: "Server Error", error: error.message });
+        }
+      };
 
 

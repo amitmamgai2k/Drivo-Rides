@@ -14,6 +14,8 @@ router.get('/dashboard/captains/:id?',authAdmin, adminController.getCaptainsData
 router.get('/dashboard/users',authAdmin, adminController.getUsersData);
 router.post('/captains/:id', authAdmin, adminController.updateCaptainData);
 router.delete('/captains/:id', authAdmin, adminController.deleteCaptain);
+router.get('/dashboard/ridesStatus', authAdmin, adminController.getRidesStatus);
+
 
 
 module.exports = router;
