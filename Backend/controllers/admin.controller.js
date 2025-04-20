@@ -273,9 +273,19 @@ async function totalPendingRides() {
         if (!req.admin) {
           return res.status(401).json({ message: "Unauthorized" });
         }
+        const userId = req.params.id;
         try {
-          const users = await userModel.find().exec();
-          res.status(200).json({ data: users });
+          if(userId){
+            const user = await userModel.findById(userId).exec();
+            if (!user) {
+              return res.status(404).json({ message: "User not found" });
+            }
+            return res.status(200).json({ data: user });
+          }else{
+            const users = await userModel.find().exec();
+            return res.status(200).json({ data: users });
+          }
+
         } catch (error) {
           console.error("Error fetching users data:", error.message);
           return res.status(500).json({ message: "Server Error", error: error.message });
@@ -287,12 +297,30 @@ async function totalPendingRides() {
         } else {
           const { id } = req.params;
           const updatedData = req.body;
+          console.log('updatedData:', updatedData);
+
           try {
             const user = await userModel.findById(id);
             if (!user) {
               return res.status(404).json({ message: "User not found" });
             }
-            user.fullname = updatedData.fullname;
+            if(updatedData.email){
+              const existingUser = await userModel.findOne({ email: updatedData.email, _id: { $ne: id } });
+              if (existingUser && existingUser._id.toString() !== id) {
+                return res.status(400).json({ message: "Email already exists" });
+              }
+            }
+              if(updatedData.mobileNumber){
+                const existingUser = await userModel.findOne({ mobileNumber: updatedData.mobileNumber, _id: { $ne: id } });
+                if (existingUser && existingUser._id.toString() !== id) {
+                  return res.status(400).json({ message: "Mobile number already exists" });
+                }
+              }
+
+
+
+            user.fullname.firstname = updatedData.firstname;
+            user.fullname.lastname = updatedData.lastname;
             user.email = updatedData.email;
             user.mobileNumber = updatedData.mobileNumber;
             await user.save();

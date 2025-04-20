@@ -1,12 +1,13 @@
 import React, { useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchUsersData } from "../Redux/Slices/AdminDashBoardData";
 import { Eye, Trash, UserRoundPen } from "lucide-react";
 
 export default function UsersTable({ setSidebarOpen }) {
   const dispatch = useDispatch();
-  const { usersData = [] } = useSelector((state) => state.dashboard);
+  const navigate = useNavigate();
+  const { usersData = [] } = useSelector((state) => state?.dashboard || []);
 
   useEffect(() => {
     dispatch(fetchUsersData());
@@ -34,14 +35,18 @@ export default function UsersTable({ setSidebarOpen }) {
     email: user.email || "Unknown",
   }));
   const handleViewDetails = (userId) => {
-
-    console.log("View details for user ID:", userId);
+    navigate(`/admin-dashboard/users/${userId}`, { state: { userId } });
   }
   const handleEditDetails = (userId) => {
-
-    console.log("Edit user ID:", userId);
+    navigate(`/admin-dashboard/users/${userId}`, {
+      state: { userId, editMode: true },
+    });
   };
   const handleDelete = (userId) => {
+    navigate(`/admin-dashboard/users/delete/${userId}`,
+      { state: { userId } }
+     )
+
 
     console.log("Delete user ID:", userId);
   };
