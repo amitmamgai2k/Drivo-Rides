@@ -19,8 +19,7 @@
     "leaflet": "^1.9.4",
     "leaflet-routing-machine": "^3.2.12",
     "lucide-react": "^0.469.0",
-    "mappls-direction-widget-react-native": "^1.1.0",
-    "mappls-map-react-native": "^1.0.10",
+
     "openrouteservice-js": "^0.4.1",
     "react": "^18.3.1",
     "react-chartjs-2": "^5.3.0",
