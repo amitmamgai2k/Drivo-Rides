@@ -124,19 +124,52 @@ export const fetchUsersData = createAsyncThunk(
   'dashboard/fetchUsers',
   async (userId = null, { rejectWithValue }) => {
     try {
-      const endpoint = captainId
+      const endpoint = userId
         ? `/admin/dashboard/users/${userId}` // single user
-        : '/admin/dashboard/user'; // all users
+        : '/admin/dashboard/users'; // all users
 
       const response = await axiosInstance.get(endpoint);
       console.log("UsersData", response.data);
       return response.data;
+
+
     } catch (error) {
       toast.error('Failed to load user data');
       return rejectWithValue(error.response?.data);
     }
   }
 );
+export const updateUserData = createAsyncThunk(
+  'admin/updateUserData',
+  async ({ userID, data }, { rejectWithValue }) => {
+    console.log("updateUserData", userID, data);
+
+    try {
+      const response = await axiosInstance.post(`/admin/users/${userID}`,  data );
+
+      return response.data;
+    } catch (error) {
+      toast.error('Failed to update user data');
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+export const deleteUser = createAsyncThunk(
+  'admin/deleteUser',
+  async (userId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.delete(`/admin/users/${userId}`);
+
+      return response.data;
+    } catch (error) {
+      toast.error('Failed to delete user');
+      return rejectWithValue(error.response?.data);
+    }
+
+  });
+
+
+
 export const fetchRidesStatusData = createAsyncThunk(
   'dashboard/fetchRidesStatus',
   async (_, { rejectWithValue }) => {
@@ -270,6 +303,8 @@ const dashboardSlice = createSlice({
       })
       .addCase(fetchUsersData.fulfilled, (state, action) => {
         state.loading = false;
+        console.log("usersData", action.payload.data);
+
         state.usersData = action.payload.data;
       }
       )
@@ -278,6 +313,30 @@ const dashboardSlice = createSlice({
         state.error = action.payload?.message || 'Failed to fetch users data';
       }
       )
+      .addCase(updateUserData.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(updateUserData.fulfilled, (state, action) => {
+        state.loading = false;
+
+        toast.success('User data updated successfully');
+      })
+      .addCase(updateUserData.rejected, (state, action) => {
+        state.loading = false;
+
+        state.error = action.payload?.message || 'Failed to update user data';
+      })
+      .addCase(deleteUser.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(deleteUser.fulfilled, (state, action) => {
+        state.loading = false;
+        toast.success('User deleted successfully');
+      })
+      .addCase(deleteUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to delete user';
+      })
       .addCase(fetchRidesStatusData.pending, (state) => {
         state.loading = true;
       })

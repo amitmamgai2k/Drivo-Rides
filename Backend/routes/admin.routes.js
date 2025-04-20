@@ -12,11 +12,11 @@ router.get('/dashboard/recentRides',authAdmin, adminController.getRecentRides);
 router.get('/dashboard/recentRides/:rideId',authAdmin, adminController.getRideDataWithID);
 router.get('/dashboard/captains/:id?',authAdmin, adminController.getCaptainsData);
 router.get('/dashboard/users',authAdmin, adminController.getUsersData);
+router.get('/users/:id', authAdmin, adminController.updateUserData);
+router.delete('/users/:id', authAdmin, adminController.deleteUser);
 router.post('/captains/:id', authAdmin, adminController.updateCaptainData);
 router.delete('/captains/:id', authAdmin, adminController.deleteCaptain);
 router.get('/dashboard/ridesStatus', authAdmin, adminController.getRidesStatus);
-
-
 
 module.exports = router;
 
