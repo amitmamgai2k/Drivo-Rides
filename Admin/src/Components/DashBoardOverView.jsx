@@ -22,13 +22,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { useEffect } from "react";
 import { Car, DollarSign, Users, Clock } from "lucide-react";
 
-export default function DashboardOverview({ monthlyData, weeklyRides }) {
+export default function DashboardOverview({ monthlyData, weeklyRides,setSidebarOpen }) {
   const dispatch = useDispatch();
   const { metricsData, loading, error } = useSelector((state) => state.dashboard);
   const { ridesStatusDatas = [] } = useSelector((state) => state?.dashboard || {});
 
   useEffect(() => {
     dispatch(fetchMetricsData());
+    setSidebarOpen(false);
   }, [dispatch]);
 
   useEffect(() => {

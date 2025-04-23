@@ -37,7 +37,7 @@ const verifyPayment = async (req, res) => {
     const payment = paymentDetails[0];
     console.log("Extracted Payment Data:", payment);
 
-    const ride = await Ride.findById(rideId).populate('user').populate('captain');
+    const ride = await Ride.findById(rideId).populate('user').populate('captain').populate('payment');
     if (!ride) {
       return res.status(404).json({ error: "Ride not found." });
     }
@@ -57,12 +57,7 @@ const verifyPayment = async (req, res) => {
       }
     }
 
-    ride.orderID = orderId;
-    ride.status = "completed";
-    ride.paymentMethod = paymentMethod;
-    ride.paymentID = payment.cf_payment_id;
 
-    await ride.save();
 
 
     const newPayment = new Payment({
@@ -82,13 +77,20 @@ const verifyPayment = async (req, res) => {
     });
 
     await newPayment.save();
+    ride.orderID = orderId;
+    ride.status = "completed";
+    ride.paymentMethod = paymentMethod;
+    ride.paymentID = payment.cf_payment_id;
+    ride.payment = newPayment?._id;
+    await ride.save();
+
     const captain = await captainModel.findById(ride.captain);
     captain.todayHoursWorked += ride.duration;
     captain.todayEarnings += ride.price;
     captain.todayDistanceTravelled += ride.distance;
     captain.todayRidesDone+=1;
-    captain.hoursWorkedoursWorked += ride.duration;
-    captain.TotalEarningsEarnings += ride.price;
+    captain.hoursWorked += ride.duration;
+    captain.TotalEarnings += ride.price;
     captain.distanceTravelled += ride.distance;
     captain.RideDone+=1;
 
@@ -101,6 +103,7 @@ user.distanceTravelled+=ride.distance;
 user.RideDone+=1;
 user.TotalExepense+=ride.price;
 await user.save();
+
 
     sendMessageToSocketId(ride.user.socketId, { event: "payment-success" , data: newPayment});
     sendMessageToSocketId(ride.captain.socketId, { event: "payment-success" , data: newPayment});

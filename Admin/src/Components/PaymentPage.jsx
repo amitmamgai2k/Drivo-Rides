@@ -1,5 +1,6 @@
-import React from "react";
-export default function PaymentsPage() {
+import React, { useEffect } from "react";
+export default function PaymentsPage({ setSidebarOpen }) {
+
   return (
     <div className="mt-4 text-gray-100">
       <h2 className="text-xl font-semibold mb-4">Payments & Payouts</h2>

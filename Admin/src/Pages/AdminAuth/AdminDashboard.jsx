@@ -49,6 +49,7 @@ export default function AdminDashboard() {
       case "Dashboard":
         return (
           <DashboardOverview
+            setSidebarOpen={setSidebarOpen}
             metricsData={metricsData}
             monthlyData={monthlyData}
             rideStatusData={rideStatusData}
@@ -64,7 +65,7 @@ export default function AdminDashboard() {
       case "Support":
         return <SupportTickets supportTickets={supportTickets} />;
       case "Payments":
-        return <PaymentsPage />;
+        return <PaymentsPage  setSidebarOpen={setSidebarOpen}/>;
       case "Reports":
         return <ReportsPage />;
       case "Settings":

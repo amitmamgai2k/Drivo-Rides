@@ -231,12 +231,16 @@ async function totalPendingRides() {
           const ride = await rideModel.findById(rideId)
             .populate("user")
             .populate("captain")
+            .populate("payment")
             .exec();
 
           if (!ride) {
             return res.status(404).json({ message: "Ride not found" });
           }
+          console.log('ride',ride);
+
           res.status(200).json({ data: ride });
+
 
         } catch (error) {
           console.error("Error fetching ride data:", error.message);
