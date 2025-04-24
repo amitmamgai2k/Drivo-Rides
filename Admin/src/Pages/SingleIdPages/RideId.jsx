@@ -1,6 +1,6 @@
 import React from 'react';
 import { useLocation } from 'react-router-dom';
-import { Clock, MapPin, CreditCard, User, Calendar, IndianRupee , CheckCircle, AlertCircle, Star, Car, Phone, Mail } from 'lucide-react';
+import { Clock, MapPin, CreditCard, User, Calendar, IndianRupee, CheckCircle, AlertCircle, Star, Car, Phone, Mail, ChevronsRight, Landmark } from 'lucide-react';
 import { fetchRideDataWithID } from '../../Redux/Slices/AdminDashBoardData';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect } from 'react';
@@ -40,6 +40,13 @@ function RideId() {
       hour: '2-digit',
       minute: '2-digit'
     });
+  };
+
+  // Format complete date with time
+  const formatDateTime = (dateString) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleString();
   };
 
   // Get status color
@@ -120,13 +127,18 @@ function RideId() {
             </div>
           </div>
 
-          {/* Payment section */}
+          {/* Payment section - UPDATED */}
           <div className="bg-gray-100 p-6 rounded-lg shadow-lg">
             <h2 className="text-xl font-semibold mb-4">Payment Details</h2>
 
             <div className="flex items-center mb-4">
-              <CreditCard size={30} className=" text-gray-500 mr-2 bg-green-200 p-2 rounded-lg" />
-              <span className="font-medium">{rideDataWithID.paymentMethod}</span>
+              <CreditCard size={30} className="text-gray-500 mr-2 bg-green-200 p-2 rounded-lg" />
+              <div>
+                <span className="font-medium capitalize">{rideDataWithID.payment ? rideDataWithID.payment.paymentMethod : rideDataWithID.paymentMethod}</span>
+                {rideDataWithID.payment && rideDataWithID.payment.upiId && (
+                  <div className="text-sm text-gray-500">{rideDataWithID.payment.upiId}</div>
+                )}
+              </div>
             </div>
 
             <div className="border-t border-gray-200 pt-4">
@@ -149,9 +161,64 @@ function RideId() {
 
               <div className="flex justify-between font-bold text-lg mt-4 pt-2 border-t border-gray-200">
                 <span>Total</span>
-                <span>₹{rideDataWithID.price}</span>
+                <span>₹{rideDataWithID.payment ? rideDataWithID.payment.amount : rideDataWithID.price}</span>
               </div>
             </div>
+
+            {/* Additional Payment Transaction Details */}
+            {rideDataWithID.payment && (
+              <div className="mt-6 border-t border-gray-200 pt-4">
+                <h3 className="text-lg font-medium mb-3">Transaction Information</h3>
+
+                <div className="space-y-3">
+                  <div className="flex items-center">
+                    <CheckCircle size={18} className="text-green-500 mr-2" />
+                    <span className="text-gray-700 mr-2">Status:</span>
+                    <span className="font-medium text-green-600">{rideDataWithID.payment.paymentStatus}</span>
+                  </div>
+
+                  <div className="flex items-center">
+                    <Clock size={18} className="text-blue-500 mr-2" />
+                    <span className="text-gray-700 mr-2">Payment Time:</span>
+                    <span className="font-medium">{formatDateTime(rideDataWithID.payment.paymentTime)}</span>
+                  </div>
+
+                  <div className="flex items-center">
+                    <ChevronsRight size={18} className="text-purple-500 mr-2" />
+                    <span className="text-gray-700 mr-2">Completion Time:</span>
+                    <span className="font-medium">{formatDateTime(rideDataWithID.payment.completionTime)}</span>
+                  </div>
+
+                  <div className="flex items-center">
+                    <Landmark size={18} className="text-indigo-500 mr-2" />
+                    <span className="text-gray-700 mr-2">Gateway:</span>
+                    <span className="font-medium">{rideDataWithID.payment.gatewayName}</span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2 mt-4">
+                    <div className="bg-white p-3 rounded shadow-sm">
+                      <div className="text-sm text-gray-600">Order ID</div>
+                      <div className="font-medium truncate">{rideDataWithID.payment.orderId}</div>
+                    </div>
+
+                    <div className="bg-white p-3 rounded shadow-sm">
+                      <div className="text-sm text-gray-600">Payment ID</div>
+                      <div className="font-medium truncate">{rideDataWithID.payment.paymentId}</div>
+                    </div>
+
+                    <div className="bg-white p-3 rounded shadow-sm">
+                      <div className="text-sm text-gray-600">Bank Reference</div>
+                      <div className="font-medium truncate">{rideDataWithID.payment.bankReference}</div>
+                    </div>
+
+                    <div className="bg-white p-3 rounded shadow-sm">
+                      <div className="text-sm text-gray-600">Transaction ID</div>
+                      <div className="font-medium truncate">{rideDataWithID.payment._id}</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -295,9 +362,6 @@ function RideId() {
           </div>
         </div>
       </div>
-
-
-
     </div>
   );
 }
