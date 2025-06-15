@@ -14,6 +14,7 @@ const initialState = {
   rideStatusDatas: [],
   monthlyData: [],
   weeklyData: [],
+  payments: [],
   loading: false,
   error: null
 };
@@ -232,6 +233,18 @@ export const fetchWeeklyRides = createAsyncThunk(
     }
   }
 );
+export const fetchPayments = createAsyncThunk(
+  'dashboard/fetchPayments',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get('/admin/dashboard/payments');
+      return response.data;
+    } catch (error) {
+      toast.error('Failed to load payments data');
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
 
 const dashboardSlice = createSlice({
   name: 'dashboard',
@@ -443,9 +456,21 @@ const dashboardSlice = createSlice({
       .addCase(fetchWeeklyRides.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch weekly data';
+      })
+      .addCase(fetchPayments.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchPayments.fulfilled, (state, action) => {
+        state.loading = false;
+        state.payments = action.payload.data;
+      })
+      .addCase(fetchPayments.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch payments data';
       });
   }
 });
+
 
 export const { resetDashboard, updateMetric } = dashboardSlice.actions;
 export default dashboardSlice.reducer;

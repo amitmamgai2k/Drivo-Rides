@@ -22,7 +22,7 @@ export default function Sidebar({ sidebarOpen, setSidebarOpen, activeTab, setAct
           className="fixed top-0 left-0 h-full w-64 bg-[#1a1a1a] text-gray-100 flex flex-col border-r  z-20 transition-all duration-300 ease-in-out"
         >
           <div className="flex items-center justify-between px-4 py-3 ">
-            <h1 className="text-xl font-bold text-neon-green">Neon Admin</h1>
+            <h1 className="text-xl font-bold text-neon-green">Admin Dashboard</h1>
             <button
               onClick={() => setSidebarOpen(false)}
               className="hover:bg-[#2a2a2a] p-1 rounded text-neon-green"

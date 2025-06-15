@@ -21,6 +21,7 @@ router.get('/dashboard/supportTickets', authAdmin, adminController.getSupportTic
 router.post('/dashboard/supportTickets/:ticketId/resolve', authAdmin, adminController.resolveSupportTicket);
 router.get('/dashboard/monthlyData', authAdmin, adminController.getMonthlyData);
 router.get('/dashboard/weeklyRides', authAdmin, adminController.getWeeklyRides);
+router.get('/dashboard/payments', authAdmin, adminController.getPaymentsData);
 
 module.exports = router;
 

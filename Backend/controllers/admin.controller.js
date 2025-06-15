@@ -6,6 +6,7 @@ const rideModel = require('../models/ride.model');
 const captainModel = require('../models/captain.model');
 const  userModel = require('../models/user.model');
 const supportModel = require('../models/support.model');
+const PaymentModel = require('../models/payment.model');
 
 
 module.exports.addAdmin = async (req, res) => {
@@ -646,3 +647,85 @@ module.exports.getWeeklyRides = async (req, res) => {
   }
 };
 
+
+module.exports.getPaymentsData = async (req, res) => {
+  if (!req.admin) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    // Method 1: Using aggregation pipeline (Most efficient)
+    const payments = await PaymentModel.aggregate([
+      {
+        $lookup: {
+          from: "rides", // Make sure this matches your actual collection name
+          localField: "rideId",
+          foreignField: "_id",
+          as: "rideData"
+        }
+      },
+      {
+        $unwind: {
+          path: "$rideData",
+          preserveNullAndEmptyArrays: false // This excludes payments without rides
+        }
+      },
+      {
+        $match: {
+          "rideData.status": "completed" // Only completed rides
+        }
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "userId",
+          foreignField: "_id",
+          as: "userData"
+        }
+      },
+      {
+        $lookup: {
+          from: "captains",
+          localField: "captainId",
+          foreignField: "_id",
+          as: "captainData"
+        }
+      },
+      {
+        $unwind: { path: "$userData", preserveNullAndEmptyArrays: true }
+      },
+      {
+        $unwind: { path: "$captainData", preserveNullAndEmptyArrays: true }
+      },
+      {
+        $sort: { createdAt: -1 }
+      }
+    ]);
+
+    const formattedPayments = payments.map(payment => ({
+      orderId: payment.orderId,
+      paymentId: payment.paymentId,
+      ride: payment.rideData ? `${payment.rideData.originText} to ${payment.rideData.destinationText}` : "N/A",
+      user: payment.userData ? `${payment.userData.fullname.firstname} ${payment.userData.fullname.lastname || ""}` : "N/A",
+      captain: payment.captainData ? `${payment.captainData.fullname.firstname} ${payment.captainData.fullname.lastname || ""}` : "N/A",
+      amount: payment.amount,
+      paymentMethod: payment.paymentMethod,
+      upiId: payment.upiId || "N/A",
+      status: payment.paymentStatus,
+      bankReference: payment.bankReference || "N/A",
+      gatewayName: payment.gatewayName || "N/A",
+      paymentTime: payment.paymentTime.toISOString(),
+      completionTime: payment.completionTime ? payment.completionTime.toISOString() : "Pending"
+    }));
+
+    res.status(200).json({
+      success: true,
+      count: formattedPayments.length,
+      data: formattedPayments
+    });
+
+  } catch (error) {
+    console.error("Error fetching payments data:", error.message);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
