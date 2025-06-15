@@ -152,12 +152,7 @@ function RideId() {
                 <span className="font-medium">₹{(rideDataWithID.price * 0.2).toFixed(2)}</span>
               </div>
 
-              {rideDataWithID.user && rideDataWithID.user.couponCode && (
-                <div className="flex justify-between mb-2 text-green-600">
-                  <span>Discount (Code: {rideDataWithID.user.couponCode})</span>
-                  <span>-₹{(rideDataWithID.price * 0.1).toFixed(2)}</span>
-                </div>
-              )}
+
 
               <div className="flex justify-between font-bold text-lg mt-4 pt-2 border-t border-gray-200">
                 <span>Total</span>

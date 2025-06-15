@@ -183,7 +183,31 @@ export const fetchRidesStatusData = createAsyncThunk(
     }
   }
 );
-
+export const fetchSupportTickets = createAsyncThunk(
+  'dashboard/fetchSupportTickets',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get('/admin/dashboard/supportTickets');
+      console.log("SupportTicketsData", response.data);
+      return response.data;
+    } catch (error) {
+      toast.error('Failed to load support tickets data');
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+export const resolveTicket = createAsyncThunk(
+  'admin/resolveTicket',
+  async (ticketId, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.post(`/admin/dashboard/supportTickets/${ticketId}/resolve`);
+      return response.data;
+    } catch (error) {
+      toast.error('Failed to resolve support ticket');
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
 
 const dashboardSlice = createSlice({
   name: 'dashboard',
@@ -349,7 +373,30 @@ const dashboardSlice = createSlice({
         state.loading = false;
         state.error = action.payload?.message || 'Failed to fetch rides status data';
       }
-      );
+      )
+      .addCase(fetchSupportTickets.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchSupportTickets.fulfilled, (state, action) => {
+        state.loading = false;
+        console.log("SupportTicketsData", action.payload.data);
+        state.supportTicketsData = action.payload.data;
+      })
+      .addCase(fetchSupportTickets.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch support tickets data';
+      })
+      .addCase(resolveTicket.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(resolveTicket.fulfilled, (state, action) => {
+        state.loading = false;
+        toast.success('Support ticket resolved successfully');
+      })
+      .addCase(resolveTicket.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to resolve support ticket';
+      });
   }
 });
 

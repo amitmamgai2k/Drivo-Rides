@@ -16,7 +16,11 @@ const messageSchema = new mongoose.Schema({
   mobileNumber: {
     type: Number,
     required: true,
-  }
+  },
+  resolved: {
+    type: Boolean,
+    default: false,
+  },
 
 }, { timestamps: true });
 

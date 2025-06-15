@@ -45,22 +45,13 @@ export default function RidesTable({ setSidebarOpen }) {
     );
   };
 
-  // Handle various actions
+
   const handleViewDetails = (rideId) => {
     dispatch(fetchRideDataWithID(rideId));
      navigate(`/admin-dashboard/rides/${rideId}`, { state: { rideId  } });
 
   };
 
-  const handleEditRide = (rideId) => {
-    console.log("Edit ride:", rideId);
-    // Implement edit functionality
-  };
-
-  const handleShowOnMap = (rideId) => {
-    console.log("Show ride on map:", rideId);
-    // Implement map view functionality
-  };
 
   // Show loading state with a subtle animation
   if (loading) {
@@ -127,7 +118,7 @@ export default function RidesTable({ setSidebarOpen }) {
                 <th className="px-6 py-4 text-left">Route</th>
                 <th className="px-6 py-4 text-left">Amount</th>
                 <th className="px-6 py-4 text-left">Status</th>
-                <th className="px-6 py-4 text-left">Actions</th>
+                <th className="px-6 py-4 text-left">View </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-800 text-sm">
@@ -151,7 +142,7 @@ export default function RidesTable({ setSidebarOpen }) {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap font-medium">₹{ride.amount}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <StatusBadge status={ride.status} />
+                      <StatusBadge status={ride.status}  />
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex space-x-2">
@@ -164,31 +155,8 @@ export default function RidesTable({ setSidebarOpen }) {
                          <Eye size={30} className=" text-gray-500 mr-2 bg-green-200 hover:bg-green-300 p-2 rounded-lg"/>
                         </button>
 
-                        {/* Edit button */}
-                        <button
-                          onClick={() => handleEditRide(ride.id)}
-                          className="p-1 text-gray-400 hover:text-white transition-colors"
-                          title="Edit Ride"
-                        >
-                         <Pencil size={30} className=" text-gray-500 mr-2 bg-violet-200 hover:bg-violet-300 p-2 rounded-lg" />
-                        </button>
 
-                        {/* Map view button */}
-                        <button
-                          onClick={() => handleShowOnMap(ride.id)}
-                          className="p-1 text-gray-400 hover:text-white transition-colors"
-                          title="View on Map"
-                        >
-                          <MapPin size={30} className=" text-gray-500 mr-2 bg-yellow-200 hover:bg-yellow-300 p-2 rounded-lg" />
-                        </button>
 
-                        {/* Context menu (options) button */}
-                        <button
-                          className="p-1 text-gray-400 hover:text-white transition-colors"
-                          title="More Options"
-                        >
-                          <MoreHorizontal size={30} className=" text-gray-500 mr-2 bg-blue-200 hover:bg-blue-300 p-2 rounded-lg" />
-                        </button>
                       </div>
                     </td>
                   </tr>

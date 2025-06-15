@@ -5,6 +5,7 @@ const jwt = require('jsonwebtoken');
 const rideModel = require('../models/ride.model');
 const captainModel = require('../models/captain.model');
 const  userModel = require('../models/user.model');
+const supportModel = require('../models/support.model');
 
 
 module.exports.addAdmin = async (req, res) => {
@@ -453,5 +454,51 @@ async function totalPendingRides() {
           res.status(500).json({ message: "Server Error", error: error.message });
         }
       };
+module.exports.getSupportTickets = async (req, res) => {
+    if (!req.admin) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    try {
+        const supportTickets = await supportModel.find().exec();
+        const formattedTickets = supportTickets.map(ticket => ({
+            id: ticket._id,
+            name: ticket.name,
+            email: ticket.email,
+            message: ticket.message,
+            mobileNumber: ticket.mobileNumber,
+            resolved: ticket.resolved,
+            createdAt: ticket.createdAt.toISOString().split('T')[0],
+            createdTime: ticket.createdAt.toISOString().split('T')[1].split('.')[0]
+        }));
+
+        res.status(200).json({ data: formattedTickets });
+    } catch (error) {
+        console.error("Error fetching support tickets:", error.message);
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+}
+module.exports.resolveSupportTicket = async (req, res) => {
+    if (!req.admin) {
+        return res.status(401).json({ message: "Unauthorized" });
+    }
+
+    const { ticketId } = req.params;
+
+    try {
+        const ticket = await supportModel.findById(ticketId);
+        if (!ticket) {
+            return res.status(404).json({ message: "Ticket not found" });
+        }
+
+        ticket.resolved = true;
+        await ticket.save();
+
+        res.status(200).json({ message: "Ticket resolved successfully" });
+    } catch (error) {
+        console.error("Error resolving support ticket:", error.message);
+        res.status(500).json({ message: "Server Error", error: error.message });
+    }
+}
 
 

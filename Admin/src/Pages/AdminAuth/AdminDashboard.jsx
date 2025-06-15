@@ -63,7 +63,7 @@ export default function AdminDashboard() {
       case "Users":
         return <UsersTable userData={userData} setSidebarOpen={setSidebarOpen} />;
       case "Support":
-        return <SupportTickets supportTickets={supportTickets} />;
+        return <SupportTickets supportTickets={supportTickets} setSidebarOpen={setSidebarOpen} />;
       case "Payments":
         return <PaymentsPage  setSidebarOpen={setSidebarOpen}/>;
       case "Reports":

@@ -17,6 +17,9 @@ router.delete('/users/:id', authAdmin, adminController.deleteUser);
 router.post('/captains/:id', authAdmin, adminController.updateCaptainData);
 router.delete('/captains/:id', authAdmin, adminController.deleteCaptain);
 router.get('/dashboard/ridesStatus', authAdmin, adminController.getRidesStatus);
+router.get('/dashboard/supportTickets', authAdmin, adminController.getSupportTickets);
+router.post('/dashboard/supportTickets/:ticketId/resolve', authAdmin, adminController.resolveSupportTicket);
+
 
 module.exports = router;
 
