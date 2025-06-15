@@ -19,7 +19,8 @@ router.delete('/captains/:id', authAdmin, adminController.deleteCaptain);
 router.get('/dashboard/ridesStatus', authAdmin, adminController.getRidesStatus);
 router.get('/dashboard/supportTickets', authAdmin, adminController.getSupportTickets);
 router.post('/dashboard/supportTickets/:ticketId/resolve', authAdmin, adminController.resolveSupportTicket);
-
+router.get('/dashboard/monthlyData', authAdmin, adminController.getMonthlyData);
+router.get('/dashboard/weeklyRides', authAdmin, adminController.getWeeklyRides);
 
 module.exports = router;
 

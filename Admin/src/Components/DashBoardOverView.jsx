@@ -1,6 +1,5 @@
-// File: components/DashboardOverview.js
-import React from "react";
-import { MapPin } from "lucide-react";
+import {useEffect} from "react";
+import { Award, CalendarDays, CheckCircle, Clock1, MapPin, Star, XCircle } from "lucide-react";
 import { motion } from "framer-motion";
 import {
   BarChart,
@@ -19,13 +18,18 @@ import {
 } from "recharts";
 import { fetchMetricsData, fetchRidesStatusData } from "../Redux/Slices/AdminDashBoardData";
 import { useDispatch, useSelector } from "react-redux";
-import { useEffect } from "react";
+
+import { fetchmonthlyData,fetchWeeklyRides } from "../Redux/Slices/AdminDashBoardData";
+
 import { Car, DollarSign, Users, Clock } from "lucide-react";
 
-export default function DashboardOverview({ monthlyData, weeklyRides,setSidebarOpen }) {
+export default function DashboardOverview({ setSidebarOpen }) {
   const dispatch = useDispatch();
   const { metricsData, loading, error } = useSelector((state) => state.dashboard);
   const { ridesStatusDatas = [] } = useSelector((state) => state?.dashboard || {});
+  const { monthlyData = [] } = useSelector((state) => state?.dashboard || {});
+  const { weeklyData = []  } = useSelector((state) => state?.dashboard || {});
+
 
   useEffect(() => {
     dispatch(fetchMetricsData());
@@ -34,7 +38,11 @@ export default function DashboardOverview({ monthlyData, weeklyRides,setSidebarO
 
   useEffect(() => {
     dispatch(fetchRidesStatusData());
+    dispatch(fetchmonthlyData());
+    dispatch(fetchWeeklyRides());
   }, [dispatch]);
+console.log('weeklyRides', weeklyData);
+
 
   if (loading) {
     return <div className="text-gray-100">Loading...</div>;
@@ -141,10 +149,7 @@ export default function DashboardOverview({ monthlyData, weeklyRides,setSidebarO
         <div className="bg-[#1a1a1a] rounded-lg shadow-neon p-6 xl:col-span-1 border border-neon-green/20">
           <div className="flex justify-between items-center mb-4">
             <h3 className="text-lg font-semibold text-neon-green">Monthly Rides & Earnings</h3>
-            <select className="bg-[#2a2a2a] border border-neon-green/20 rounded px-2 py-1 text-sm text-neon-green">
-              <option>Last 8 months</option>
-              <option>Last 12 months</option>
-            </select>
+
           </div>
           <div className="w-full" style={{ height: "300px" }}>
             <ResponsiveContainer width="100%" height={300}>
@@ -214,7 +219,7 @@ export default function DashboardOverview({ monthlyData, weeklyRides,setSidebarO
           <div className="w-full" style={{ height: "300px" }}>
             <ResponsiveContainer width="100%" height={300}>
               <AreaChart
-                data={weeklyRides}
+                data={weeklyData}
                 margin={{ top: 10, right: 10, left: 0, bottom: 10 }}
               >
                 <defs>
@@ -233,11 +238,79 @@ export default function DashboardOverview({ monthlyData, weeklyRides,setSidebarO
           </div>
         </div>
 
-        <div className="bg-[#1a1a1a] rounded-lg shadow-neon p-6 flex flex-col items-center justify-center border border-neon-green/20">
-          <MapPin size={40} className="text-neon-green" />
-          <p className="text-gray-400 mt-4">Live map view would appear here</p>
-          <p className="text-sm text-gray-500">24 captains currently active</p>
-        </div>
+   <div className="bg-[#1a1a1a] rounded-lg shadow-neon p-6 border border-neon-green/20">
+  <h3 className="text-lg font-semibold text-neon-green mb-4">Quick Stats</h3>
+
+  <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 text-sm">
+    {/* Total Distance */}
+    <div className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-lg border border-violet-500/10 hover:border-violet-500/30 transition-colors">
+      <div className="p-2 bg-violet-500/10 rounded">
+        <MapPin className="text-violet-400" size={20} />
+      </div>
+      <div>
+        <p className="text-gray-300 font-medium">Total Distance</p>
+        <p className="text-lg font-semibold text-violet-400">{metricsData.totalDistance} km</p>
+      </div>
+    </div>
+
+    {/* Total Time */}
+    <div className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-lg border border-pink-500/10 hover:border-neon-green/30 transition-colors">
+      <div className="p-2 bg-red-500/10 rounded">
+        <Clock1 className="text-pink-400" size={20} />
+      </div>
+      <div>
+        <p className="text-gray-300 font-medium">Total Time</p>
+        <p className="text-lg font-semibold text-pink-400">{metricsData.totalTime} hrs</p>
+      </div>
+    </div>
+
+    {/* Ongoing Rides */}
+    <div className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-lg border border-blue-500/10 hover:border-blue-500/30 transition-colors">
+      <div className="p-2 bg-blue-500/10 rounded">
+        <Car className="text-blue-400" size={20} />
+      </div>
+      <div>
+        <p className="text-gray-300 font-medium">Ongoing Rides</p>
+        <p className="text-lg font-semibold text-blue-400">{metricsData.ongoingRides || 0}</p>
+      </div>
+    </div>
+
+    {/* Accepted Rides */}
+    <div className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-lg border border-green-500/10 hover:border-green-500/30 transition-colors">
+      <div className="p-2 bg-green-500/10 rounded">
+        <CheckCircle className="text-green-400" size={20} />
+      </div>
+      <div>
+        <p className="text-gray-300 font-medium">Accepted Rides</p>
+        <p className="text-lg font-semibold text-green-400">{metricsData.acceptedRides || 0}</p>
+      </div>
+    </div>
+
+    {/* Pending Rides */}
+    <div className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-lg border border-yellow-500/10 hover:border-yellow-500/30 transition-colors">
+      <div className="p-2 bg-yellow-500/10 rounded">
+        <Clock className="text-yellow-400" size={20} />
+      </div>
+      <div>
+        <p className="text-gray-300 font-medium">Pending Rides</p>
+        <p className="text-lg font-semibold text-yellow-400">{metricsData.pendingRides || 0}</p>
+      </div>
+    </div>
+
+    {/* Cancelled Rides */}
+    <div className="flex items-center gap-3 p-3 bg-gray-800/30 rounded-lg border border-red-500/10 hover:border-red-500/30 transition-colors">
+      <div className="p-2 bg-red-500/10 rounded">
+        <XCircle className="text-red-400" size={20} />
+      </div>
+      <div>
+        <p className="text-gray-300 font-medium">Cancelled Rides</p>
+        <p className="text-lg font-semibold text-red-400">{metricsData.cancelledRides || 0}</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+
       </div>
     </div>
   );

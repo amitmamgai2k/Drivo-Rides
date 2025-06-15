@@ -74,10 +74,22 @@ async function totalCompletedRides() {
       return 0;
     }
   }
-  async function totalOngoingRides() {
+async function totalOngoingRides() {
     try {
       const rides = await rideModel.find({ status: "ongoing" });
+      console.log('ongoing rides count:', rides.length);
       return rides.length;
+    } catch (error) {
+      console.error('Error fetching ongoing rides:', error);
+      return 0;
+    }
+  }
+async function totalTimeTaken() {
+    try {
+      const rides = await rideModel.find({ status: "completed" });
+      const totalTime = rides.reduce((acc, ride) => acc + ride.duration, 0);
+      console.log('total time:', totalTime);
+      return totalTime;
     } catch (error) {
       console.error('Error fetching ongoing rides:', error);
       return 0;
@@ -151,7 +163,17 @@ async function totalPendingRides() {
 
         }
     }
-
+async function totalDistanceCovered() {
+    try {
+        const rides = await rideModel.find({ status: "completed" });
+        const totalDistance = rides.reduce((acc, ride) => acc + ride.distance, 0);
+        console.log('total distance:', totalDistance);
+        return totalDistance;
+    } catch (error) {
+        console.error('Error fetching total distance:', error);
+        return 0;
+    }
+}
 
     module.exports.getMetricsData = async (req, res) => {
 
@@ -165,12 +187,24 @@ async function totalPendingRides() {
           const totalEarnings = await totalEarning();
           const activeCaptains = await totalActiveCaptains();
           const activeRiders = await totalActiveRiders();
+          const totalDistance = await totalDistanceCovered();
+          const ongoingRides = await totalOngoingRides();
+          const cancelledRides = await totalCancelledRides();
+          const pendingRides = await totalPendingRides();
+          const acceptedRides = await totalAcceptedRides();
+          const totalTime = await totalTimeTaken();
 
           const metricsData = {
             totalRides,
             totalEarnings,
             activeCaptains,
             activeRiders,
+            totalDistance,
+            ongoingRides,
+            cancelledRides,
+            pendingRides,
+            acceptedRides,
+            totalTime
           };
 
           res.status(200).json({ data: metricsData });
@@ -491,7 +525,9 @@ module.exports.resolveSupportTicket = async (req, res) => {
             return res.status(404).json({ message: "Ticket not found" });
         }
 
+
         ticket.resolved = true;
+
         await ticket.save();
 
         res.status(200).json({ message: "Ticket resolved successfully" });
@@ -501,4 +537,112 @@ module.exports.resolveSupportTicket = async (req, res) => {
     }
 }
 
+
+const monthMap = {
+  1: "Jan", 2: "Feb", 3: "Mar", 4: "Apr",
+  5: "May", 6: "Jun", 7: "Jul", 8: "Aug",
+  9: "Sep", 10: "Oct", 11: "Nov", 12: "Dec"
+};
+
+module.exports.getMonthlyData = async (req, res) => {
+  if (!req.admin) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const rawData = await rideModel.aggregate([
+      {
+        $group: {
+          _id: { $month: "$createdAt" },
+          totalRides: { $sum: 1 },
+          completedRides: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "completed"] }, 1, 0],
+            },
+          },
+          earnings: {
+            $sum: {
+              $cond: [{ $eq: ["$status", "completed"] }, "$price", 0],
+            },
+          },
+        },
+      },
+      { $sort: { "_id": 1 } }
+    ]);
+
+    // Step 1: Pre-fill all months
+    const monthlyData = Array.from({ length: 12 }, (_, i) => ({
+      month: monthMap[i + 1],
+      totalRides: 0,
+      completedRides: 0,
+      earnings: 0,
+    }));
+
+    // Step 2: Overwrite with real data
+    rawData.forEach(item => {
+      const index = item._id - 1; // Month number is 1-based
+      monthlyData[index] = {
+        month: monthMap[item._id],
+        totalRides: item.totalRides,
+        completedRides: item.completedRides,
+        earnings: item.earnings,
+      };
+    });
+
+    res.status(200).json({ success: true, data: monthlyData });
+  } catch (error) {
+    console.error("Error fetching monthly data:", error.message);
+    res.status(500).json({ message: "Server Error", error: error.message });
+  }
+};
+const dayMap = {
+  1: "Mon",
+  2: "Tue",
+  3: "Wed",
+  4: "Thu",
+  5: "Fri",
+  6: "Sat",
+  0: "Sun"
+};
+
+module.exports.getWeeklyRides = async (req, res) => {
+  if (!req.admin) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  try {
+    const data = await rideModel.aggregate([
+      {
+        $group: {
+          _id: { $dayOfWeek: "$createdAt" },
+          rides: { $sum: 1 },
+        },
+      }
+    ]);
+
+
+    const weeklyData = [
+      { day: "Mon", rides: 0 },
+      { day: "Tue", rides: 0 },
+      { day: "Wed", rides: 0 },
+      { day: "Thu", rides: 0 },
+      { day: "Fri", rides: 0 },
+      { day: "Sat", rides: 0 },
+      { day: "Sun", rides: 0 },
+    ];
+
+
+    data.forEach(item => {
+      const dayIndex = item._id === 1 ? 6 : item._id - 2;
+      weeklyData[dayIndex].rides = item.rides;
+    });
+
+    console.log('weeklyData', weeklyData);
+
+    res.status(200).json({ success: true, data: weeklyData });
+  } catch (err) {
+    console.error("Error fetching weekly rides:", err);
+    res.status(500).json({ message: "Server Error", error: err.message });
+  }
+};
 

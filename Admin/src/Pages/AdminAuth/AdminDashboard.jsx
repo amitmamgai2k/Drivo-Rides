@@ -19,14 +19,16 @@ import {
   LifeBuoy,
   Settings,
 } from "lucide-react";
+
+
 import {
-  metricsData,
+
   monthlyData,
-  rideStatusData,
+
   weeklyRides,
-  captainsData,
-  userData,
-  supportTickets,
+
+
+
 } from "../../Helpers/mockData";
 
 export default function AdminDashboard() {
@@ -50,9 +52,9 @@ export default function AdminDashboard() {
         return (
           <DashboardOverview
             setSidebarOpen={setSidebarOpen}
-            metricsData={metricsData}
+
             monthlyData={monthlyData}
-            rideStatusData={rideStatusData}
+
             weeklyRides={weeklyRides}
           />
         );
@@ -61,9 +63,9 @@ export default function AdminDashboard() {
       case "Captains":
         return <CaptainsTable setSidebarOpen={setSidebarOpen} />;
       case "Users":
-        return <UsersTable userData={userData} setSidebarOpen={setSidebarOpen} />;
+        return <UsersTable setSidebarOpen={setSidebarOpen} />;
       case "Support":
-        return <SupportTickets supportTickets={supportTickets} setSidebarOpen={setSidebarOpen} />;
+        return <SupportTickets setSidebarOpen={setSidebarOpen} />;
       case "Payments":
         return <PaymentsPage  setSidebarOpen={setSidebarOpen}/>;
       case "Reports":

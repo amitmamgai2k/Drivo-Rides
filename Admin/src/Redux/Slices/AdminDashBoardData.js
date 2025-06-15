@@ -13,7 +13,7 @@ const initialState = {
   totalBookings: 0,
   rideStatusDatas: [],
   monthlyData: [],
-  weeklyRides: [],
+  weeklyData: [],
   loading: false,
   error: null
 };
@@ -208,6 +208,30 @@ export const resolveTicket = createAsyncThunk(
     }
   }
 );
+export const fetchmonthlyData = createAsyncThunk(
+  'dashboard/fetchMonthlyData',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get('/admin/dashboard/monthlyData');
+      return response.data;
+    } catch (error) {
+      toast.error('Failed to load monthly data');
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
+export const fetchWeeklyRides = createAsyncThunk(
+  'dashboard/fetchWeeklyRides',
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await axiosInstance.get('/admin/dashboard/weeklyRides');
+      return response.data;
+    } catch (error) {
+      toast.error('Failed to load weekly rides');
+      return rejectWithValue(error.response?.data);
+    }
+  }
+);
 
 const dashboardSlice = createSlice({
   name: 'dashboard',
@@ -396,6 +420,29 @@ const dashboardSlice = createSlice({
       .addCase(resolveTicket.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || 'Failed to resolve support ticket';
+      })
+      .addCase(fetchmonthlyData.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchmonthlyData.fulfilled, (state, action) => {
+        state.loading = false;
+        state.monthlyData = action.payload.data;
+      })
+      .addCase(fetchmonthlyData.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch monthly data';
+      })
+      .addCase(fetchWeeklyRides.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchWeeklyRides.fulfilled, (state, action) => {
+        state.loading = false;
+
+        state.weeklyData = action.payload.data;
+      })
+      .addCase(fetchWeeklyRides.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || 'Failed to fetch weekly data';
       });
   }
 });
