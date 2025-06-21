@@ -1,8 +1,7 @@
-import React, { useState, useEffect, useContext  } from 'react';
-import { ChevronDown, Circle, MapPin, Menu,LocateFixed } from 'lucide-react';
+import React, { useState, useEffect, useContext } from 'react';
+import { ChevronDown, Circle, MapPin, Menu, LocateFixed } from 'lucide-react';
 import LocationSearchPanel from '../components/LocationSearchPanel';
 import { useRef } from 'react';
-import gsap from "gsap";
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import logo from '../assets/logo.png';
@@ -35,18 +34,12 @@ const Home = () => {
   const [vehicleType, setVehicleType] = useState(null)
   const [ride, setRide] = useState(null)
 
-  const vehiclePanelRef = useRef(null);
-  const confirmRidePanelRef = useRef(null);
-  const vehiceleFoundRef = useRef(null);
-  const waitingForDriverRef = useRef(null);
   const { socket } = useContext(SocketContext)
   const { user } = useContext(UserDataContext)
 
   const navigate = useNavigate();
 
-
   useEffect(() => {
-
     socket.emit("join", {
       userId: user?.user?._id,  // Notice the double nesting
       userType: "user"
@@ -54,21 +47,21 @@ const Home = () => {
   }, [user]);
 
   socket.on('ride-confirmed', ride => {
-
     console.log("Ride confirmed at Home:", ride);
     setwaitingForDriver(true);
     setVehicleFound(false);
     setVehiclePanel(false);
     setRide(ride)
   });
+
   socket.on('ride-started', ride => {
     setwaitingForDriver(false)
     navigate('/riding', { state: { ride } }) // Updated navigate to include ride data
   })
+
   const handlePickupChange = async (e) => {
     setPickup(e.target.value);
     try {
-
       const response = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-suggestions`, {
         params: { address: e.target.value },
         headers: {
@@ -78,9 +71,6 @@ const Home = () => {
       });
 
       setPickupSuggestions(response.data.data || []);
-
-
-      // Extract the 'data' array
     } catch (error) {
       toast.error("Error fetching pickup suggestions:", error);
       console.error("Error fetching pickup suggestions:", error);
@@ -101,66 +91,11 @@ const Home = () => {
       console.error("Error fetching destination suggestions:", error);
     }
   };
+
   const handleFormSubmit = (e) => {
     e.preventDefault();
     console.log('Pickup:', pickup, 'Drop:', drop);
   };
-
-  useEffect(function () {
-    if (vehiclePanel) {
-      gsap.to(vehiclePanelRef.current, {
-        transform: 'translateY(0)'
-      })
-    } else {
-      gsap.to(vehiclePanelRef.current, {
-        transform: 'translateY(100%)'
-      })
-    }
-
-
-  }, [vehiclePanel])
-
-  useEffect(function () {
-    if (confirmRidePanel) {
-      gsap.to(confirmRidePanelRef.current, {
-        transform: 'translateY(0)'
-      })
-    } else {
-      gsap.to(confirmRidePanelRef.current, {
-        transform: 'translateY(100%)'
-      })
-    }
-
-
-  }, [confirmRidePanel])
-  useEffect(function () {
-    if (vehicleFound) {
-      gsap.to(vehiceleFoundRef.current, {
-        transform: 'translateY(0)'
-      })
-    } else {
-      gsap.to(vehiceleFoundRef.current, {
-        transform: 'translateY(100%)'
-      })
-    }
-
-
-  }, [vehicleFound])
-  useEffect(function () {
-    if (waitingForDriver) {
-      gsap.to(waitingForDriverRef.current, {
-        transform: 'translateY(0)'
-      })
-    } else {
-      gsap.to(waitingForDriverRef.current, {
-        transform: 'translateY(100%)'
-      })
-    }
-
-
-  }, [waitingForDriver])
-
-
 
   async function findTrip() {
     setLoading(true)
@@ -182,7 +117,8 @@ const Home = () => {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         }
       });
-      const pickupCoordinates = pickupGeocode.data; // Example: { latitude: ..., longitude: ... }
+
+      const pickupCoordinates = pickupGeocode.data;
       const dropCoordinates = dropGeocode.data;
       console.log("Pickup coordinates:", pickupCoordinates);
       console.log("Drop coordinates:", dropCoordinates);
@@ -194,51 +130,28 @@ const Home = () => {
           originLng: pickupGeocode.data.longitude,
           destinationLat: dropGeocode.data.latitude,
           destinationLng: dropGeocode.data.longitude
-
         },
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
       });
 
-     if(fareResponse.status === 200){
-      toast.success('Vehicle Found');
-      setfare(fareResponse.data);
-      setVehiclePanel(true);
-    }
-  }catch (error) {
-    toast.error('Failed to fetch fare');
+      if (fareResponse.status === 200) {
+        toast.success('Vehicle Found');
+        setfare(fareResponse.data);
+        setVehiclePanel(true);
+      }
+    } catch (error) {
+      toast.error('Failed to fetch fare');
       console.error("Error fetching fare:", error);
     } finally {
       setLoading(false)
     }
   }
+
   async function createRide() {
-
-
-
     try {
-      // First, get coordinates for pickup address
-      //   const pickupGeocode = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
-      //     params: { address: pickup },
-      //     headers: {
-      //         Authorization: `Bearer ${localStorage.getItem('token')}`,
-      //     }
-      // });
-
-      // // Then get coordinates for destination address
-      // const dropGeocode = await axios.get(`${import.meta.env.VITE_BASE_URL}/maps/get-coordinates`, {
-      //     params: { address: drop },
-      //     headers: {
-      //         Authorization: `Bearer ${localStorage.getItem('token')}`,
-      //     }
-      // });
-
-      // const origin = [pickupGeocode.data.longitude, pickupGeocode.data.latitude];
-      // const destination = [dropGeocode.data.longitude, dropGeocode.data.latitude];
-
       const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/create`, {
-
         origin: pickup,
         destination: drop,
         vehicleType,
@@ -247,42 +160,36 @@ const Home = () => {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         }
-
       })
       toast.success('Ride created successfully');
       console.log("Create Ride Debugger", response.data);
-
-
-
-
     } catch (error) {
       toast.error('Failed to create ride');
       console.error("Error creating ride:", error.response?.data || error.message);
     }
   }
-  async function CancleRide(){
+
+  async function CancleRide() {
     try {
-      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/ride-cancel`,{
-        rideId:ride._id
+      const response = await axios.post(`${import.meta.env.VITE_BASE_URL}/rides/ride-cancel`, {
+        rideId: ride._id
       }, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`,
         }
-
       });
-      if(response.status === 200){
+      if (response.status === 200) {
         toast.success('Ride cancelled successfully');
         setRide(null);
         setwaitingForDriver(false);
         navigate('/home');
       }
-
     } catch (error) {
       toast.error('Failed to cancel ride');
       console.error("Error cancelling ride:", error.response?.data || error.message);
-
     }
   }
+
   const toggleMenu = (state) => {
     setMenuOpen(state !== undefined ? state : !menuOpen); // Toggle menu state
   };
@@ -293,7 +200,7 @@ const Home = () => {
         const { latitude, longitude } = position.coords;
         console.log("Latitude:", latitude, "Longitude:", longitude);
         try {
-          const response  = axios.post(`${import.meta.env.VITE_BASE_URL}/maps/current-location`, {
+          const response = axios.post(`${import.meta.env.VITE_BASE_URL}/maps/current-location`, {
             latitude,
             longitude
           }, {
@@ -305,26 +212,19 @@ const Home = () => {
               toast.success('Location fetched successfully');
               setPickup(response.data.data);
               console.log("Current Location:", response.data);
-
             }
           })
-
-
         } catch (error) {
           toast.error('Failed to fetch location');
           console.error('Error during fetching location:', error);
-
-
         }
-
       });
-
-
     }
   }
+
   return (
-    <div className="relative h-screen w-screen  bg-gray-100 mb-18">
-      {/* UBER Text at top */}
+    <div className="relative h-screen w-screen bg-gray-100">
+      {/* Header with Logo and Menu */}
       <div
         className={`absolute top-5 left-1 right-3 z-10 transition-opacity duration-300 flex flex-row justify-between items-center ${panelOpen ? 'opacity-0' : 'opacity-100'
           }`}
@@ -334,19 +234,20 @@ const Home = () => {
 
         {/* Menu icon on the right */}
         <button className="text-3xl font-semibold p-2 bg-white rounded-lg opacity-60" onClick={() => toggleMenu()}>
-          <Menu size={35}  strokeWidth={2} />
+          <Menu size={35} strokeWidth={2} />
         </button>
       </div>
-      <DropdownMenu isOpen={menuOpen} toggleMenu={toggleMenu} />
-      {/* <MapBackGround panelOpen={panelOpen} setVehiclePanel={setVehiclePanel} /> */}
-      <MapBackGround
-  panelOpen={panelOpen}
-  setVehiclePanel={setVehiclePanel}
-  pickup={pickup}  // Pass the pickup coordinates
-  drop={drop}      // Pass the drop coordinates
-  vehiclePanel={vehiclePanel}  // Pass the panel state
-/>
 
+      <DropdownMenu isOpen={menuOpen} toggleMenu={toggleMenu} />
+
+      {/* Map Background */}
+      <MapBackGround
+        panelOpen={panelOpen}
+        setVehiclePanel={setVehiclePanel}
+        pickup={pickup}
+        drop={drop}
+        vehiclePanel={vehiclePanel}
+      />
 
       {/* Ride finder panel */}
       <div
@@ -359,7 +260,7 @@ const Home = () => {
             <h4 className="font-semibold text-2xl">Find a ride</h4>
             <button
               onClick={() => setPanelOpen(!panelOpen)}
-              className="   rounded-full transition-colors"
+              className="rounded-full transition-colors"
             >
               <ChevronDown
                 className={`transform transition-transform duration-300 ${panelOpen ? 'rotate-180' : ''
@@ -406,34 +307,33 @@ const Home = () => {
               />
             </div>
           </form>
-          <div
-  onClick={() => useCurrentLocation()}
-  className="bg-blue-500 hover:bg-blue-600 focus:ring-blue-300
-    text-white px-4 py-2 rounded-lg mt-3 w-full flex items-center justify-center gap-2
-    transition-colors duration-300 ease-in-out
-    hover:border-2 hover:border-white
-    focus:outline-none focus:ring-2 "
->
-  <LocateFixed size={20} />
-  <span>Use Current Location</span>
-</div>
 
+          <div
+            onClick={() => useCurrentLocation()}
+            className="bg-blue-500 hover:bg-blue-600 focus:ring-blue-300
+              text-white px-4 py-2 rounded-lg mt-3 w-full flex items-center justify-center gap-2
+              transition-colors duration-300 ease-in-out cursor-pointer
+              hover:border-2 hover:border-white
+              focus:outline-none focus:ring-2"
+          >
+            <LocateFixed size={20} />
+            <span>Use Current Location</span>
+          </div>
 
           <button
             onClick={findTrip}
             className="bg-blue-500 hover:bg-blue-600 focus:ring-blue-300
-  text-white px-4 py-2 rounded-lg mt-3 w-full
-    transition-colors duration-300 ease-in-out
-     hover:border-2 hover:border-white
-    focus:outline-none focus:ring-2 "
+              text-white px-4 py-2 rounded-lg mt-3 w-full
+              transition-colors duration-300 ease-in-out
+              hover:border-2 hover:border-white
+              focus:outline-none focus:ring-2"
           >
             Find Trip
           </button>
-
         </div>
+
         {loading && (
           <div className="flex justify-center items-center min-h-screen">
-
             <Oval
               height={40}
               width={40}
@@ -451,75 +351,119 @@ const Home = () => {
 
         {/* Expandable panel content */}
         <div className={`${panelOpen ? 'block' : 'hidden'} p-5`}>
-
           <LocationSearchPanel
             suggestions={activeField === 'pickup' ? pickupSuggestions : destinationSuggestions}
             setPickup={setPickup}
             setDrop={setDrop}
-
             setPanelOpen={setPanelOpen}
             setVehiclePanel={setVehiclePanel}
             activeField={activeField}
           />
-
-
         </div>
       </div>
-      <div ref={vehiclePanelRef} className=' fixed h-[60%] overflow-y-scroll w-full bottom-0 translate-y-full  bg-white px-3  z-50'>
 
-
-        <VehiclesAvailable vehicleType={vehicleType} setfare={setfare}  setVehicleType={setVehicleType} fare={fare} setVehiclePanel={setVehiclePanel} setConfirmRidePanel={setConfirmRidePanel} />
-
-      </div>
+      {/* Vehicle Panel Modal */}
       <div
-        ref={confirmRidePanelRef}
-        className={`fixed w-full bottom-0 ${confirmRidePanel ? 'translate-y-0' : 'translate-y-full'
-          } bg-white px-3 py-3 z-50`}
-        style={{ zIndex: 60 }} // Add this line
+        className={`fixed inset-0 z-50 transition-opacity duration-300 ${vehiclePanel ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
       >
-        <ConfirmedVehicle
-          createRide={createRide}
-          pickup={pickup}
-          drop={drop}
-          fare={fare}
-          vehicleType={vehicleType}
-
-          setConfirmRidePanel={setConfirmRidePanel}
-          setVehicleFound={setVehicleFound}
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black bg-opacity-50"
+          onClick={() => setVehiclePanel(false)}
         />
+
+        {/* Panel Content */}
+        <div className={`absolute bottom-0 left-0 right-0 transform transition-transform duration-300 ${vehiclePanel ? 'translate-y-0' : 'translate-y-full'
+          }`}>
+          <VehiclesAvailable
+            vehicleType={vehicleType}
+            setfare={setfare}
+            setVehicleType={setVehicleType}
+            fare={fare}
+            setVehiclePanel={setVehiclePanel}
+            setConfirmRidePanel={setConfirmRidePanel}
+          />
+        </div>
       </div>
+
+      {/* Confirm Ride Panel Modal */}
       <div
-        ref={vehiceleFoundRef}
-        className="fixed w-full bottom-0   bg-white px-3 py-3  translate-y-full z-40"
-
+        className={`fixed inset-0 z-50 transition-opacity duration-300 ${confirmRidePanel ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
       >
-        <LookingForDriver
-          createRide={createRide}
-          pickup={pickup}
-          drop={drop}
-          fare={fare}
-          vehicleType={vehicleType}
-          setwaitingForDriver={setwaitingForDriver}
-          setVehicleFound={setVehicleFound}
-          setConfirmRidePanel={setConfirmRidePanel}
-          setVehiclePanel={setVehiclePanel}
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black bg-opacity-50"
+          onClick={() => setConfirmRidePanel(false)}
         />
+
+        {/* Panel Content */}
+        <div className={`absolute bottom-0 left-0 right-0 transform transition-transform duration-300 ${confirmRidePanel ? 'translate-y-0' : 'translate-y-full'
+          }`}>
+          <ConfirmedVehicle
+            createRide={createRide}
+            pickup={pickup}
+            drop={drop}
+            fare={fare}
+            vehicleType={vehicleType}
+            setConfirmRidePanel={setConfirmRidePanel}
+            setVehicleFound={setVehicleFound}
+          />
+        </div>
       </div>
+
+      {/* Vehicle Found Panel Modal */}
       <div
-        ref={waitingForDriverRef}
-        className={`fixed w-full bottom-0 ${waitingForDriver ? 'translate-y-0' : 'translate-y-full'
-          } bg-white px-3 py-3 z-50`}
-        style={{ zIndex: 60 }}
-      // className='fixed w-full bottom-0  translate-y-full h-screen bg-white px-3 py-3 z-10 '
-
+        className={`fixed inset-0 z-50 transition-opacity duration-300 ${vehicleFound ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
       >
-        <WaitForDriver waitingForDriver={waitingForDriver} CancleRide={CancleRide} setwaitingForDriver={setwaitingForDriver} ride={ride}
-          setVehicleFound={setVehicleFound}
-
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black bg-opacity-50"
+          onClick={() => setVehicleFound(false)}
         />
+
+        {/* Panel Content */}
+        <div className={`absolute bottom-0 left-0 right-0 transform transition-transform duration-300 ${vehicleFound ? 'translate-y-0' : 'translate-y-full'
+          }`}>
+          <LookingForDriver
+            createRide={createRide}
+            pickup={pickup}
+            drop={drop}
+            fare={fare}
+            vehicleType={vehicleType}
+            setwaitingForDriver={setwaitingForDriver}
+            setVehicleFound={setVehicleFound}
+            setConfirmRidePanel={setConfirmRidePanel}
+            setVehiclePanel={setVehiclePanel}
+          />
+        </div>
       </div>
 
+      {/* Waiting for Driver Panel Modal */}
+      <div
+        className={`fixed inset-0 z-50 transition-opacity duration-300 ${waitingForDriver ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+          }`}
+      >
+        {/* Backdrop */}
+        <div
+          className="absolute inset-0 bg-black bg-opacity-50"
+          onClick={() => setwaitingForDriver(false)}
+        />
 
+        {/* Panel Content */}
+        <div className={`absolute bottom-0 left-0 right-0 h-[90%] transform transition-transform duration-300 ${waitingForDriver ? 'translate-y-0' : 'translate-y-full'
+          }`}>
+          <WaitForDriver
+            waitingForDriver={waitingForDriver}
+            CancleRide={CancleRide}
+            setwaitingForDriver={setwaitingForDriver}
+            ride={ride}
+            setVehicleFound={setVehicleFound}
+          />
+        </div>
+      </div>
     </div>
   );
 };
