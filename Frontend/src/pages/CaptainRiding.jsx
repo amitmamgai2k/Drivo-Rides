@@ -72,7 +72,7 @@ function CaptainRiding(props) {
                      hover:bg-red-700 active:bg-red-800 transition-colors
                      shadow-md hover:shadow-lg"
           >
-            Complete Ride
+            Finish Ride
           </button>
         </div>
       </div>
