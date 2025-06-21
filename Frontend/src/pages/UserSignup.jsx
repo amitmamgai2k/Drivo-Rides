@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { UserDataContext } from '../context/UserContext';
 import logo from '../assets/logo.png';
-import { Mail, Lock, User, Phone, Upload, X } from 'lucide-react';
+import { Mail, Lock, User, Phone, Upload, X, Loader2 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const UserSignup = () => {
@@ -15,6 +15,7 @@ const UserSignup = () => {
     const [profilePicture, setProfilePicture] = useState(null);
     const [previewURL, setPreviewURL] = useState(null);
     const [userData, setUserData] = useState({});
+    const [isLoading, setIsLoading] = useState(false); // Added loading state
 
     const navigate = useNavigate();
     const { user, setUser } = useContext(UserDataContext);
@@ -39,6 +40,8 @@ const UserSignup = () => {
    // In submitHandler function
 const submitHandler = async (e) => {
     e.preventDefault();
+    setIsLoading(true); // Start loading
+
     const formData = new FormData();
 
     // Append ProfileImage (if exists)
@@ -57,10 +60,7 @@ const submitHandler = async (e) => {
       lastname: lastName,
     };
 
-
     formData.append("fullname", JSON.stringify(fullname));
-
-
 
         try {
             const response = await axios.post(
@@ -77,18 +77,18 @@ const submitHandler = async (e) => {
                 localStorage.setItem('token', response.data.token);
                 toast.success('Registration successful');
 
-
-
                 setUser(response.data.user);
-
 
                 navigate('/home');
             }
         } catch (error) {
             toast.error(error.response.data);
             console.error('Registration error:', error.response?.data || error);
+        } finally {
+            setIsLoading(false); // Stop loading regardless of success or error
         }
     };
+
     return (
         <div className="min-h-screen bg-gray-50">
             <div className='max-w-2xl mx-auto p-6'>
@@ -163,6 +163,7 @@ const submitHandler = async (e) => {
                                     placeholder='First name'
                                     value={firstName}
                                     onChange={(e) => setFirstName(e.target.value)}
+                                    disabled={isLoading}
                                 />
                             </div>
                             <div className="relative flex-1">
@@ -173,6 +174,7 @@ const submitHandler = async (e) => {
                                     placeholder='Last name'
                                     value={lastName}
                                     onChange={(e) => setLastName(e.target.value)}
+                                    disabled={isLoading}
                                 />
                             </div>
                         </div>
@@ -190,6 +192,7 @@ const submitHandler = async (e) => {
                                 className='w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none'
                                 type="email"
                                 placeholder='email@example.com'
+                                disabled={isLoading}
                             />
                         </div>
                     </div>
@@ -206,6 +209,7 @@ const submitHandler = async (e) => {
                                 className='w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all outline-none'
                                 type="tel"
                                 placeholder='+91 9876543210'
+                                disabled={isLoading}
                             />
                         </div>
                     </div>
@@ -223,12 +227,24 @@ const submitHandler = async (e) => {
                                 type="password"
                                 placeholder='Enter secure password'
                                 minLength={6}
+                                disabled={isLoading}
                             />
                         </div>
                     </div>
 
-                    <button className='w-full bg-black hover:bg-gray-800 text-white font-semibold py-3 rounded-xl transition-colors duration-200 shadow-lg'>
-                        Create Account
+                    <button
+                        type="submit"
+                        disabled={isLoading}
+                        className='w-full bg-black hover:bg-gray-800 disabled:bg-gray-400 disabled:cursor-not-allowed text-white font-semibold py-3 rounded-xl transition-colors duration-200 shadow-lg flex items-center justify-center gap-2'
+                    >
+                        {isLoading ? (
+                            <>
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                                Creating Account...
+                            </>
+                        ) : (
+                            'Create Account'
+                        )}
                     </button>
 
                     <p className='text-center text-gray-600'>
