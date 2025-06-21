@@ -1,14 +1,18 @@
 import React,{useState} from 'react'
 import { MapPin, ArrowLeft,MapPinHouse } from 'lucide-react';
 import GamePanel from './GamePanel';
+import carImg from '../assets/car.png';
+import bikeImg from '../assets/bike.png';
+import autoImg from '../assets/auto.png';
+import roadImg from '../assets/Road.png';
 function LookingForDriver(props) {
 
     const vehiclesData = [
         {
-          img1: '../src/assets/car.png',
-      img2:'../src/assets/bike.png',
-      img3:'../src/assets/auto.png',
-      img4:'../src/assets/Road.png',
+          img1: carImg,
+      img2: bikeImg,
+      img3: autoImg,
+      img4: roadImg,
           srcLocation: 'Pickup Location',
 
           destLocation: 'Dropoff Location',

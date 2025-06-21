@@ -1,12 +1,16 @@
 import React from 'react';
 import { MapPin, ArrowLeft, Home } from 'lucide-react';
+import carImg from '../assets/car.png';
+import bikeImg from '../assets/bike.png';
+import autoImg from '../assets/auto.png';
+
 
 const ConfirmedVehicle = (props) => {
   const vehiclesData = [
     {
-      img1: '../src/assets/car.png',
-      img2: '../src/assets/bike.png',
-      img3: '../src/assets/auto.png',
+      img1:carImg,
+      img2: bikeImg,
+      img3: autoImg,
       srcLocation: 'Pickup Location',
       destLocation: 'Dropoff Location',
       payMethod: 'Cash',
