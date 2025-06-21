@@ -126,7 +126,7 @@ const VehiclesAvailable = (props) => {
     };
 
     return (
-        <div className="bg-white w-full h-full flex flex-col max-h-[80vh] rounded-t-2xl">
+        <div className="bg-white w-full h-full flex flex-col max-h-[80vh] rounded-t-2xl border bottom-0 shadow-lg ">
             {/* Header */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 bg-white rounded-t-2xl">
                 <div className="flex items-center gap-3">
